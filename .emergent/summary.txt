@@ -1,0 +1,227 @@
+<analysis>original_problem_statement:
+The user wants to build a mobile card collecting app for their Thrash Kan Kidz cards.
+
+**PRODUCT REQUIREMENTS:**
+- **Core Gameplay**: Users log in, receive coins, and can purchase cards. A collection view shows all cards, indicating which are owned and which are missing.
+- **Card Tiers & Unlocks**:
+    - **Common Cards**: Purchasable from the shop.
+    - **Rare Cards**: Become purchasable after collecting a certain number of cards (10, 20, 30, 40).
+    - **Epic Cards**: Become purchasable after achieving consecutive login streaks (7-day, 14-day).
+    - **Milestone Cards**: Users receive one free, random, unowned common card every time their collection size grows by 10 cards.
+    - **Coming Soon Cards**: A set of cards that are visible in the shop but marked as unavailable for purchase. Some are unlocked via engagement-based milestones.
+- **Engagement Milestones**: Specific Coming Soon cards are unlocked by meeting certain criteria:
+    - **Dedicated Fan**: 30-day login streak unlocks Maxi Pad.
+    - **Big Spender**: Spend 750 total coins unlocks Musty Dave.
+    - **Monthly Master**: Log in 20 days in a single month unlocks Chum Araya.
+- **Card Interaction**: Cards in the collection should flip over to show the back when swiped.
+- **UI/UX**:
+    - Custom logo and background on all screens.
+    - A celebration pop-up (Modal) when a special card is unlocked/awarded.
+    - A user profile/dashboard screen for stats and logging out.
+    - Tab navigation with icons.
+- **App Store Preparation**: The app should be configured with an icon, splash screen, and necessary metadata.
+
+**User's preferred language**: English
+
+**what currently exists?**
+A full-stack application using Expo (React Native) for the frontend and FastAPI for the backend with a MongoDB database. The app features tab-based navigation for Home (Login), Collection, Shop, Goals, Trade, and Profile.
+
+The backend manages users, cards, and game logic, including a startup seeding mechanism. It supports Common, Rare, and Epic card tiers with various unlock mechanics (collection size, login streaks). A milestone system awards free cards every 10 cards collected. Goals award coins for achievements.
+
+The frontend displays cards in a Shop and Collection view, featuring a swipe-to-flip card component and progress indicators for achievements. The UI is customized with a global background and logo. The app's  is configured for app store submission.
+
+**Last working item**:
+- Last item agent was working: The user requested to implement three new engagement-based milestones to unlock specific Coming Soon cards. The agent gathered the requirements and was about to start implementation.
+    - **Dedicated Fan (30-day streak)** → Unlocks Maxi Pad
+    - **Big Spender (750 coins spent)** → Unlocks Musty Dave
+    - **Monthly Master (20 days/month login)** → Unlocks Chum Araya
+- Status: NOT STARTED
+- Agent Testing Done: N
+- Which testing method agent to use? both
+- User Testing Done: N
+
+**All Pending/In progress Issue list**:
+- Issue 1: Implement new engagement-based milestones for unlocking Coming Soon cards. (P0)
+- Issue 2: User reported the Cliff Diver card's front image is missing in the collection view. (P1)
+- Issue 3: The user-reported issue where Epic cards were styled incorrectly as Coming Soon cards. The agent suspected caching, but the user never confirmed a fix. (P2)
+- Issue 4: Scrolling in the web preview is unreliable, especially on long screens like the Shop. (P3)
+- Issue 5: User reported card backs were blank after a redeployment. A fix was attempted but requires user verification. (P3)
+
+  Issues Detail:
+  - Issue 1:
+     - Attempted fixes: None. The agent just received the requirements.
+     - Next debug checklist:
+        1.  Modify the  collection in MongoDB to track .
+        2.  Implement logic to track monthly logins (e.g., a sub-document on the user model like ).
+        3.  Create a new backend function, , to be called after relevant actions (login, purchase).
+        4.  This function should check the user's , , and  against the new milestone requirements.
+        5.  When a milestone is met, update the corresponding Coming Soon card's  status to  for that user (or globally if intended).
+        6.  Update the  frontend to correctly display these newly available cards in the common cards section.
+     - Why fix this issue and what will be achieved with the fix? This implements a new core feature requested by the user, adding new long-term goals and rewards.
+     - Status:  NOT STARTED
+     - Is recurring issue? N
+     - Should Test frontend/backend/both after fix? Both
+     - Blocked on other issue: None
+  - Issue 2:
+     - Attempted fixes: The previous agent verified the image URL was correct in the DB. Assumed it was a frontend rendering/caching issue. No code fix was applied.
+     - Next debug checklist:
+        1.  Log in as a user who owns Cliff Diver.
+        2.  Navigate to the collection screen and verify if the image is still missing.
+        3.  Inspect  and the  being passed for that specific card.
+     - Why fix this issue and what will be achieved with this? Fixes a visual bug.
+     - Status:  NOT STARTED
+     - Is recurring issue? N
+     - Should Test frontend/backend/both after fix? Frontend
+     - Blocked on other issue: None
+  - Issue 3:
+     - Attempted fixes: The agent added a more specific filter in  and cleared caches. The root cause was not definitively found, but it's likely a frontend rendering/caching bug.
+     - Next debug checklist:
+        1.  Have the user log in and go to the Shop screen.
+        2.  Scroll down to the Epic Streak Cards section.
+        3.  Verify if the cards Tom Angeltipper and Tom Angelflipper display correctly with the purple locked overlay and streak progress, not the yellow SOON text.
+        4.  If the issue persists, investigate the  style and the rendering logic in  between lines 356-414.
+     - Why fix this issue and what will be achieved with this? Fixes a confusing UI bug where premium cards look like they are unavailable indefinitely.
+     - Status:  USER VERIFICATION PENDING
+     - Is recurring issue? Y
+     - Should Test frontend/backend/both after fix? Frontend
+     - Blocked on other issue: None
+  - Issue 4:
+     - Attempted fixes: None.
+     - Next debug checklist:
+        1.  In  and , replace  or  with  for rendering the card grids.
+        2.  Ensure the parent containers have .
+     - Why fix this issue and what will be achieved with this? This improves the development and testing experience in the web preview.
+     - Status:  NOT STARTED
+     - Is recurring issue? Y
+     - Should Test frontend/backend/both after fix? Frontend
+     - Blocked on other issue: None
+  - Issue 5:
+     - Attempted fixes: The agent wrapped the card back  component in a  with styles in .
+     - Next debug checklist:
+        1.  Confirm with the user if the fix is still working.
+        2.  If not, take a screenshot of a flipped card in the collection view.
+     - Why fix this issue and what will be achieved with this? Restores a core visual feature.
+     - Status:  USER VERIFICATION PENDING
+     - Is recurring issue? Y
+     - Should Test frontend/backend/both after fix? Frontend
+     - Blocked on other issue: None
+
+**In progress Task List**:
+- None
+
+**Upcoming and Future Tasks**
+- **Upcoming Tasks**:
+    - **(P0)** Implement the three engagement-based milestones to unlock Coming Soon cards.
+    - **(P1)** Finalize app store submission process (e.g., build binary, guide user through submission).
+    - **(P2)** Implement a Privacy Policy screen for app store compliance.
+- **Future Tasks**:
+    - Refactor  into smaller, more manageable modules (e.g., routers, models).
+    - Refactor  into smaller components.
+
+**Completed work in this session**
+- **Feature: Unlock-to-Purchase**: Refactored Rare/Epic card logic from being auto-awarded to becoming purchasable after meeting achievement criteria.
+- **Feature: New Rare Cards**: Added two new Rare cards (Kerry The King, Jeff Possess Ya) unlocked at 30 and 40 cards collected.
+- **Feature: Goal System Update**: Changed the Card Enthusiast goal to require collecting 1 of each rarity (Common, Rare, Epic) for 150 coins, and Thrash Master to collecting 50 cards for 250 coins.
+- **Feature: Milestone Update**: Changed the milestone bonus to award a free card every 10 cards collected (previously 5).
+- **Bug Fix: Coin Economy**: Investigated user report of coins increasing and confirmed it was expected behavior due to large coin rewards from goals. The user accepted this.
+- **Bug Fix: Tab Navigation**: Fixed an issue where an extra screens tab appeared and the Trade tab was missing on Expo Go. This was likely a caching issue resolved by having the user reinstall Expo Go.
+- **Bug Fix: Missing Common Cards**: Fixed a filter in  that was preventing common cards from being displayed in the shop.
+- **Bug Fix: Milestone UI**: Corrected the milestone progress text in  to reflect the every 10 cards change.
+- **Content Management**:
+    - Made all 5 original Coming Soon cards available for purchase.
+    - Added 5 new Coming Soon cards (Philled Up, Maxi Pad, Musty Dave, Chum Araya, Mille Gorezza).
+    - Handled multiple user requests for card data correction, including swapping names/images for Don Doody and Beer Schmier, and removing duplicate/incorrect cards.
+
+**Earlier issues found/mentioned but not fixed**
+   - Issue 1: Unreliable scrolling in the web preview.
+     - Debug checklist: Investigate replacing  with .
+     - Why to solve this issue and what will be achieved with this? Improves the development experience.
+     - Should Test frontend/backend/both after fix: Frontend
+     - Is recurring issue? Y
+   - Issue 2: Cliff Diver card front image is missing.
+     - Debug checklist: Verify URI in  and check for frontend caching issues.
+     - Why to solve this issue and what will be achieved with this? Fixes a visual bug.
+     - Should Test frontend/backend/both after fix: Frontend
+     - Is recurring issue? N
+
+**Known issue recurrence from previous fork**
+  - **Unreliable scrolling in web preview**: This was mentioned in the previous handoff summary and remains unfixed.
+  - **Blank card backs**: This was a regression that was fixed, but user verification is still pending.
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+- **Frontend**: Expo, React Native, React Navigation, Zustand.
+- **Backend**: FastAPI, PyMongo, Pydantic.
+- **Database**: MongoDB. Seeding logic is in .
+- **Deployment**: Hosted on Emergent platform. Mobile builds via EAS.
+
+**key DB schema**
+-   **users**: 
+-   **cards**: 
+-   **goals**: 
+
+**changes in tech stack**
+- None.
+
+**All files of reference**
+-   : Contains all backend logic, API endpoints, and DB seeding. Heavily modified this session to update game logic.
+-   : Core UI for the shop. Heavily modified to add purchase buttons for unlocked cards and fix various display bugs.
+-   : Defines the main tab navigation. Modified to fix tab icons and ordering.
+-   : Manages global state.
+
+**Areas that need refactoring**:
+-  has grown very large and complex. It should be broken down into separate files for routes, database models, and services.
+- The database seeding logic is brittle and doesn't handle adding new cards gracefully, often requiring manual DB updates. It should be refactored to be more robust.
+-  is responsible for rendering all card sections and contains a lot of conditional logic. It should be split into smaller, dedicated components (e.g., , ).
+
+**key api endpoints**
+-   : Logs in or creates a user.
+-   : Purchases a card. Logic was updated to handle purchasing unlocked Rare/Epic cards.
+-   : Fetches all cards.
+-   : Fetches rare card status.
+-   : Fetches epic card status.
+-   : Fetches goal status for a user.
+
+**Critical Info for New Agent**
+- **Frontend Caching is Aggressive**: Expo Go, especially on mobile, caches data and UI components aggressively. When the user reports that a change is not visible, the first step should always be to instruct them to force-close and reopen Expo Go. If that fails, a full reinstall of Expo Go is the most reliable solution. Do not spend too much time debugging server-side code if the API responses are correct.
+- **DB Seeding Brittleness**: The seeding logic in  uses  with , which works for updating existing cards but has been unreliable for adding brand new cards to the  list. The agent often had to manually add or update cards in the database. Be prepared to do the same or refactor the seeding logic.
+- **User Authentication**: Auth is basic. A new username at login creates a new account. This was the source of the coins increasing report, which the user now understands.
+
+**documents and test reports created in this job**
+- None.
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **What kind of milestone can we create to unlock coming soon cards?**: User asked for ideas. (Completed)
+2.  **Engagement based**: User chose a category of milestones. (Completed)
+3.  **ill use your suggestion. lets change Big Spender to 750 coins spent**: User confirmed the new engagement milestones and a modification. (In Progress - implementation pending)
+4.  **Lets add these cards to "coming soon""**: User provided 2 new cards. (Completed)
+5.  **"Lets add these two**: User provided another 2 new cards. (Completed)
+6.  **still says 0/5**: User reported the milestone UI tally was still wrong. (Completed)
+7.  **okay it says every 10 cards collected, but the tally thing at bottom still says 0/5...**: User reported an incomplete UI fix for the milestone change. (Completed)
+8.  **still says every 5 cards**: User reported the milestone UI text was not updated. (Completed)
+9.  **lets change the milestone bonus to every 10 cards collected**: User requested a change to the milestone reward frequency. (Completed)
+10. **the app preview Im looking at doesnt have Billy Mylanta... but beer schmier and Don Doody arent switched**: User reported a persistent card name/image swap issue, likely due to caching. (Completed)
+
+**Project Health Check:**
+- **Working**: Core gameplay (login, purchase), all card tier display logic (Common, Rare, Epic), milestone rewards (at 10 cards), goal rewards, tab navigation.
+- **Broken**: The new engagement-based milestone feature is not yet implemented.
+- **Mocked**: No mocked data.
+
+**3rd Party Integrations**
+- None.
+
+**Testing status**
+  - Testing agent used after significant changes: NO
+  - Troubleshoot agent used after agent stuck in loop: NO
+  - Test files created: None.
+  - Known regressions:
+    - User needs to verify if the blank card backs issue is still fixed.
+    - User needs to verify if the Epic cards styled as Coming Soon issue is fixed.
+
+**Credentials to test flow:**
+- No password is required. Use any username to log in. To test with an existing account, use a consistent username like . To test a new user flow, use a new, unique username.
+
+**What agent forgot to execute**
+- The plan to create a **Privacy Policy screen** () from the previous fork was never executed. This is important for app store compliance.</analysis>
