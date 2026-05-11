@@ -853,9 +853,27 @@ export default function ShopScreen() {
       {/* Card Picker Modal */}
       <CardPickerModal
         visible={showCardPicker}
-        onClose={() => {
+        onClose={async () => {
           setShowCardPicker(false);
           refreshData();
+          // Pull the latest medal/free_pack counts so the shop header
+          // reflects the prize the user just won in the Card Picker.
+          // Without this re-fetch the Shop's local `freePacks` state stays
+          // stale and the user thinks the pack wasn't credited — even
+          // though the backend granted it. Going through the daily-wheel
+          // endpoint (which returns the same medals/free_packs fields)
+          // would risk re-popping the wheel modal, so we hit /users/{id}
+          // directly here.
+          try {
+            const res = await fetch(`${apiUrl}/api/users/${user.id}`);
+            if (res.ok) {
+              const data = await res.json();
+              setMedals(data.medals || 0);
+              setFreePacks(data.free_packs || 0);
+            }
+          } catch (_e) {
+            // best-effort; AppContext refreshData covers the rest
+          }
         }}
         apiUrl={apiUrl}
         userId={user.id}
