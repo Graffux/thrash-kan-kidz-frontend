@@ -991,15 +991,11 @@ RARE_CARD_ACHIEVEMENTS = {
 # Variants without a registered cover here fall back to the generic
 # black foil (or skip the scratch overlay entirely on the frontend).
 VARIANT_SCRATCH_COVERS = {
-    # Upload covers as they're created; the frontend reads
-    # card.scratch_cover_url which is populated from this dict.
-    # Example shape (uncomment and add URL when artwork is ready):
-    # "toxic": "https://customer-assets.emergentagent.com/...green-slime.png",
-    # "hellfire": "https://customer-assets.emergentagent.com/...burned-ash.png",
-    # "cosmic": "https://customer-assets.emergentagent.com/...static-stars.png",
-    # "biomechanical": "https://customer-assets.emergentagent.com/...wires-flesh.png",
-    # "stoned": "https://customer-assets.emergentagent.com/...concrete-dust.png",
-    # "melted": "https://customer-assets.emergentagent.com/...dripping-wax.png",
+    # Series 1 variants
+    "toxic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/lmnutg9f_enhanced-1778620218219.jpg",
+    "electric": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ugb3wiys_Screenshot_20260512_160653_ChatGPT.png",
+    "hellfire": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/gwvcl3lo_enhanced-1778620389057.jpg",
+    "cosmic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/9fte3ln2_enhanced-1778620451204.jpg",
 }
 
 INITIAL_CARDS = [
