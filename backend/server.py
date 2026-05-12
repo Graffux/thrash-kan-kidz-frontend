@@ -14,7 +14,7 @@ import base64
 import random
 import bcrypt
 import stripe
-from data.cards_data import INITIAL_CARDS, CARD_IMAGE_URLS, CARD_BACK_IMAGE_URLS, RARE_CARD_ACHIEVEMENTS
+from data.cards_data import INITIAL_CARDS, CARD_IMAGE_URLS, CARD_BACK_IMAGE_URLS, RARE_CARD_ACHIEVEMENTS, VARIANT_SCRATCH_COVERS
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
@@ -53,7 +53,23 @@ class Card(BaseModel):
     is_variant: bool = False  # Whether this is a variant card
     base_card_id: Optional[str] = None  # The base card this is a variant of
     variant_name: Optional[str] = None  # Name of the variant (e.g., "Toxic", "Electric")
+    scratch_cover_url: Optional[str] = None  # Variant-themed scratch-off overlay (only for variants on pack open)
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+def _with_scratch_cover(card_doc: dict) -> dict:
+    """Inject scratch_cover_url onto a card dict from VARIANT_SCRATCH_COVERS.
+
+    Mutates a shallow copy so the caller can safely unpack into ``Card(**...)``.
+    Only variant cards get a cover; non-variants or unmapped variants return
+    None (frontend skips the scratch overlay in that case).
+    """
+    out = dict(card_doc)
+    if out.get("is_variant") and out.get("variant_name"):
+        out["scratch_cover_url"] = VARIANT_SCRATCH_COVERS.get(
+            str(out["variant_name"]).lower()
+        )
+    return out
 
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -1853,7 +1869,7 @@ async def spin_wheel(user_id: str, series: int = None):
             await db.user_cards.insert_one(user_card.dict())
         
         cards_result.append({
-            "card": Card(**won_card),
+            "card": Card(**_with_scratch_cover(won_card)),
             "is_duplicate": is_duplicate,
         })
     
@@ -3144,7 +3160,7 @@ async def reroll_pack(user_id: str, request: Request):
         else:
             user_card = UserCard(user_id=user_id, card_id=won_card["id"])
             await db.user_cards.insert_one(user_card.dict())
-        cards_result.append({"card": Card(**won_card), "is_duplicate": is_duplicate})
+        cards_result.append({"card": Card(**_with_scratch_cover(won_card)), "is_duplicate": is_duplicate})
     
     # Deduct medals
     new_medals = medals - REROLL_COST_MEDALS
@@ -3294,7 +3310,7 @@ async def redeem_free_pack(user_id: str, request: Request):
         else:
             user_card = UserCard(user_id=user_id, card_id=won_card["id"])
             await db.user_cards.insert_one(user_card.dict())
-        cards_result.append({"card": Card(**won_card), "is_duplicate": is_duplicate})
+        cards_result.append({"card": Card(**_with_scratch_cover(won_card)), "is_duplicate": is_duplicate})
     
     # Check series completion
     series_completion = await check_series_completion(user_id, series)

@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import { useFocusEffect } from 'expo-router';
 import BuyCoinsModal from '../src/components/BuyCoinsModal';
+import ScratchCard from '../src/components/ScratchCard';
 import { useSoundPlayer } from '../src/utils/sounds';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -57,6 +58,23 @@ export default function ShopScreen() {
   const [revealIndex, setRevealIndex] = useState(0);
   const [cardFlipped, setCardFlipped] = useState(false);
   const [showFrontImage, setShowFrontImage] = useState(false);
+  // Tracks whether the user has finished scratching the variant cover for
+  // the currently-revealed pack card. Non-variants (or variants with no
+  // scratch cover registered) are treated as "already scratched". When this
+  // is false we hide the Next / Awesome button so the user must scratch
+  // before advancing.
+  const [scratched, setScratched] = useState(true);
+
+  // Whenever the visible pack card changes (modal open OR Next pressed), look
+  // at the new card and decide whether the user needs to scratch a variant
+  // cover before advancing. Only variants with a registered scratch cover
+  // gate progression; everything else (commons, variants missing covers,
+  // duplicates, reward cards) is auto-marked as scratched.
+  useEffect(() => {
+    const currentCard = spinResult?.won_cards?.[revealIndex]?.card;
+    const needsScratch = !!(currentCard?.is_variant && currentCard?.scratch_cover_url);
+    setScratched(!needsScratch);
+  }, [revealIndex, spinResult]);
   
   // Daily wheel & medals (medals/free_packs displayed here are read from
   // AppContext via the daily-wheel endpoint on focus; the wheel modal + Card
@@ -502,14 +520,26 @@ export default function ShopScreen() {
                       spinResult.won_cards[revealIndex].is_duplicate && styles.packCardDupe,
                     ]}
                   >
-                    <ExpoImage
-                      key={`reveal-${revealIndex}`}
-                      source={{ uri: spinResult.won_cards[revealIndex].card.front_image_url }}
-                      style={styles.packCardImage}
-                      contentFit="contain"
-                      cachePolicy="memory-disk"
-                      transition={150}
-                    />
+                    {spinResult.won_cards[revealIndex].card.is_variant &&
+                    spinResult.won_cards[revealIndex].card.scratch_cover_url ? (
+                      <ScratchCard
+                        key={`scratch-${revealIndex}-${spinResult.won_cards[revealIndex].card.id}`}
+                        width={140}
+                        height={200}
+                        imageUri={spinResult.won_cards[revealIndex].card.front_image_url}
+                        coverUri={spinResult.won_cards[revealIndex].card.scratch_cover_url}
+                        onComplete={() => setScratched(true)}
+                      />
+                    ) : (
+                      <ExpoImage
+                        key={`reveal-${revealIndex}`}
+                        source={{ uri: spinResult.won_cards[revealIndex].card.front_image_url }}
+                        style={styles.packCardImage}
+                        contentFit="contain"
+                        cachePolicy="memory-disk"
+                        transition={150}
+                      />
+                    )}
                   </View>
                   <Text style={styles.packCardName} numberOfLines={2}>
                     {spinResult.won_cards[revealIndex].card.name}
@@ -517,31 +547,38 @@ export default function ShopScreen() {
                   {spinResult.won_cards[revealIndex].is_duplicate && (
                     <Text style={styles.packCardDupeLabel}>DUPE</Text>
                   )}
+                  {!scratched && (
+                    <Text style={styles.scratchHint}>Scratch to reveal!</Text>
+                  )}
                 </View>
               </View>
             )}
 
             {spinResult?.won_cards && revealIndex < spinResult.won_cards.length - 1 ? (
-              <TouchableOpacity
-                style={styles.closeResultButton}
-                onPress={() => {
-                  try { cardFlipSound.play(); } catch (_e) { /* ignore */ }
-                  const nextIdx = revealIndex + 1;
-                  setRevealIndex(nextIdx);
-                  // First-Variant celebration check for cards #2 / #3
-                  const nextCard = spinResult?.won_cards?.[nextIdx]?.card;
-                  if (nextCard) setTimeout(() => maybeCelebrateForCard(nextCard), 500);
-                }}
-                data-testid="next-card-btn"
-              >
-                <Text style={styles.closeResultText}>Next</Text>
-              </TouchableOpacity>
+              scratched && (
+                <TouchableOpacity
+                  style={styles.closeResultButton}
+                  onPress={() => {
+                    try { cardFlipSound.play(); } catch (_e) { /* ignore */ }
+                    const nextIdx = revealIndex + 1;
+                    setRevealIndex(nextIdx);
+                    // First-Variant celebration check for cards #2 / #3
+                    const nextCard = spinResult?.won_cards?.[nextIdx]?.card;
+                    if (nextCard) setTimeout(() => maybeCelebrateForCard(nextCard), 500);
+                  }}
+                  data-testid="next-card-btn"
+                >
+                  <Text style={styles.closeResultText}>Next</Text>
+                </TouchableOpacity>
+              )
             ) : (
-              <TouchableOpacity style={styles.closeResultButton} onPress={closeResult} data-testid="close-result-btn">
-                <Text style={styles.closeResultText}>
-                  {spinResult?.series_completion?.series_completed ? 'Continue...' : 'Awesome!'}
-                </Text>
-              </TouchableOpacity>
+              scratched && (
+                <TouchableOpacity style={styles.closeResultButton} onPress={closeResult} data-testid="close-result-btn">
+                  <Text style={styles.closeResultText}>
+                    {spinResult?.series_completion?.series_completed ? 'Continue...' : 'Awesome!'}
+                  </Text>
+                </TouchableOpacity>
+              )
             )}
 
             {/* Reroll Button - only show on final card */}
@@ -1401,13 +1438,20 @@ const styles = StyleSheet.create({
     width: 140,
     height: 200,
   },
+  scratchHint: {
+    color: '#FFD700',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    marginTop: 4,
+  },
   packCardName: {
     color: '#fff',
     fontSize: 10,
     fontWeight: '600',
     textAlign: 'center',
-    marginTop: 6,
-  },
+    marginTop: 6,  },
   packCardDupeLabel: {
     color: '#FF9800',
     fontSize: 9,

@@ -980,6 +980,28 @@ RARE_CARD_ACHIEVEMENTS = {
     "card_alien_dubin": {"required_cards": 112, "name": "Alien Dubin"}  # Complete Series 7
 }
 
+# =====================================================================
+# Variant Scratch-Off Covers
+# =====================================================================
+# Keyed by lowercase variant_name. When a variant card is pulled from a
+# pack, the frontend overlays this image and the player scratches it off
+# to reveal the card art beneath. Covers are themed to match the variant
+# (e.g. Toxic -> green slime, Hellfire -> burned ash, Cosmic -> stars).
+#
+# Variants without a registered cover here fall back to the generic
+# black foil (or skip the scratch overlay entirely on the frontend).
+VARIANT_SCRATCH_COVERS = {
+    # Upload covers as they're created; the frontend reads
+    # card.scratch_cover_url which is populated from this dict.
+    # Example shape (uncomment and add URL when artwork is ready):
+    # "toxic": "https://customer-assets.emergentagent.com/...green-slime.png",
+    # "hellfire": "https://customer-assets.emergentagent.com/...burned-ash.png",
+    # "cosmic": "https://customer-assets.emergentagent.com/...static-stars.png",
+    # "biomechanical": "https://customer-assets.emergentagent.com/...wires-flesh.png",
+    # "stoned": "https://customer-assets.emergentagent.com/...concrete-dust.png",
+    # "melted": "https://customer-assets.emergentagent.com/...dripping-wax.png",
+}
+
 INITIAL_CARDS = [
     # =====================
     # SERIES 1 - 8 bands, 16 cards (A & B for each band)
