@@ -636,6 +636,12 @@ CARD_IMAGE_URLS = {
     "hellbound_chef_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/938ood8q_Screenshot_20260506_084025_ChatGPT.png",
     "hellbound_chef_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/13sbqsn9_Screenshot_20260506_142422_ChatGPT.png",
     "hellbound_chef_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/dx0r1f1k_enhanced-1778098171399.jpg",
+    # Band 3: Anel Cant
+    "seth_buttman": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/csglkzcg_enhanced-1778122386844.jpg",
+    "seth_buttman_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/oztiicla_Screenshot_20260506_215919_ChatGPT.png",
+    "seth_buttman_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/055gxo42_enhanced-1778123521485.jpg",
+    "seth_buttman_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/0iv97lvs_Screenshot_20260506_220756_ChatGPT.png",
+    "seth_buttman_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ocbmvauc_enhanced-1778123583154.jpg",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -930,6 +936,8 @@ CARD_BACK_IMAGE_URLS = {
     # Band 2: Cheese Grater Mutilation
     "hellhound_jeff": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/bn1g82g3_enhanced-1778021681572.jpg",
     "hellbound_chef": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/0yjdk2ex_enhanced-1778059749015.jpg",
+    # Band 3: Anel Cant
+    "seth_buttman": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/bgn343bv_enhanced-1778122975845.jpg",
     # Universal Series 7 (Grind Edition) variant backs — shared across ALL
     # Series 7 variant cards, same way Series 6 has stormy/decayed/etc backs.
     "variant_back_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/fl4sjpqj_enhanced-1777972963939.jpg",
@@ -8918,6 +8926,87 @@ INITIAL_CARDS = [
         "card_type": "B",
         "is_variant": True,
         "base_card_id": "card_hellbound_chef",
+        "variant_name": "Melted"
+    },
+    # =============================================================
+    # Band 3: Anel Cant  (parody of Anal Cunt)
+    # =============================================================
+    {
+        "id": "card_seth_buttman",
+        "name": "Seth Buttman",
+        "description": "Vocalist of Anel Cant. Master of anal chaos. Leaves nothing but filth, gas, and broken will in his wake. \"I don't sing songs... I shit chemical warfare.\"",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["seth_buttman"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["seth_buttman"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "A"
+    },
+    # ---- Seth Buttman variants (Series 7 / Grind Edition) ----
+    {
+        "id": "card_seth_buttman_blacklight",
+        "name": "Seth Buttman (Blacklight)",
+        "description": "Bathed in blacklight, his Butt Blast glows toxic neon green. Seth Buttman drops a radioactive cloud of chemical warfare on the front row.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["seth_buttman_blacklight"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_blacklight"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_seth_buttman",
+        "variant_name": "Blacklight"
+    },
+    {
+        "id": "card_seth_buttman_chrome",
+        "name": "Seth Buttman (Chrome)",
+        "description": "Polished, plated, and putrid. Seth Buttman returns in chrome-glazed glory -- a mirror-shined monument to gas, grind, and graceless brutality.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["seth_buttman_chrome"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_chrome"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_seth_buttman",
+        "variant_name": "Chrome"
+    },
+    {
+        "id": "card_seth_buttman_digital",
+        "name": "Seth Buttman (Digital)",
+        "description": "INSERT COIN. 8-bit Buttman blasts pixelated putrescence across the arcade. Hi-score: 666660. Game over for anyone within sniffing distance.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["seth_buttman_digital"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_digital"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_seth_buttman",
+        "variant_name": "Digital"
+    },
+    {
+        "id": "card_seth_buttman_melted",
+        "name": "Seth Buttman (Melted)",
+        "description": "Skin sloughing, gut dripping, Buttman oozes across the stage in a slow-cooked stew of bile and brutality. The pit melts. Nobody escapes.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["seth_buttman_melted"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_melted"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_seth_buttman",
         "variant_name": "Melted"
     },
 ]
