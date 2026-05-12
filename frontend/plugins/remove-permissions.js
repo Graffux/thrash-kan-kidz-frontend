@@ -16,6 +16,12 @@ module.exports = function removePermissionsPlugin(config) {
       "android.permission.READ_EXTERNAL_STORAGE",
       "android.permission.WRITE_EXTERNAL_STORAGE",
       "android.permission.RECORD_AUDIO",
+      // Strip foreground service permissions injected by expo-audio.
+      // We only play short SFX while the user is actively in the app —
+      // never background audio — so these permissions are not needed
+      // and trigger a Google Play declaration requirement.
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
     ];
     
     if (!manifest["uses-permission"]) {

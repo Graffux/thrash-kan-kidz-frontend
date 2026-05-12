@@ -21,9 +21,10 @@
  *     the threshold; the user feels the reveal happen at the right moment.
  */
 import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { View, StyleSheet, PanResponder, GestureResponderEvent, PanResponderGestureState, Animated } from 'react-native';
+import { View, StyleSheet, PanResponder, GestureResponderEvent, PanResponderGestureState, Animated, Platform } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import Svg, { Defs, Mask, Rect, Circle, G, Image as SvgImage } from 'react-native-svg';
+import * as Haptics from 'expo-haptics';
 
 interface Props {
   width: number;
@@ -58,11 +59,38 @@ export const ScratchCard: React.FC<Props> = ({
   const rows = Math.max(1, Math.ceil(height / cellSize));
   const totalCells = cols * rows;
   const touchedCells = useRef<Set<number>>(new Set());
+  // Throttle haptic feedback. PanResponder fires onMove ~60Hz which would
+  // queue a vibration on every frame — that feels like a constant buzz
+  // and on Android can trip the OS rate limiter. We gate haptics to fire
+  // at most once every ~80ms, which feels like the textured chatter of
+  // dragging a coin across foil.
+  const lastHapticAt = useRef(0);
+
+  const fireHaptic = useCallback(() => {
+    // Haptics aren't supported on web — guard so the dev preview doesn't
+    // throw. On native, expo-haptics is a no-op if the device lacks a
+    // vibration motor.
+    if (Platform.OS === 'web') return;
+    const now = Date.now();
+    if (now - lastHapticAt.current < 80) return;
+    lastHapticAt.current = now;
+    // Light impact = a single short "tick", perfect for scratch chatter.
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
+      /* ignore haptic errors silently — never crash a scratch */
+    });
+  }, []);
 
   // Trigger the reveal animation + onComplete callback exactly once.
   const triggerReveal = useCallback(() => {
     if (revealed) return;
     setRevealed(true);
+    // Stronger haptic to mark the reveal moment — feels like ripping off
+    // the last sliver of foil.
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {
+        /* swallow — never crash the reveal */
+      });
+    }
     Animated.timing(coverOpacity, {
       toValue: 0,
       duration: 350,
@@ -80,8 +108,12 @@ export const ScratchCard: React.FC<Props> = ({
       const col = Math.floor(cx / cellSize);
       const row = Math.floor(cy / cellSize);
       const key = row * cols + col;
-      if (!touchedCells.current.has(key)) {
+      const isNewCell = !touchedCells.current.has(key);
+      if (isNewCell) {
         touchedCells.current.add(key);
+        // Only buzz when the finger crosses into fresh territory. Avoids
+        // a constant rumble when the user holds still mid-drag.
+        fireHaptic();
       }
       setDots((prev) => [...prev, { x: cx, y: cy }]);
       const coverage = touchedCells.current.size / totalCells;
@@ -89,7 +121,7 @@ export const ScratchCard: React.FC<Props> = ({
         triggerReveal();
       }
     },
-    [width, height, cellSize, cols, totalCells, threshold, triggerReveal]
+    [width, height, cellSize, cols, totalCells, threshold, triggerReveal, fireHaptic]
   );
 
   // PanResponder captures both initial touch and drag deltas. We feed every
