@@ -647,6 +647,12 @@ CARD_IMAGE_URLS = {
     "meth_putnam_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/cy8megw7_enhanced-1778125735930.jpg",
     "meth_putnam_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/jkdbertf_Screenshot_20260506_225035_ChatGPT.png",
     "meth_putnam_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xsfzc8ij_Screenshot_20260506_225648_ChatGPT.png",
+    # Band 4: Foreseen Terror
+    "shane_emery_board": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/b313n7nb_enhanced-1778150167361.jpg",
+    "shane_emery_board_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/wrvlxik4_Screenshot_20260507_095005_ChatGPT.png",
+    "shane_emery_board_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/uceyh7xv_Screenshot_20260507_060400_ChatGPT.png",
+    "shane_emery_board_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/oyretk86_Screenshot_20260507_095534_ChatGPT.png",
+    "shane_emery_board_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/wpz48rcy_Screenshot_20260507_100246_ChatGPT.png",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -944,6 +950,8 @@ CARD_BACK_IMAGE_URLS = {
     # Band 3: Anel Cant
     "seth_buttman": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/bgn343bv_enhanced-1778122975845.jpg",
     "meth_putnam": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/e0omjq5w_enhanced-1778125585319.jpg",
+    # Band 4: Foreseen Terror
+    "shane_emery_board": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/kx0c8zlm_enhanced-1778150418272.jpg",
     # Universal Series 7 (Grind Edition) variant backs — shared across ALL
     # Series 7 variant cards, same way Series 6 has stormy/decayed/etc backs.
     "variant_back_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/fl4sjpqj_enhanced-1777972963939.jpg",
@@ -9092,6 +9100,87 @@ INITIAL_CARDS = [
         "card_type": "B",
         "is_variant": True,
         "base_card_id": "card_meth_putnam",
+        "variant_name": "Melted"
+    },
+    # =============================================================
+    # Band 4: Foreseen Terror  (parody of Foreseen / hardcore-grind crossover)
+    # =============================================================
+    {
+        "id": "card_shane_emery_board",
+        "name": "Shane Emery Board",
+        "description": "Real name Shane Embryo. Born in the pits of grind. Lays down the low-end punishment with riffs so heavy they'll scrape the gunk right off your soul. \"Smooth? Never heard of her.\"",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["shane_emery_board"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["shane_emery_board"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Foreseen Terror",
+        "card_type": "A"
+    },
+    # ---- Shane Emery Board variants (Series 7 / Grind Edition) ----
+    {
+        "id": "card_shane_emery_board_blacklight",
+        "name": "Shane Emery Board (Blacklight)",
+        "description": "Bass Destroyer glowing toxic pink and acid green. Shane Emery Board grinds rough stuff under UV -- coarse, heavy, and 100% radioactive filth.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["shane_emery_board_blacklight"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_blacklight"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Foreseen Terror",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_shane_emery_board",
+        "variant_name": "Blacklight"
+    },
+    {
+        "id": "card_shane_emery_board_chrome",
+        "name": "Shane Emery Board (Chrome)",
+        "description": "Polished to a mirror finish, every grit speck a sparkling weapon. Shane Emery Board's 4-string sludge machine reflects the hellish light of a thousand grindcore breakdowns.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["shane_emery_board_chrome"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_chrome"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Foreseen Terror",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_shane_emery_board",
+        "variant_name": "Chrome"
+    },
+    {
+        "id": "card_shane_emery_board_digital",
+        "name": "Shane Emery Board (Digital)",
+        "description": "INSERT COIN TO GRIND. 8-bit Shane shreds rough stuff in pixelated low-end punishment. Hi-score: 1,000,000. Coarse and heavy. File til ya smooth.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["shane_emery_board_digital"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_digital"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Foreseen Terror",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_shane_emery_board",
+        "variant_name": "Digital"
+    },
+    {
+        "id": "card_shane_emery_board_melted",
+        "name": "Shane Emery Board (Melted)",
+        "description": "Grit dissolves in molten gunk. Shane Emery Board drips off the stage in a cascade of bubbling sludge -- still shredding, still slemmin', still poundin' until the speakers melt.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["shane_emery_board_melted"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_melted"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Foreseen Terror",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_shane_emery_board",
         "variant_name": "Melted"
     },
 ]
