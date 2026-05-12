@@ -642,6 +642,11 @@ CARD_IMAGE_URLS = {
     "seth_buttman_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/055gxo42_enhanced-1778123521485.jpg",
     "seth_buttman_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/0iv97lvs_Screenshot_20260506_220756_ChatGPT.png",
     "seth_buttman_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ocbmvauc_enhanced-1778123583154.jpg",
+    "meth_putnam": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ywlu0khm_enhanced-1778124897722.jpg",
+    "meth_putnam_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/16c1uf08_Screenshot_20260506_224236_ChatGPT.png",
+    "meth_putnam_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/cy8megw7_enhanced-1778125735930.jpg",
+    "meth_putnam_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/jkdbertf_Screenshot_20260506_225035_ChatGPT.png",
+    "meth_putnam_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xsfzc8ij_Screenshot_20260506_225648_ChatGPT.png",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -938,6 +943,7 @@ CARD_BACK_IMAGE_URLS = {
     "hellbound_chef": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/0yjdk2ex_enhanced-1778059749015.jpg",
     # Band 3: Anel Cant
     "seth_buttman": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/bgn343bv_enhanced-1778122975845.jpg",
+    "meth_putnam": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/e0omjq5w_enhanced-1778125585319.jpg",
     # Universal Series 7 (Grind Edition) variant backs — shared across ALL
     # Series 7 variant cards, same way Series 6 has stormy/decayed/etc backs.
     "variant_back_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/fl4sjpqj_enhanced-1777972963939.jpg",
@@ -9007,6 +9013,85 @@ INITIAL_CARDS = [
         "card_type": "A",
         "is_variant": True,
         "base_card_id": "card_seth_buttman",
+        "variant_name": "Melted"
+    },
+    # ---- Meth Putnam (Anel Cant) ----
+    {
+        "id": "card_meth_putnam",
+        "name": "Meth Putnam",
+        "description": "Anel Cant was once just Meth Putnam. But after years of abuse, neglect, and questionable life choices -- he shattered. Now he screams for nothing. The system doesn't stand a chance. \"Break shit. Scream louder. Die happy.\"",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["meth_putnam"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["meth_putnam"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "B"
+    },
+    # ---- Meth Putnam variants (Series 7 / Grind Edition) ----
+    {
+        "id": "card_meth_putnam_blacklight",
+        "name": "Meth Putnam (Blacklight)",
+        "description": "Crystal shards glowing neon green under blacklight. Meth Putnam shrieks Sound Shatter through the alleyway -- no future, only noise, painted in radioactive filth.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["meth_putnam_blacklight"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_blacklight"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_meth_putnam",
+        "variant_name": "Blacklight"
+    },
+    {
+        "id": "card_meth_putnam_chrome",
+        "name": "Meth Putnam (Chrome)",
+        "description": "Forged in shattered glass and mirror-polished hate. Meth Putnam glints under the streetlamp -- every shard a weapon, every scream a chrome-plated curse.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["meth_putnam_chrome"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_chrome"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_meth_putnam",
+        "variant_name": "Chrome"
+    },
+    {
+        "id": "card_meth_putnam_digital",
+        "name": "Meth Putnam (Digital)",
+        "description": "Pixelated, broadcast from a haunted back-alley arcade. Meth Putnam shrieks in 8-bit pain -- no future, no save point, just glitched grindcore until the screen dies.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["meth_putnam_digital"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_digital"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_meth_putnam",
+        "variant_name": "Digital"
+    },
+    {
+        "id": "card_meth_putnam_melted",
+        "name": "Meth Putnam (Melted)",
+        "description": "The crystal mask cracks. The shards liquefy. Meth Putnam dissolves in a puddle of rain, regret, and broken glass -- still screaming, even as he drips away.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["meth_putnam_melted"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_melted"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Anel Cant",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_meth_putnam",
         "variant_name": "Melted"
     },
 ]
