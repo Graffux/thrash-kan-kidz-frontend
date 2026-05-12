@@ -996,6 +996,11 @@ VARIANT_SCRATCH_COVERS = {
     "electric": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ugb3wiys_Screenshot_20260512_160653_ChatGPT.png",
     "hellfire": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/gwvcl3lo_enhanced-1778620389057.jpg",
     "cosmic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/9fte3ln2_enhanced-1778620451204.jpg",
+    # Series 2 variants
+    "bloodbath": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/3o3mm9zl_enhanced-1778620519247.jpg",
+    "ice": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/k9n4b8l7_enhanced-1778620706815.jpg",
+    "psychedelic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/1sv2owr3_enhanced-1778620911657.jpg",
+    "biomechanical": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/3bu3dwjk_enhanced-1778621043740.jpg",
 }
 
 INITIAL_CARDS = [
