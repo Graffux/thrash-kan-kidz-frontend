@@ -614,6 +614,11 @@ CARD_IMAGE_URLS = {
     # Band 1: Napalm Breath  (parody of Napalm Death)
     "messy_pintado": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/l5mbvoy8_enhanced-1777938677399.jpg",
     "jesse_pinata": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/d42b0i0e_enhanced-1777974009105.jpg",
+    # Messy Pintado Variants (Series 7 variants: Blacklight, Chrome, Digital, Melted)
+    "messy_pintado_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/gh5l09qe_Screenshot_20260504_191226_ChatGPT.png",
+    "messy_pintado_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/tp9nivly_enhanced-1777942768452.jpg",
+    "messy_pintado_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/0r7pqv1i_enhanced-1777942718894.jpg",
+    "messy_pintado_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/r4c4m6o7_enhanced-1777942623471.jpg",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -905,6 +910,12 @@ CARD_BACK_IMAGE_URLS = {
     # Band 1: Napalm Breath
     "messy_pintado": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/jwv591rv_enhanced-1777939259003.jpg",
     "jesse_pinata": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/wllrrzjo_enhanced-1777985209049.jpg",
+    # Universal Series 7 (Grind Edition) variant backs — shared across ALL
+    # Series 7 variant cards, same way Series 6 has stormy/decayed/etc backs.
+    "variant_back_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/fl4sjpqj_enhanced-1777972963939.jpg",
+    "variant_back_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/4xtenwkt_enhanced-1777973266535.jpg",
+    "variant_back_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rwqpqj2r_enhanced-1777973091465.jpg",
+    "variant_back_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/9rtg9pzl_enhanced-1777973441663.jpg",
 }
 
 # Rare card achievement requirements (Series completion rewards)
@@ -8598,5 +8609,71 @@ INITIAL_CARDS = [
         "series": 7,
         "band": "Napalm Breath",
         "card_type": "B"
+    },
+    # ---- Messy Pintado variants (Series 7 / Grind Edition) ----
+    # All variants share the universal Grind Edition back for their flavour.
+    {
+        "id": "card_messy_pintado_blacklight",
+        "name": "Messy Pintado (Blacklight)",
+        "description": "Drenched in slime. Fueled by chaos. Built for the pit. Born to destroy. This ain't just thrash -- this is a toxic eruption of sound that melts faces and minds alike.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["messy_pintado_blacklight"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_blacklight"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Napalm Breath",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_messy_pintado",
+        "variant_name": "Blacklight"
+    },
+    {
+        "id": "card_messy_pintado_chrome",
+        "name": "Messy Pintado (Chrome)",
+        "description": "Corrupted by noise. Fueled by chaos. Built for the pit. Born to destroy. This ain't just thrash -- this is a chrome eruption of sound that hits like steel and shines like hell.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["messy_pintado_chrome"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_chrome"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Napalm Breath",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_messy_pintado",
+        "variant_name": "Chrome"
+    },
+    {
+        "id": "card_messy_pintado_digital",
+        "name": "Messy Pintado (Digital)",
+        "description": "Corrupted by noise. Fueled by chaos. Built for the pit. Born to destroy. This ain't just thrash -- this is a digital eruption of sound that glitches faces and minds alike.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["messy_pintado_digital"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_digital"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Napalm Breath",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_messy_pintado",
+        "variant_name": "Digital"
+    },
+    {
+        "id": "card_messy_pintado_melted",
+        "name": "Messy Pintado (Melted)",
+        "description": "Drenched in filth. Melted by mayhem. Built for the pit. Born to destroy. This ain't just thrash -- this is a melted eruption of sound that eats faces and leaves nothing behind.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["messy_pintado_melted"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_melted"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Napalm Breath",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_messy_pintado",
+        "variant_name": "Melted"
     },
 ]
