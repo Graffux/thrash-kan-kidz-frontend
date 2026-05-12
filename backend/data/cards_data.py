@@ -624,6 +624,12 @@ CARD_IMAGE_URLS = {
     "jesse_pinata_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/p1aedg85_Screenshot_20260505_094740_ChatGPT.png",
     "jesse_pinata_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ayhqi1du_enhanced-1778017744707.jpg",
     "jesse_pinata_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/zymkkw94_enhanced-1778017943713.jpg",
+    # Band 2: Cheese Grater Mutilation
+    "hellhound_jeff": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/p9qrdvzj_enhanced-1778021609637.jpg",
+    "hellhound_jeff_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ydk90epk_Screenshot_20260505_180138_ChatGPT.png",
+    "hellhound_jeff_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/fgtdh378_enhanced-1778023255658.jpg",
+    "hellhound_jeff_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/sgc54p2w_enhanced-1778023520939.jpg",
+    "hellhound_jeff_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/7wywv19v_Screenshot_20260505_184828_ChatGPT.png",
 }
 
 CARD_BACK_IMAGE_URLS = {
