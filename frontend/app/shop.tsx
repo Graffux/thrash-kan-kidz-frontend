@@ -22,6 +22,7 @@ import ScratchCard from '../src/components/ScratchCard';
 import PackRevealWrapper from '../src/components/PackRevealWrapper';
 import MetalButton from '../src/components/MetalButton';
 import MascotStamp from '../src/components/MascotStamp';
+import RonchTrashTalk, { maybeShowRonchTrashTalk } from '../src/components/RonchTrashTalk';
 import { useSoundPlayer } from '../src/utils/sounds';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -67,6 +68,9 @@ export default function ShopScreen() {
   // is false we hide the Next / Awesome button so the user must scratch
   // before advancing.
   const [scratched, setScratched] = useState(true);
+  // Ronch trash-talk line shown after pack close every Nth pack open.
+  // null = hidden. Component auto-fades after ~3.2s and calls onDismiss.
+  const [ronchLine, setRonchLine] = useState<string | null>(null);
 
   // Whenever the visible pack card changes (modal open OR Next pressed), look
   // at the new card and decide whether the user needs to scratch a variant
@@ -453,6 +457,13 @@ export default function ShopScreen() {
       setSpinResult(null);
       resetAnimations();
     }
+    // Ronch's chance to shit-talk — fires every Nth pack open. The helper
+    // returns null when it's not Ronch's turn so we just no-op then.
+    maybeShowRonchTrashTalk()
+      .then((line) => {
+        if (line) setRonchLine(line);
+      })
+      .catch(() => { /* swallow — never block close */ });
   };
 
   const closeSeriesComplete = () => {
@@ -503,6 +514,7 @@ export default function ShopScreen() {
 
       {/* Buy Coins Modal */}
       <BuyCoinsModal visible={showBuyCoins} onClose={() => setShowBuyCoins(false)} />
+      <RonchTrashTalk line={ronchLine} onDismiss={() => setRonchLine(null)} />
 
       {/* Result Modal */}
       <Modal visible={showResult} transparent animationType="fade" onRequestClose={closeResult}>
