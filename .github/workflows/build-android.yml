@@ -1,0 +1,113 @@
+name: Build Android AAB (Free, Local on Linux Runner)
+
+# Builds an Android App Bundle (.aab) on GitHub Actions' free Linux
+# runner using `eas build --local`. Because the build runs on our
+# runner (not Expo's cloud), it does NOT consume EAS build credits.
+#
+# Triggered automatically on pushes to main that touch frontend code,
+# OR manually via the "Run workflow" button in the GitHub Actions UI.
+#
+# Requires GitHub repo secret `EXPO_TOKEN`:
+#   1. Visit https://expo.dev/settings/access-tokens
+#   2. "Create token" -> copy the token
+#   3. GitHub repo Settings -> Secrets and variables -> Actions -> New
+#      repository secret. Name: EXPO_TOKEN, Value: paste the token.
+#
+# The token lets EAS pull your existing Android keystore from Expo's
+# credential server so the AAB is signed identically to v77/v78 — Play
+# Store will accept it as an update, not a new app.
+#
+# The finished AAB is uploaded as a workflow artifact. Download from
+# the workflow run's summary page → "Artifacts" section, then upload
+# manually to Google Play Console.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/build-android.yml'
+  workflow_dispatch: {}   # also allow on-demand triggering
+
+# Don't pile up builds — newer push cancels in-flight build.
+concurrency:
+  group: android-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0 platform-tools'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install EAS CLI
+        run: yarn global add eas-cli
+
+      - name: Verify Expo authentication
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::EXPO_TOKEN secret is not configured."
+            echo "Generate at https://expo.dev/settings/access-tokens"
+            exit 1
+          fi
+          npx eas-cli whoami
+
+      - name: Build Android AAB (local on this runner — no EAS credits)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          # --non-interactive is critical: any prompt mid-build would
+          # hang the runner indefinitely. EAS pulls keystore from Expo
+          # automatically when the token is set.
+          npx eas-cli build \
+            --platform android \
+            --profile production \
+            --local \
+            --non-interactive \
+            --output ./thrash-kan-kidz.aab
+
+      - name: Show AAB info
+        run: |
+          ls -la *.aab
+          echo "---"
+          echo "Built versionCode + version from app.json:"
+          node -e "const p=require('./app.json');console.log('versionCode:',p.expo.android.versionCode,'version:',p.expo.version)"
+
+      - name: Upload AAB as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: thrash-kan-kidz-android-aab
+          path: frontend/thrash-kan-kidz.aab
+          # Keep artifact 30 days so you have time to upload to Play Store
+          retention-days: 30
+          if-no-files-found: error
