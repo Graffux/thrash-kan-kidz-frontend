@@ -23,6 +23,8 @@ import { useSoundPlayer } from '../src/utils/sounds';
 import ScratchCard from '../src/components/ScratchCard';
 import OozeProgressBar from '../src/components/OozeProgressBar';
 import MetalButton from '../src/components/MetalButton';
+import MascotStamp from '../src/components/MascotStamp';
+import MascotEmptyState from '../src/components/MascotEmptyState';
 import {
   scheduleLaunchNotification,
   cancelLaunchNotification,
@@ -989,6 +991,11 @@ export default function CollectionScreen() {
       >
         <View style={styles.tradeResultOverlay}>
           <View style={styles.tradeResultModal}>
+            <MascotStamp
+              mood={tradeInResult?.all_variants_complete ? 'series_complete' : 'variant_pull'}
+              position="tr"
+              size={64}
+            />
             <Text style={styles.tradeResultTitle}>🎉 Trade Complete!</Text>
             {tradeInResult && (
               <>

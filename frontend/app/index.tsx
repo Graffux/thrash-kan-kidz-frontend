@@ -19,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSoundPlayer } from '../src/utils/sounds';
 import { DailyWheelModal } from '../src/components/DailyWheelModal';
 import { CardPickerModal } from '../src/components/CardPickerModal';
+import MascotSplash from '../src/components/MascotSplash';
 
 export default function HomeScreen() {
   const { user, loading, login, logout, claimDailyLogin, userCards, refreshData, apiUrl } = useApp();
@@ -141,10 +142,21 @@ export default function HomeScreen() {
     }
   };
 
+  // Show Ronch's entrance once per component mount. On real Android cold
+  // start the home screen mounts fresh and this fires; tab-switches back
+  // to Home preserve component state via React Navigation, so the splash
+  // won't replay annoyingly. Component self-unmounts after its animation.
+  const [renderSplash, setRenderSplash] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setRenderSplash(false), 1600);
+    return () => clearTimeout(t);
+  }, []);
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#FFD700" />
+        {renderSplash && <MascotSplash holdMs={1500} />}
       </View>
     );
   }
@@ -152,6 +164,7 @@ export default function HomeScreen() {
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
+        {renderSplash && <MascotSplash holdMs={1500} />}
         <Image
           source={{ uri: 'https://customer-assets.emergentagent.com/job_earn-cards/artifacts/zgy2com2_enhanced-1771247671181.jpg' }}
           style={styles.backgroundImage}
@@ -245,6 +258,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {renderSplash && <MascotSplash holdMs={1500} />}
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>

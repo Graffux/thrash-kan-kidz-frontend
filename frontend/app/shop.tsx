@@ -21,6 +21,7 @@ import BuyCoinsModal from '../src/components/BuyCoinsModal';
 import ScratchCard from '../src/components/ScratchCard';
 import PackRevealWrapper from '../src/components/PackRevealWrapper';
 import MetalButton from '../src/components/MetalButton';
+import MascotStamp from '../src/components/MascotStamp';
 import { useSoundPlayer } from '../src/utils/sounds';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -507,6 +508,20 @@ export default function ShopScreen() {
       <Modal visible={showResult} transparent animationType="fade" onRequestClose={closeResult}>
         <View style={styles.resultOverlay}>
           <View style={styles.resultContainer}>
+            {/* Ronch corner stamp — mood depends on the rarity of the
+                currently-revealed card. Epic / rare pulls get a wide-eyed
+                Ronch, dupes get an angry Ronch, anything else is happy. */}
+            <MascotStamp
+              mood={
+                spinResult?.won_cards?.[revealIndex]?.is_duplicate
+                  ? 'duplicate'
+                  : ['rare', 'epic'].includes(spinResult?.won_cards?.[revealIndex]?.card?.rarity || '')
+                  ? 'rare_reveal'
+                  : 'variant_pull'
+              }
+              position="tr"
+              size={64}
+            />
             <Text style={styles.resultTitle}>
               {spinResult?.won_cards && revealIndex < spinResult.won_cards.length - 1
                 ? `Card ${revealIndex + 1} of ${spinResult.won_cards.length}`
