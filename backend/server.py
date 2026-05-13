@@ -2507,6 +2507,7 @@ async def trade_in_for_variant(user_id: str, card_id: str):
     updated_user = await db.users.find_one({"id": user_id}, {"_id": 0, "coins": 1})
     
     won_variant_copy = {k: v for k, v in won_variant.items() if k != "_id"}
+    won_variant_copy = _with_scratch_cover(won_variant_copy)
     
     return {
         "success": True,

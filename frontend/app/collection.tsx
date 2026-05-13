@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import type { SeriesCatalogEntry } from '../src/context/AppContext';
 import { useSoundPlayer } from '../src/utils/sounds';
+import ScratchCard from '../src/components/ScratchCard';
 import {
   scheduleLaunchNotification,
   cancelLaunchNotification,
@@ -472,6 +473,10 @@ export default function CollectionScreen() {
   const [tradeInEligible, setTradeInEligible] = useState<any[]>([]);
   const [showTradeInResult, setShowTradeInResult] = useState(false);
   const [tradeInResult, setTradeInResult] = useState<any>(null);
+  // Trade-in variant scratch state. Set to false the moment a new variant
+  // is revealed so the modal hides "AWESOME!" until the user scratches. Set
+  // back to true on auto-reveal (or when the won variant has no cover URL).
+  const [tradeScratched, setTradeScratched] = useState(true);
   const [isTrading, setIsTrading] = useState(false);
   const cardFlipSound = useSoundPlayer('card_flip');
   const prizeWonSound = useSoundPlayer('prize_won');
@@ -685,6 +690,11 @@ export default function CollectionScreen() {
       
       if (data.success) {
         setTradeInResult(data);
+        // Reset scratch gating: if the won variant ships with a cover URL,
+        // require the user to scratch before the AWESOME button appears.
+        // Variants without a cover (defensive fallback) auto-resolve.
+        const needsScratch = !!(data?.won_variant?.is_variant && data?.won_variant?.scratch_cover_url);
+        setTradeScratched(!needsScratch);
         setShowTradeInResult(true);
         refreshData();
         fetchTradeInEligible();
@@ -983,11 +993,28 @@ export default function CollectionScreen() {
                 <Text style={styles.tradeResultText}>
                   You received a {tradeInResult.won_variant?.variant_name} variant!
                 </Text>
-                <ExpoImage
-                  source={{ uri: tradeInResult.won_variant?.front_image_url }}
-                  style={styles.tradeResultImage}
-                  contentFit="contain"
-                />
+                {tradeInResult.won_variant?.scratch_cover_url ? (
+                  <View style={styles.tradeResultImage}>
+                    <ScratchCard
+                      key={`trade-scratch-${tradeInResult.won_variant?.id}`}
+                      width={200}
+                      height={300}
+                      imageUri={tradeInResult.won_variant?.front_image_url}
+                      coverUri={tradeInResult.won_variant?.scratch_cover_url}
+                      brushRadius={28}
+                      onComplete={() => setTradeScratched(true)}
+                    />
+                  </View>
+                ) : (
+                  <ExpoImage
+                    source={{ uri: tradeInResult.won_variant?.front_image_url }}
+                    style={styles.tradeResultImage}
+                    contentFit="contain"
+                  />
+                )}
+                {!tradeScratched && (
+                  <Text style={styles.scratchHint}>Scratch to reveal!</Text>
+                )}
                 <Text style={styles.tradeResultText}>
                   {tradeInResult.variants_owned}/{tradeInResult.variants_total} variants collected
                 </Text>
@@ -998,12 +1025,14 @@ export default function CollectionScreen() {
                 )}
               </>
             )}
-            <TouchableOpacity
-              style={styles.tradeResultButton}
-              onPress={() => setShowTradeInResult(false)}
-            >
-              <Text style={styles.tradeResultButtonText}>AWESOME!</Text>
-            </TouchableOpacity>
+            {tradeScratched && (
+              <TouchableOpacity
+                style={styles.tradeResultButton}
+                onPress={() => setShowTradeInResult(false)}
+              >
+                <Text style={styles.tradeResultButtonText}>AWESOME!</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </Modal>
@@ -1563,6 +1592,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
     backgroundColor: '#333',
+  },
+  scratchHint: {
+    color: '#FFD700',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    marginBottom: 12,
   },
   tradeResultButton: {
     backgroundColor: '#9C27B0',
