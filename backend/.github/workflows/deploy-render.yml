@@ -1,0 +1,44 @@
+name: Trigger Render Deploy
+
+# When new commits land on main, ping Render's deploy hook so the
+# backend redeploys automatically. We use a hook (vs Render's native
+# GitHub webhook) because the repo is connected via "Public Git
+# Repository" mode in Render, which doesn't install GitHub webhooks.
+#
+# The deploy hook URL is stored as a GitHub repository secret named
+# RENDER_DEPLOY_HOOK_URL (see workflow setup instructions). Keep it
+# secret — anyone with this URL can trigger deploys.
+
+on:
+  push:
+    branches:
+      - main
+
+# Only one deploy at a time. If another push arrives mid-run, cancel
+# the in-flight one so the freshest commit wins.
+concurrency:
+  group: render-deploy
+  cancel-in-progress: true
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Curl Render deploy hook
+        env:
+          HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK_URL secret is not configured"
+            exit 1
+          fi
+          # POST with empty body; Render's API treats this as "deploy now"
+          STATUS=$(curl -s -o /tmp/resp -w "%{http_code}" -X POST "$HOOK_URL")
+          echo "Render responded with HTTP $STATUS"
+          cat /tmp/resp
+          # Render returns 200 / 201 on success
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "201" ]; then
+            echo "::error::Render deploy hook returned non-success status"
+            exit 1
+          fi
