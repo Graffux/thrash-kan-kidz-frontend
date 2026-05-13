@@ -19,6 +19,8 @@ import { useApp } from '../src/context/AppContext';
 import { useFocusEffect } from 'expo-router';
 import BuyCoinsModal from '../src/components/BuyCoinsModal';
 import ScratchCard from '../src/components/ScratchCard';
+import PackRevealWrapper from '../src/components/PackRevealWrapper';
+import MetalButton from '../src/components/MetalButton';
 import { useSoundPlayer } from '../src/utils/sounds';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -520,26 +522,33 @@ export default function ShopScreen() {
                       spinResult.won_cards[revealIndex].is_duplicate && styles.packCardDupe,
                     ]}
                   >
-                    {spinResult.won_cards[revealIndex].card.is_variant &&
-                    spinResult.won_cards[revealIndex].card.scratch_cover_url ? (
-                      <ScratchCard
-                        key={`scratch-${revealIndex}-${spinResult.won_cards[revealIndex].card.id}`}
-                        width={140}
-                        height={200}
-                        imageUri={spinResult.won_cards[revealIndex].card.front_image_url}
-                        coverUri={spinResult.won_cards[revealIndex].card.scratch_cover_url}
-                        onComplete={() => setScratched(true)}
-                      />
-                    ) : (
-                      <ExpoImage
-                        key={`reveal-${revealIndex}`}
-                        source={{ uri: spinResult.won_cards[revealIndex].card.front_image_url }}
-                        style={styles.packCardImage}
-                        contentFit="contain"
-                        cachePolicy="memory-disk"
-                        transition={150}
-                      />
-                    )}
+                    <PackRevealWrapper
+                      animationKey={`pack-${revealIndex}-${spinResult.won_cards[revealIndex].card.id}`}
+                      rarity={(spinResult.won_cards[revealIndex].card.rarity as 'common' | 'rare' | 'epic') || 'common'}
+                      width={140}
+                      height={200}
+                    >
+                      {spinResult.won_cards[revealIndex].card.is_variant &&
+                      spinResult.won_cards[revealIndex].card.scratch_cover_url ? (
+                        <ScratchCard
+                          key={`scratch-${revealIndex}-${spinResult.won_cards[revealIndex].card.id}`}
+                          width={140}
+                          height={200}
+                          imageUri={spinResult.won_cards[revealIndex].card.front_image_url}
+                          coverUri={spinResult.won_cards[revealIndex].card.scratch_cover_url}
+                          onComplete={() => setScratched(true)}
+                        />
+                      ) : (
+                        <ExpoImage
+                          key={`reveal-${revealIndex}`}
+                          source={{ uri: spinResult.won_cards[revealIndex].card.front_image_url }}
+                          style={styles.packCardImage}
+                          contentFit="contain"
+                          cachePolicy="memory-disk"
+                          transition={150}
+                        />
+                      )}
+                    </PackRevealWrapper>
                   </View>
                   <Text style={styles.packCardName} numberOfLines={2}>
                     {spinResult.won_cards[revealIndex].card.name}
@@ -556,28 +565,29 @@ export default function ShopScreen() {
 
             {spinResult?.won_cards && revealIndex < spinResult.won_cards.length - 1 ? (
               scratched && (
-                <TouchableOpacity
-                  style={styles.closeResultButton}
+                <MetalButton
+                  label="NEXT"
                   onPress={() => {
                     try { cardFlipSound.play(); } catch (_e) { /* ignore */ }
                     const nextIdx = revealIndex + 1;
                     setRevealIndex(nextIdx);
-                    // First-Variant celebration check for cards #2 / #3
                     const nextCard = spinResult?.won_cards?.[nextIdx]?.card;
                     if (nextCard) setTimeout(() => maybeCelebrateForCard(nextCard), 500);
                   }}
-                  data-testid="next-card-btn"
-                >
-                  <Text style={styles.closeResultText}>Next</Text>
-                </TouchableOpacity>
+                  tone="hellfire"
+                  size="md"
+                  testID="next-card-btn"
+                />
               )
             ) : (
               scratched && (
-                <TouchableOpacity style={styles.closeResultButton} onPress={closeResult} data-testid="close-result-btn">
-                  <Text style={styles.closeResultText}>
-                    {spinResult?.series_completion?.series_completed ? 'Continue...' : 'Awesome!'}
-                  </Text>
-                </TouchableOpacity>
+                <MetalButton
+                  label={spinResult?.series_completion?.series_completed ? 'CONTINUE...' : 'AWESOME!'}
+                  onPress={closeResult}
+                  tone={spinResult?.series_completion?.series_completed ? 'gold' : 'hellfire'}
+                  size="md"
+                  testID="close-result-btn"
+                />
               )
             )}
 

@@ -21,6 +21,8 @@ import { useApp } from '../src/context/AppContext';
 import type { SeriesCatalogEntry } from '../src/context/AppContext';
 import { useSoundPlayer } from '../src/utils/sounds';
 import ScratchCard from '../src/components/ScratchCard';
+import OozeProgressBar from '../src/components/OozeProgressBar';
+import MetalButton from '../src/components/MetalButton';
 import {
   scheduleLaunchNotification,
   cancelLaunchNotification,
@@ -1015,9 +1017,14 @@ export default function CollectionScreen() {
                 {!tradeScratched && (
                   <Text style={styles.scratchHint}>Scratch to reveal!</Text>
                 )}
-                <Text style={styles.tradeResultText}>
-                  {tradeInResult.variants_owned}/{tradeInResult.variants_total} variants collected
-                </Text>
+                <View style={{ width: 240, marginTop: 4, marginBottom: 8 }}>
+                  <OozeProgressBar
+                    value={tradeInResult.variants_owned}
+                    max={tradeInResult.variants_total}
+                    tone="blacklight"
+                    label={`${tradeInResult.variants_owned}/${tradeInResult.variants_total} VARIANTS COLLECTED`}
+                  />
+                </View>
                 {tradeInResult.all_variants_complete && (
                   <View style={styles.bonusContainer}>
                     <Text style={styles.bonusText}>ALL VARIANTS COMPLETE! +200 COINS!</Text>
@@ -1026,12 +1033,15 @@ export default function CollectionScreen() {
               </>
             )}
             {tradeScratched && (
-              <TouchableOpacity
-                style={styles.tradeResultButton}
-                onPress={() => setShowTradeInResult(false)}
-              >
-                <Text style={styles.tradeResultButtonText}>AWESOME!</Text>
-              </TouchableOpacity>
+              <View style={{ marginTop: 8 }}>
+                <MetalButton
+                  label={tradeInResult?.all_variants_complete ? 'HORNS UP!' : 'AWESOME!'}
+                  onPress={() => setShowTradeInResult(false)}
+                  tone={tradeInResult?.all_variants_complete ? 'gold' : 'hellfire'}
+                  size="lg"
+                  testID="trade-in-result-ok"
+                />
+              </View>
             )}
           </View>
         </View>
