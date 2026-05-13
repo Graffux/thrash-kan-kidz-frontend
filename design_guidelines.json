@@ -1,0 +1,151 @@
+{
+  "theme": "Archetype 7: Electric & Neon (Death Metal Variant)",
+  "vibe": "Aggressive, tactile, glowing decay. No flat surfaces. Everything bleeds, glows, or snaps.",
+  "color_tokens": {
+    "background": {
+      "void_black": "#050505",
+      "abyss_grey": "#111113",
+      "surface_dark": "#1A1A1D"
+    },
+    "neon_accents": {
+      "hellfire_red": "#FF003C",
+      "toxic_slime": "#39FF14",
+      "blacklight_purple": "#B026FF",
+      "magma_orange": "#FF5F00",
+      "electric_cyan": "#00F0FF"
+    },
+    "metals": {
+      "tarnished_gold": "#C5A059",
+      "rusted_iron": "#7A3C3C",
+      "chrome_shine": "#E8E8E8"
+    }
+  },
+  "typography_hierarchy": {
+    "setup_instructions": "Use system fonts heavily styled (tracking, uppercase, heavy weights) or setup expo-google-fonts if available. All text must feel intense.",
+    "h1_hero": {
+      "fontSize": 48,
+      "fontWeight": "900",
+      "textTransform": "uppercase",
+      "letterSpacing": 2,
+      "color": "#E8E8E8",
+      "textShadowColor": "#FF003C",
+      "textShadowOffset": { "width": 2, "height": 2 },
+      "textShadowRadius": 6
+    },
+    "h2_section": {
+      "fontSize": 32,
+      "fontWeight": "800",
+      "textTransform": "uppercase",
+      "letterSpacing": 1.5,
+      "color": "#C5A059"
+    },
+    "button_label": {
+      "fontSize": 24,
+      "fontWeight": "900",
+      "textTransform": "uppercase",
+      "letterSpacing": 3,
+      "color": "#050505"
+    },
+    "body_stats": {
+      "fontWeight": "700",
+      "fontSize": 14,
+      "color": "#A0A0A0",
+      "letterSpacing": 0.5
+    }
+  },
+  "depth_system": {
+    "philosophy": "Flatness is dead. Elevation is achieved through neon underglows, sharp 1px borders, and heavy gradient overlays.",
+    "elevation_1_cards": {
+      "backgroundColor": "#111113",
+      "borderWidth": 1,
+      "borderColor": "rgba(255, 0, 60, 0.4)",
+      "shadowColor": "#FF003C",
+      "shadowOffset": { "width": 0, "height": 4 },
+      "shadowOpacity": 0.4,
+      "shadowRadius": 8,
+      "elevation": 5
+    },
+    "elevation_2_modals": {
+      "backgroundColor": "#050505",
+      "borderWidth": 2,
+      "borderColor": "#B026FF",
+      "shadowColor": "#B026FF",
+      "shadowOffset": { "width": 0, "height": 0 },
+      "shadowOpacity": 0.8,
+      "shadowRadius": 16,
+      "elevation": 10
+    }
+  },
+  "animation_specs": {
+    "library": "moti + react-native-reanimated",
+    "springs": {
+      "heavy_snap": { "type": "spring", "damping": 12, "stiffness": 200, "mass": 1 },
+      "toxic_ooze": { "type": "timing", "duration": 800 },
+      "screen_shake": { "type": "spring", "damping": 2, "stiffness": 800, "mass": 0.5 }
+    },
+    "choreography": {
+      "button_press": "Moti animate from={{ scale: 1 }} animate={{ scale: pressed ? 0.95 : 1, shadowOpacity: pressed ? 1 : 0.5 }} transition={{ type: 'spring', damping: 12 }}",
+      "pack_reveal": "1. Tremble (X/Y translation +/- 4px). 2. Flash white (Opacity 1). 3. Card scales up from 0.5 to 1.2 then settles to 1.0. 4. Glow intensifies based on rarity.",
+      "coin_gain": "Floating text component: translateY 0 -> -50 over 800ms. Opacity 1 -> 0. Scale 1 -> 1.5. Uses Reanimated layout transitions.",
+      "variant_trade_completion": "Screen-wide dark overlay (expo-blur). The 5 cards converge to center. Massive white flash. Resulting variant card pulses with #39FF14 glow (scale 1.0 to 1.05 loop)."
+    }
+  },
+  "components": {
+    "MetalButton": {
+      "file_extension": ".js",
+      "structure": "Pressable -> MotiView (Outer Glow Box) -> LinearGradient (Surface) -> Text",
+      "props_moti": {
+        "state_handling": "Use React Native Pressable onPressIn/onPressOut to toggle a Moti 'pressed' state variable.",
+        "animate": "{ scale: pressed ? 0.95 : 1, shadowOpacity: pressed ? 1 : 0.6 }",
+        "transition": "{ type: 'spring', damping: 15, stiffness: 200 }"
+      },
+      "style_outer": {
+        "borderRadius": 4,
+        "borderWidth": 2,
+        "borderColor": "#FF003C",
+        "shadowColor": "#FF003C",
+        "shadowOffset": { "width": 0, "height": 0 },
+        "shadowRadius": 12,
+        "backgroundColor": "#050505"
+      },
+      "style_inner": {
+        "paddingVertical": 14,
+        "paddingHorizontal": 24,
+        "alignItems": "center",
+        "justifyContent": "center"
+      },
+      "accessibility": "Must include data-testid='metal-button'"
+    },
+    "OozeProgressBar": {
+      "structure": "View (Track) -> MotiView (Fill) -> Text (Label)",
+      "style_track": {
+        "height": 20,
+        "backgroundColor": "#111113",
+        "borderWidth": 2,
+        "borderColor": "#39FF14",
+        "borderRadius": 4,
+        "overflow": "hidden",
+        "shadowColor": "#39FF14",
+        "shadowOpacity": 0.4,
+        "shadowRadius": 6
+      },
+      "moti_fill": {
+        "animate": "{ width: `${percentage}%` }",
+        "transition": "{ type: 'timing', duration: 1000 }"
+      },
+      "style_fill": {
+        "backgroundColor": "#39FF14",
+        "flex": 1,
+        "opacity": 0.8
+      }
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. Replace generic system buttons with the <MetalButton> spec using Moti for interaction states. Apply in .js files.",
+    "2. Implement `OozeProgressBar` for Goals and Series Completion screens, ensuring the Moti width animation feels like filling toxic ooze.",
+    "3. On Pack Reveal, wrap the existing expo-image in a MotiView. Apply the 'pack_reveal' choreography (scale, rotate, shake).",
+    "4. Add a floating coin animation component that renders on top of the Home screen when balances change, using react-native-reanimated.",
+    "5. Ensure all interactive components have the required 'data-testid' attribute (e.g., data-testid='buy-pack-button').",
+    "6. Avoid touching the core EXPO config or adding new native libraries. Stick to Moti, Reanimated, and Expo modules already installed."
+  ]
+}
