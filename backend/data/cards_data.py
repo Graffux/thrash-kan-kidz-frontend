@@ -937,7 +937,7 @@ CARD_BACK_IMAGE_URLS = {
     "dan_cements": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/zy4a5v13_file_000000003cb871f8aa79381b876a3e9e.png",
     "handsome_dan": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ie1u5duc_file_00000000beb871fdbc0785124b08a383.png",
     # Band 6: Butt Feast
-    "tranquilized_adam": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rgmnwoqe_enhanced-1777638282399.jpg",
+    "tranquilized_adam": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/yjm17gw1_enhanced-1777631095906.jpg",
     "sadam_tranquilli": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/c13ggcuw_enhanced-1777633879806.jpg",
     # Band 7: Diseased
     "king_browley": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/y72ev7xq_enhanced-1777676212318.jpg",
