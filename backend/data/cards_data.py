@@ -658,6 +658,13 @@ CARD_IMAGE_URLS = {
     "shane_embryo_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/hgsl2r5h_Screenshot_20260507_060617_ChatGPT.png",
     "shane_embryo_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/k11ob3cc_Screenshot_20260507_095634_ChatGPT.png",
     "shane_embryo_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/t11wyd6h_Screenshot_20260507_100228_ChatGPT.png",
+    # Band 5: Snasum
+    "anger_jakobson": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/2kgkn3xp_enhanced-1778870752280.jpg",
+    "anger_jakobson_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/klv0x22t_Screenshot_20260515_110713_ChatGPT.png",
+    "anger_jakobson_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ru4yfqme_enhanced-1778870921430.jpg",
+    "anger_jakobson_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/zz16fib5_Screenshot_20260515_135754_ChatGPT.png",
+    "anger_jakobson_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/wbzyqst0_enhanced-1778871085675.jpg",
+    "anders_jerkobson": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/boaxyzu6_enhanced-1778905822706.jpg",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
 }
@@ -960,6 +967,9 @@ CARD_BACK_IMAGE_URLS = {
     # Band 4: Foreseen Terror
     "shane_emery_board": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/kx0c8zlm_enhanced-1778150418272.jpg",
     "shane_embryo": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/u07kuxxm_enhanced-1778150387091.jpg",
+    # Band 5: Snasum
+    "anger_jakobson": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/fhmzm086_enhanced-1778870810172.jpg",
+    "anders_jerkobson": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rq1shm64_enhanced-1778905944244.jpg",
     # Universal Series 7 (Grind Edition) variant backs — shared across ALL
     # Series 7 variant cards, same way Series 6 has stormy/decayed/etc backs.
     "variant_back_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/fl4sjpqj_enhanced-1777972963939.jpg",
@@ -9336,6 +9346,100 @@ INITIAL_CARDS = [
         "card_type": "B",
         "is_variant": True,
         "base_card_id": "card_shane_embryo",
+        "variant_name": "Melted"
+    },
+    # =====================
+    # SERIES 7 - Band 5: Snasum (parody of Anaal Nathrakh / Mayhem)
+    # =====================
+    {
+        "id": "card_anger_jakobson",
+        "name": "Anger Jakobson",
+        "description": "Angry. Loud. Disrespectful. That's just the warm up. Snasum plays pissed. Anger lives pissed. Don't like it? Good. Fuck off. Special Move: VOMIT BLAST. Rank: PERMANENTLY PISSED.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["anger_jakobson"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["anger_jakobson"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Snasum",
+        "card_type": "A"
+    },
+    {
+        "id": "card_anders_jerkobson",
+        "name": "Anders Jerkobson",
+        "description": "Vocalist and full-time annoyance specialist. Joined Snasum in 1999 -- thankfully not dead yet. Known for talking during songs, stupid faces, and existing. \"I'm not rude... I just don't care!\"",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["anders_jerkobson"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["anders_jerkobson"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Snasum",
+        "card_type": "B"
+    },
+    # ---- Anger Jakobson variants (Series 7 / Grind Edition) ----
+    {
+        "id": "card_anger_jakobson_blacklight",
+        "name": "Anger Jakobson (Blacklight)",
+        "description": "Glowing with neon hatred. The mic crackles with UV bile. Even his rage has gone fluorescent -- you can see his vocal cords vibrate through his neck.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["anger_jakobson_blacklight"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_blacklight"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Snasum",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_anger_jakobson",
+        "variant_name": "Blacklight"
+    },
+    {
+        "id": "card_anger_jakobson_chrome",
+        "name": "Anger Jakobson (Chrome)",
+        "description": "Forged in steel and screams. The Chrome variant of Anger Jakobson -- his hate is now mirror-polished, reflecting every poser's worst fears back at them at 200 dB.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["anger_jakobson_chrome"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_chrome"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Snasum",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_anger_jakobson",
+        "variant_name": "Chrome"
+    },
+    {
+        "id": "card_anger_jakobson_digital",
+        "name": "Anger Jakobson (Digital)",
+        "description": "8-bit blast beats and pixelated screams. Anger Jakobson glitched into the matrix and refused to leave -- now his hate compiles in real time.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["anger_jakobson_digital"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_digital"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Snasum",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_anger_jakobson",
+        "variant_name": "Digital"
+    },
+    {
+        "id": "card_anger_jakobson_melted",
+        "name": "Anger Jakobson (Melted)",
+        "description": "Drenched in caramel-colored fury. His face is sliding off but his scream stays perfectly intact. Snasum's rehearsal space now smells like burnt sugar and regret.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["anger_jakobson_melted"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_melted"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Snasum",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_anger_jakobson",
         "variant_name": "Melted"
     },
 ]
