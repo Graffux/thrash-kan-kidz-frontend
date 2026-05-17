@@ -680,6 +680,9 @@ CARD_IMAGE_URLS = {
     "deamon_jonez_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/92vc05od_enhanced-1778954649620.jpg",
     "deamon_jonez_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/lf9tjkvo_Screenshot_20260516_130044_ChatGPT.png",
     "deamon_jonez_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/qrjilzoh_enhanced-1778956839905.jpg",
+    # Band 7: Brutal Lies
+    "kevin_shark": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/zimce6i6_enhanced-1778959578619.jpg",
+    "kevin_shart": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/bj4oa7w6_enhanced-1778972923718.jpg",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
 }
@@ -988,6 +991,9 @@ CARD_BACK_IMAGE_URLS = {
     # Band 6: Minimal Noise Horror
     "deanimator": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/lggyzib9_enhanced-1778942545033.jpg",
     "deamon_jonez": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/gzu6y6hg_Screenshot_20260516_100124_ChatGPT.png",
+    # Band 7: Brutal Lies
+    "kevin_shark": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/y16ykiuv_enhanced-1778959288598.jpg",
+    "kevin_shart": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vr9oncj2_Screenshot_20260516_180635_ChatGPT.png",
     # Universal Series 7 (Grind Edition) variant backs — shared across ALL
     # Series 7 variant cards, same way Series 6 has stormy/decayed/etc backs.
     "variant_back_blacklight": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/fl4sjpqj_enhanced-1777972963939.jpg",
@@ -9683,5 +9689,34 @@ INITIAL_CARDS = [
         "is_variant": True,
         "base_card_id": "card_deamon_jonez",
         "variant_name": "Melted"
+    },
+    # =====================
+    # SERIES 7 - Band 7: Brutal Lies (parody of Brutal Truth / Agathocles)
+    # =====================
+    {
+        "id": "card_kevin_shark",
+        "name": "Kevin Shark",
+        "description": "Half man. Half shark. All thrash. Kevin Shark sings for the ones drowned in corrupt and chews up any lies in his way. Origin: Sewer City. Weapon: Mic of Mayhem. Signature Move: AQUATIC ASSAULT. \"The truth stinks. The lies bite.\"",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["kevin_shark"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["kevin_shark"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Brutal Lies",
+        "card_type": "A"
+    },
+    {
+        "id": "card_kevin_shart",
+        "name": "Kevin Shart",
+        "description": "King of the Accidental Assault. Kevin didn't mean to shart. But now it's part of who he is. A lifelong thrasher. A brutal frontman. A walking warning label. Stench Level: 95. Bathing Habits: 10. \"It wasn't meant to come out like that.\"",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["kevin_shart"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["kevin_shart"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 7,
+        "band": "Brutal Lies",
+        "card_type": "B"
     },
 ]
