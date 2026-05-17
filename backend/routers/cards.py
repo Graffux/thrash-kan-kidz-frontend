@@ -72,6 +72,9 @@ async def get_all_cards():
     their `series_reward` series — if any — is released.
     """
     released = released_series_nums()
+    # Card catalog now exceeds 500 entries (S1-S7 totals 567+). The previous
+    # `to_list(500)` cap silently truncated, dropping random cards from the
+    # response. Bumped to 2000 — enough headroom for ~25 series.
     cards = await db.cards.find({
         "$or": [
             {"series": {"$in": released}},
@@ -79,7 +82,7 @@ async def get_all_cards():
             {"series": {"$exists": False}},
             {"series": None},
         ],
-    }).to_list(500)
+    }).to_list(2000)
     # Secondary filter for series_reward-only cards (rare reward cards):
     # if their reward series is unreleased, drop them too.
     filtered = []
