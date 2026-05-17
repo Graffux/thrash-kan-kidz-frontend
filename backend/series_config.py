@@ -75,12 +75,12 @@ SERIES_CONFIG: Dict[int, dict] = {
         "rare_reward": "card_nicklebag_darrell",
         "description": "Maximum Dose",
     },
-    # Series 7 — declared so the frontend "Coming Soon" tile renders before
-    # any cards are seeded. Cards + rare_reward will be added in a later pass.
+    # Series 7 — Grind Edition. Reward is the epic "Alien Dubin" card,
+    # auto-granted on series completion (all 16 base cards collected).
     7: {
         "name": "Series 7",
         "cards_required": 16,
-        "rare_reward": None,
+        "rare_reward": "card_alien_dubin",
         "description": "Grind Edition",
     },
 }
