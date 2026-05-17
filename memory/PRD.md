@@ -7,7 +7,7 @@ Pail Kids style). Built with React Native (Expo SDK 54) + FastAPI + MongoDB.
 ## Status
 - **Live on Google Play Production** (v80 series shipping; v82 prepared and queued for next push).
 - Custom domain `thrashkankidz.com` mapped via Porkbun → Cloudflare Pages.
-- 527 cards seeded; Series 1–6 fully released, Series 7 "Grind Edition" unlocks **2026-05-17**.
+- 567 cards seeded; Series 1–7 FULLY seeded. Series 1–6 released, Series 7 "Grind Edition" unlocks **2026-05-17**.
 - CI/CD: GitHub Actions auto-deploys backend to Render and builds Android `.aab` for free via `eas build --local` on the GitHub runner.
 
 ## Architecture
