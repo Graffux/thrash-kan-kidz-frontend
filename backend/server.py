@@ -813,6 +813,15 @@ INITIAL_GOALS = [
         "target_value": 6,
         "reward_coins": 500,
         "reward_card_id": None
+    },
+    {
+        "id": "goal_all_variants_s7",
+        "title": "Series 7 Variant Master",
+        "description": "Collect every variant in Series 7",
+        "goal_type": "collect_all_variants_series",
+        "target_value": 7,
+        "reward_coins": 500,
+        "reward_card_id": None
     }
 ]
 

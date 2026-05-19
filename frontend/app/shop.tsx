@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import BuyCoinsModal from '../src/components/BuyCoinsModal';
 import ScratchCard from '../src/components/ScratchCard';
 import PackRevealWrapper from '../src/components/PackRevealWrapper';
@@ -51,6 +51,7 @@ interface SpinPoolData {
 
 export default function ShopScreen() {
   const { user, apiUrl, refreshData, userCards } = useApp();
+  const router = useRouter();
   const [spinning, setSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState<SpinResult | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -609,13 +610,36 @@ export default function ShopScreen() {
               )
             ) : (
               scratched && (
-                <MetalButton
-                  label={spinResult?.series_completion?.series_completed ? 'CONTINUE...' : 'AWESOME!'}
-                  onPress={closeResult}
-                  tone={spinResult?.series_completion?.series_completed ? 'gold' : 'hellfire'}
-                  size="md"
-                  testID="close-result-btn"
-                />
+                <View style={styles.finalActionsRow}>
+                  <MetalButton
+                    label={spinResult?.series_completion?.series_completed ? 'CONTINUE...' : 'AWESOME!'}
+                    onPress={closeResult}
+                    tone={spinResult?.series_completion?.series_completed ? 'gold' : 'hellfire'}
+                    size="md"
+                    testID="close-result-btn"
+                  />
+                  {/* Share-this-pull → Mosh Pit composer with the card pre-attached. */}
+                  {spinResult?.won_cards?.[revealIndex]?.card && (
+                    <TouchableOpacity
+                      style={styles.sharePullBtn}
+                      onPress={() => {
+                        const c = spinResult.won_cards[revealIndex].card;
+                        closeResult();
+                        router.push({
+                          pathname: '/mosh',
+                          params: {
+                            sharePullName: c.name,
+                            sharePullImage: c.front_image_url,
+                          },
+                        } as any);
+                      }}
+                      testID="share-pull-btn"
+                    >
+                      <Ionicons name="share-social" size={16} color="#39ff14" />
+                      <Text style={styles.sharePullText}>SHARE TO MOSH PIT</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               )
             )}
 
@@ -925,6 +949,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
+  },
+  finalActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  sharePullBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#39ff14',
+    backgroundColor: 'rgba(57, 255, 20, 0.1)',
+  },
+  sharePullText: {
+    color: '#39ff14',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
   // First-Variant celebration overlay
   celebrationOverlay: {

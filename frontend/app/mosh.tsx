@@ -21,7 +21,7 @@ import {
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -59,6 +59,7 @@ const MAX_LEN = 200;
 
 export default function MoshPitScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ sharePullName?: string; sharePullImage?: string }>();
   const { user, userCards, apiUrl } = useApp();
   const [posts, setPosts] = useState<MoshPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +70,32 @@ export default function MoshPitScreen() {
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [showCardPicker, setShowCardPicker] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
+  // Track whether we've consumed the share-pull deeplink so we don't re-fire
+  // it if the user navigates back to the screen later.
+  const consumedShare = React.useRef(false);
+
+  // Consume deeplink params: pre-fill text + auto-attach the card image.
+  // Fires exactly once when the screen mounts with sharePull* params present.
+  useEffect(() => {
+    if (consumedShare.current) return;
+    if (!params.sharePullName && !params.sharePullImage) return;
+    consumedShare.current = true;
+    if (params.sharePullName) {
+      setComposing(`Just pulled ${params.sharePullName}! 🤘`);
+    }
+    if (params.sharePullImage) {
+      // Re-encode the remote card URL to base64 via the same pipeline as the picker
+      ImageManipulator.manipulateAsync(
+        params.sharePullImage,
+        [{ resize: { width: 600 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true },
+      )
+        .then((m) => {
+          if (m.base64) setAttachedImage(`data:image/jpeg;base64,${m.base64}`);
+        })
+        .catch(() => { /* user can attach manually if this fails */ });
+    }
+  }, [params.sharePullName, params.sharePullImage]);
 
   const load = useCallback(async () => {
     if (!user) return;
