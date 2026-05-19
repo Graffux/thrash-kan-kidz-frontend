@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -30,6 +31,7 @@ import { MASCOT_SIGNATURE } from '../src/assets/mascot';
 
 export default function HomeScreen() {
   const { user, loading, login, logout, claimDailyLogin, userCards, refreshData, apiUrl } = useApp();
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
@@ -275,8 +277,12 @@ export default function HomeScreen() {
             </View>
           </View>
           <DrippingLogo width={220} height={60} />
-          <TouchableOpacity onPress={logout} style={styles.logoutButton}>
-            <Ionicons name="log-out-outline" size={22} color="#9aff5a" />
+          <TouchableOpacity
+            onPress={() => router.push('/settings')}
+            style={styles.logoutButton}
+            testID="home-settings-btn"
+          >
+            <Ionicons name="settings-outline" size={24} color="#9aff5a" />
           </TouchableOpacity>
         </View>
 

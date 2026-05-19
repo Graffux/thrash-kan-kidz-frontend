@@ -187,6 +187,7 @@ function TabsNavigator() {
         }}
       />
       {/* Hidden screens */}
+      <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarButton: () => null }} />
       <Tabs.Screen name="privacy" options={{ title: 'Privacy Policy', tabBarButton: () => null }} />
       <Tabs.Screen name="payment-success" options={{ title: 'Payment Success', tabBarButton: () => null }} />
     </Tabs>

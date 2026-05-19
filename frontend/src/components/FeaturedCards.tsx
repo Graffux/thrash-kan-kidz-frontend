@@ -27,26 +27,34 @@ const SLOTS = 5;
 
 interface Props {
   apiUrl: string;
+  /** When true, render the slots without picker/edit affordances — used on
+      a friend's profile so visitors can see the showcase but not modify it. */
+  readOnly?: boolean;
+  /** Optional override — when viewing another user's profile, pass their
+      featured card IDs + cards so the component can render their showcase
+      instead of pulling from the current viewer's AppContext. */
+  featuredIds?: string[];
+  cardsLookup?: Record<string, any>;
 }
 
-export const FeaturedCards: React.FC<Props> = () => {
+export const FeaturedCards: React.FC<Props> = ({ readOnly = false, featuredIds, cardsLookup }) => {
   const { user, userCards, updateFeaturedCards } = useApp();
   const [showPicker, setShowPicker] = useState(false);
   const [editingSlot, setEditingSlot] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const featured = user?.featured_card_ids ?? [];
+  const featured = featuredIds ?? user?.featured_card_ids ?? [];
 
-  // Map id -> card lookup from user's owned cards. We only show owned cards
-  // in the picker, so the lookup also doubles as "is this card still owned"
-  // — if a featured card was traded away, it'll silently disappear next refresh.
+  // Map id -> card lookup. In readOnly mode use the passed-in cardsLookup
+  // (the visitor doesn't own those cards, so AppContext.userCards wouldn't help).
   const ownedById = useMemo(() => {
+    if (cardsLookup) return cardsLookup;
     const m: Record<string, any> = {};
     for (const uc of userCards) {
       if (uc.card?.id) m[uc.card.id] = uc.card;
     }
     return m;
-  }, [userCards]);
+  }, [userCards, cardsLookup]);
 
   const slots = useMemo(() => {
     const arr: (any | null)[] = Array(SLOTS).fill(null);
@@ -57,6 +65,7 @@ export const FeaturedCards: React.FC<Props> = () => {
   }, [featured, ownedById]);
 
   const openPicker = (slotIndex: number) => {
+    if (readOnly) return;
     setEditingSlot(slotIndex);
     setShowPicker(true);
   };
@@ -95,7 +104,9 @@ export const FeaturedCards: React.FC<Props> = () => {
         <Text style={styles.title}>💀 FEATURED CARDS</Text>
         <Text style={styles.subtitle}>{featured.length}/{SLOTS}</Text>
       </View>
-      <Text style={styles.help}>Pin your top 5 to flex on the homies.</Text>
+      {!readOnly && (
+        <Text style={styles.help}>Pin your top 5 to flex on the homies.</Text>
+      )}
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
         {slots.map((card, idx) => (
