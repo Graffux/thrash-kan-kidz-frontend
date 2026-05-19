@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GrungeBackground } from '../src/components/GrungeBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import { useFocusEffect } from 'expo-router';
@@ -496,22 +497,21 @@ export default function ShopScreen() {
 
   if (!user) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Image source={{ uri: BACKGROUND_IMAGE }} style={styles.backgroundImage} resizeMode="cover" />
-        <View style={styles.overlay} />
-        <View style={styles.loginPrompt}>
-          <Text style={styles.loginText}>Please login to visit the shop</Text>
-        </View>
-      </SafeAreaView>
+      <GrungeBackground>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.loginPrompt}>
+            <Text style={styles.loginText}>Please login to visit the shop</Text>
+          </View>
+        </SafeAreaView>
+      </GrungeBackground>
     );
   }
 
   const progress = spinPool ? (spinPool.owned_count / spinPool.total_count) * 100 : 0;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Image source={{ uri: BACKGROUND_IMAGE }} style={styles.backgroundImage} resizeMode="cover" />
-      <View style={styles.overlay} />
+    <GrungeBackground>
+      <SafeAreaView style={styles.container}>
 
       {/* Buy Coins Modal */}
       <BuyCoinsModal visible={showBuyCoins} onClose={() => setShowBuyCoins(false)} />
@@ -916,14 +916,15 @@ export default function ShopScreen() {
           </Animated.View>
         </Animated.View>
       )}
-    </SafeAreaView>
+      </SafeAreaView>
+    </GrungeBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f1a',
+    backgroundColor: 'transparent',
   },
   // First-Variant celebration overlay
   celebrationOverlay: {

@@ -31,6 +31,7 @@ import { HeroCarousel } from '../src/components/HeroCarousel';
 import { ThrashMissionsPreview } from '../src/components/ThrashMissionsPreview';
 import { MoshPitPreview } from '../src/components/MoshPitPreview';
 import { MASCOT_SIGNATURE } from '../src/assets/mascot';
+import { ICONS } from '../src/assets/icons';
 
 export default function HomeScreen() {
   const { user, loading, login, logout, claimDailyLogin, userCards, refreshData, apiUrl } = useApp();
@@ -301,28 +302,25 @@ export default function HomeScreen() {
         {/* 4-up Metal Stat Panel grid */}
         <View style={styles.statsGrid}>
           <MetalStatPanel
-            iconName="albums"
+            iconSource={ICONS.statCards}
             value={userCards.length}
             label="MY CARDS"
             style={styles.statCell}
           />
           <MetalStatPanel
-            iconName="cash"
-            iconColor="#ffd24a"
+            iconSource={ICONS.statCoins}
             value={user.coins}
             label="COINS"
             style={styles.statCell}
           />
           <MetalStatPanel
-            iconName="flame"
-            iconColor="#ff7a3a"
+            iconSource={ICONS.statStreak}
             value={user.daily_login_streak}
             label="STREAK"
             style={styles.statCell}
           />
           <MetalStatPanel
-            iconName="trophy"
-            iconColor="#c4ff5a"
+            iconSource={ICONS.statTrophy}
             value={(user.completed_series ?? []).length}
             label="SERIES DONE"
             style={styles.statCell}

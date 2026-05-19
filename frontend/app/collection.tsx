@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GrungeBackground } from '../src/components/GrungeBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import type { SeriesCatalogEntry } from '../src/context/AppContext';
@@ -722,14 +723,14 @@ export default function CollectionScreen() {
 
   if (!user) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Image source={{ uri: BACKGROUND_IMAGE }} style={styles.backgroundImage} resizeMode="cover" />
-        <View style={styles.backgroundOverlay} />
-        <View style={styles.centerContainer}>
-          <Text style={styles.lockIcon}>🔒</Text>
-          <Text style={styles.lockedText}>Please login to view your collection</Text>
-        </View>
-      </SafeAreaView>
+      <GrungeBackground>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.centerContainer}>
+            <Text style={styles.lockIcon}>🔒</Text>
+            <Text style={styles.lockedText}>Please login to view your collection</Text>
+          </View>
+        </SafeAreaView>
+      </GrungeBackground>
     );
   }
 
@@ -843,9 +844,8 @@ export default function CollectionScreen() {
   const [tradeInExpanded, setTradeInExpanded] = useState(false);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Image source={{ uri: BACKGROUND_IMAGE }} style={styles.backgroundImage} resizeMode="cover" />
-      <View style={styles.backgroundOverlay} />
+    <GrungeBackground>
+      <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <ExpoImage source={{ uri: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/jgg6an70_enhanced-1776903865079.png' }} style={styles.headerImage} contentFit="contain" />
         <Text style={styles.subtitle}>
@@ -1183,14 +1183,15 @@ export default function CollectionScreen() {
           </Animated.View>
         </Animated.View>
       )}
-    </SafeAreaView>
+      </SafeAreaView>
+    </GrungeBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: 'transparent',
   },
   backgroundImage: {
     position: 'absolute',

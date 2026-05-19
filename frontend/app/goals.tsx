@@ -12,6 +12,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
 import { useApp } from '../src/context/AppContext';
 
+import { GrungeBackground } from '../src/components/GrungeBackground';
+import { SplatTitle } from '../src/components/SplatTitle';
+
 const BACKGROUND_IMAGE = 'https://customer-assets.emergentagent.com/job_earn-cards/artifacts/zgy2com2_enhanced-1771247671181.jpg';
 
 export default function GoalsScreen() {
@@ -19,14 +22,14 @@ export default function GoalsScreen() {
 
   if (!user) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Image source={{ uri: BACKGROUND_IMAGE }} style={styles.backgroundImage} resizeMode="cover" />
-        <View style={styles.backgroundOverlay} />
-        <View style={styles.centerContainer}>
-          <Text style={styles.lockIcon}>🔒</Text>
-          <Text style={styles.lockedText}>Please login to view your goals</Text>
-        </View>
-      </SafeAreaView>
+      <GrungeBackground>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.centerContainer}>
+            <Text style={styles.lockIcon}>🔒</Text>
+            <Text style={styles.lockedText}>Please login to view your goals</Text>
+          </View>
+        </SafeAreaView>
+      </GrungeBackground>
     );
   }
 
@@ -69,9 +72,8 @@ export default function GoalsScreen() {
   const inProgressGoals = userGoals.filter(ug => !ug.user_goal.completed);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Image source={{ uri: BACKGROUND_IMAGE }} style={styles.backgroundImage} resizeMode="cover" />
-      <View style={styles.backgroundOverlay} />
+    <GrungeBackground>
+      <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <ExpoImage source={{ uri: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/gkgk0gcw_enhanced-1776904123985.png' }} style={styles.headerImage} contentFit="contain" />
         <Text style={styles.subtitle}>
@@ -95,7 +97,7 @@ export default function GoalsScreen() {
         {/* In Progress */}
         {inProgressGoals.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>In Progress</Text>
+            <SplatTitle>IN PROGRESS</SplatTitle>
             {inProgressGoals.map(({ user_goal, goal }) => (
               <View key={user_goal.id} style={styles.goalCard}>
                 <View style={styles.goalIcon}>
@@ -149,7 +151,7 @@ export default function GoalsScreen() {
         {/* Completed */}
         {completedGoals.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>Completed</Text>
+            <SplatTitle>COMPLETED</SplatTitle>
             {completedGoals.map(({ user_goal, goal }) => (
               <View key={user_goal.id} style={[styles.goalCard, styles.goalCardCompleted]}>
                 <View style={[styles.goalIcon, styles.goalIconCompleted]}>
@@ -179,14 +181,15 @@ export default function GoalsScreen() {
 
         <View style={styles.spacer} />
       </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </GrungeBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f1a',
+    backgroundColor: 'transparent',
   },
   backgroundImage: {
     position: 'absolute',

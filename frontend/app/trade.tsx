@@ -13,6 +13,7 @@ import {
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GrungeBackground } from '../src/components/GrungeBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
 import { useApp } from '../src/context/AppContext';
@@ -115,14 +116,14 @@ export default function TradeScreen() {
 
   if (!user) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Image source={{ uri: BACKGROUND_IMAGE }} style={styles.backgroundImage} resizeMode="cover" />
-        <View style={styles.backgroundOverlay} />
-        <View style={styles.centerContainer}>
-          <Ionicons name="lock-closed" size={48} color="#666" />
-          <Text style={styles.lockedText}>Please login to trade cards</Text>
-        </View>
-      </SafeAreaView>
+      <GrungeBackground>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.centerContainer}>
+            <Ionicons name="lock-closed" size={48} color="#666" />
+            <Text style={styles.lockedText}>Please login to trade cards</Text>
+          </View>
+        </SafeAreaView>
+      </GrungeBackground>
     );
   }
 
@@ -333,9 +334,8 @@ export default function TradeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Image source={{ uri: BACKGROUND_IMAGE }} style={styles.backgroundImage} resizeMode="cover" />
-      <View style={styles.backgroundOverlay} />
+    <GrungeBackground>
+      <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <ExpoImage source={{ uri: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/z4mb78cz_enhanced-1776904246547.png' }} style={styles.headerImage} contentFit="contain" />
       </View>
@@ -651,12 +651,13 @@ export default function TradeScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+      </SafeAreaView>
+    </GrungeBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f1a' },
+  container: { flex: 1, backgroundColor: 'transparent' },
   backgroundImage: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%' },
   backgroundOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)' },
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },

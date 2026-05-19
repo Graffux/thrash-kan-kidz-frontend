@@ -1,39 +1,38 @@
 import React, { useEffect, useRef } from 'react';
 import { Tabs } from 'expo-router';
 import { AppProvider, useApp } from '../src/context/AppContext';
-import { View, StyleSheet, Text, Platform, Animated, Easing } from 'react-native';
+import { View, StyleSheet, Text, Platform, Animated, Easing, Image, ImageSourcePropType } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
+import { ICONS } from '../src/assets/icons';
 
 /**
  * Bottom nav — rusted-metal aesthetic with slime drip on the active tab.
  *
  * Each tab renders a `<MetalTab>` that shows:
- *   - An Ionicons glyph chosen to fit the death-metal theme (skull/anarchy/etc.)
- *   - A glowing "slime drip" anchor (animated vertical drip + halo) on the active
- *     tab only. The drip uses an Animated loop for a slow oozing rise/fall.
+ *   - A Nano Banana custom icon themed for the death-metal aesthetic
+ *   - A glowing "slime drip" anchor (animated vertical drip + halo) on the
+ *     active tab only.
  *
  * The tab bar background is a rusted dark gradient (solid colors + 1px top
- * border in oxidized green) so it reads as corroded metal vs the prior flat
- * navy blue.
+ * border in oxidized green).
  */
-const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  index: 'skull',           // Home → Skull (Thrash mascot energy)
-  collection: 'albums',     // Collection → Album spine
-  shop: 'flame',            // Shop → Flame (hot deals, har har)
-  goals: 'flash',           // Goals → Lightning (anarchy adjacent)
-  trade: 'swap-horizontal', // Trade → Swap arrows
-  profile: 'person-circle', // Profile → Person
+const TAB_ICONS: Record<string, ImageSourcePropType> = {
+  index: ICONS.navHome,
+  collection: ICONS.navCollection,
+  shop: ICONS.navShop,
+  goals: ICONS.navGoals,
+  trade: ICONS.navTrade,
+  profile: ICONS.navProfile,
 };
 
 interface MetalTabProps {
-  iconName: keyof typeof Ionicons.glyphMap;
+  iconSource: ImageSourcePropType;
   focused: boolean;
   badge?: number;
 }
 
-const MetalTab = ({ iconName, focused, badge }: MetalTabProps) => {
+const MetalTab = ({ iconSource, focused, badge }: MetalTabProps) => {
   // Drip animation: slow vertical "ooze" cycle, only active for focused tab.
   const drip = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -74,10 +73,13 @@ const MetalTab = ({ iconName, focused, badge }: MetalTabProps) => {
   return (
     <View style={tabStyles.tabWrap}>
       <View style={[tabStyles.iconPlate, focused && tabStyles.iconPlateActive]}>
-        <Ionicons
-          name={iconName}
-          size={focused ? 26 : 22}
-          color={focused ? '#39ff14' : '#9aa39a'}
+        <Image
+          source={iconSource}
+          style={[
+            tabStyles.iconImage,
+            focused && tabStyles.iconImageActive,
+          ]}
+          resizeMode="contain"
         />
         {badge !== undefined && badge > 0 && (
           <View style={tabStyles.badge}>
@@ -137,7 +139,7 @@ function TabsNavigator() {
         options={{
           title: 'Home',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconName={TAB_ICONS.index} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.index} focused={focused} />
           ),
         }}
       />
@@ -146,7 +148,7 @@ function TabsNavigator() {
         options={{
           title: 'Collection',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconName={TAB_ICONS.collection} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.collection} focused={focused} />
           ),
         }}
       />
@@ -155,7 +157,7 @@ function TabsNavigator() {
         options={{
           title: 'Shop',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconName={TAB_ICONS.shop} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.shop} focused={focused} />
           ),
         }}
       />
@@ -164,7 +166,7 @@ function TabsNavigator() {
         options={{
           title: 'Goals',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconName={TAB_ICONS.goals} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.goals} focused={focused} />
           ),
         }}
       />
@@ -173,7 +175,7 @@ function TabsNavigator() {
         options={{
           title: 'Trade',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconName={TAB_ICONS.trade} focused={focused} badge={incomingTradeCount} />
+            <MetalTab iconSource={TAB_ICONS.trade} focused={focused} badge={incomingTradeCount} />
           ),
         }}
       />
@@ -182,7 +184,7 @@ function TabsNavigator() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconName={TAB_ICONS.profile} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.profile} focused={focused} />
           ),
         }}
       />
@@ -254,6 +256,17 @@ const tabStyles = StyleSheet.create({
     // and border-bottom darker (RN can't do real insets but this fakes it).
     borderTopColor: '#4a3527',
     borderBottomColor: '#1a0e08',
+    overflow: 'hidden',
+  },
+  iconImage: {
+    width: 26,
+    height: 26,
+    opacity: 0.72,
+  },
+  iconImageActive: {
+    width: 30,
+    height: 30,
+    opacity: 1,
   },
   iconPlateActive: {
     backgroundColor: '#1a2a14',

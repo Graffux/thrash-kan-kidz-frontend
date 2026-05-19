@@ -9,11 +9,14 @@
  * COLLECTIONS / TRADES / DAILY STREAK grid).
  */
 import React from 'react';
-import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle, StyleProp, Image, ImageSourcePropType } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface Props {
-  iconName: keyof typeof Ionicons.glyphMap;
+  /** Custom artwork (preferred). */
+  iconSource?: ImageSourcePropType;
+  /** Fallback Ionicons glyph if no custom source provided. */
+  iconName?: keyof typeof Ionicons.glyphMap;
   iconColor?: string;
   value: string | number;
   label: string;
@@ -21,6 +24,7 @@ interface Props {
 }
 
 export const MetalStatPanel: React.FC<Props> = ({
+  iconSource,
   iconName,
   iconColor = '#c4ff5a',
   value,
@@ -30,7 +34,11 @@ export const MetalStatPanel: React.FC<Props> = ({
   return (
     <View style={[styles.panel, style]}>
       <View style={styles.iconWrap}>
-        <Ionicons name={iconName} size={28} color={iconColor} />
+        {iconSource ? (
+          <Image source={iconSource} style={styles.iconImage} resizeMode="contain" />
+        ) : iconName ? (
+          <Ionicons name={iconName} size={28} color={iconColor} />
+        ) : null}
       </View>
       <Text style={styles.value}>{value}</Text>
       <Text style={styles.label}>{label}</Text>
@@ -75,6 +83,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     borderWidth: 1,
     borderColor: 'rgba(57, 255, 20, 0.4)',
+    overflow: 'hidden',
+  },
+  iconImage: {
+    width: 40,
+    height: 40,
   },
   value: {
     fontSize: 20,
