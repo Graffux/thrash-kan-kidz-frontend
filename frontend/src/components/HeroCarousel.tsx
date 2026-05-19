@@ -19,6 +19,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { HERO_ART } from '../assets/icons';
 
 const SCREEN_W = Dimensions.get('window').width;
 const SLIDE_W = SCREEN_W - 32; // 16px horizontal padding on each side
@@ -30,7 +31,7 @@ interface Slide {
   cta: string;
   href: string;
   accentColor: string;
-  bgImage?: string;
+  bgImage?: any;
   icon: keyof typeof Ionicons.glyphMap;
 }
 
@@ -42,6 +43,7 @@ const SLIDES: Slide[] = [
     cta: 'RIP PACKS',
     href: '/shop',
     accentColor: '#39ff14',
+    bgImage: HERO_ART.series7,
     icon: 'flame',
   },
   {
@@ -51,6 +53,7 @@ const SLIDES: Slide[] = [
     cta: 'VIEW MISSIONS',
     href: '/goals',
     accentColor: '#ffd24a',
+    bgImage: HERO_ART.missions,
     icon: 'flash',
   },
   {
@@ -60,6 +63,7 @@ const SLIDES: Slide[] = [
     cta: 'GO TO TRADE',
     href: '/trade',
     accentColor: '#ff7a3a',
+    bgImage: HERO_ART.trade,
     icon: 'swap-horizontal',
   },
 ];
@@ -120,8 +124,16 @@ export const HeroCarousel: React.FC = () => {
               style={styles.slideGradient}
             />
             {s.bgImage && (
-              <Image source={{ uri: s.bgImage }} style={styles.slideBg} resizeMode="cover" />
+              <Image source={s.bgImage} style={styles.slideBg} resizeMode="cover" />
             )}
+            {/* Dark gradient ON TOP of the bgImage so text stays readable */}
+            <LinearGradient
+              colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.75)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={StyleSheet.absoluteFill}
+              pointerEvents="none"
+            />
             <View style={styles.slideContent}>
               <View style={styles.slideIconWrap}>
                 <Ionicons name={s.icon} size={32} color={s.accentColor} />
@@ -155,15 +167,15 @@ export const HeroCarousel: React.FC = () => {
 const styles = StyleSheet.create({
   wrap: { marginBottom: 16 },
   slide: {
-    height: 110,
+    height: 160,
     borderRadius: 12,
     borderWidth: 2,
     overflow: 'hidden',
     backgroundColor: '#0a0d0a',
     marginRight: 0,
   },
-  slideGradient: { ...StyleSheet.absoluteFillObject },
-  slideBg: { ...StyleSheet.absoluteFillObject, opacity: 0.3 },
+  slideGradient: { ...StyleSheet.absoluteFillObject, opacity: 0.35 },
+  slideBg: { ...StyleSheet.absoluteFillObject, opacity: 1.0 },
   slideContent: {
     flex: 1,
     flexDirection: 'row',

@@ -1,6 +1,6 @@
 /**
  * Centralized export of the custom Thrash Kan Kidz icon set.
- * Generated via Gemini Nano Banana — see /app/backend/scripts/generate_icons.py
+ * Generated via Gemini Nano Banana — see /app/backend/scripts/generate_icons_v2.py
  *
  * To regenerate any icon: delete the PNG and re-run the script.
  */
@@ -17,4 +17,10 @@ export const ICONS = {
   navGoals:      require('../../assets/icons/nav_goals.png'),
   navTrade:      require('../../assets/icons/nav_trade.png'),
   navProfile:    require('../../assets/icons/nav_profile.png'),
+};
+
+export const HERO_ART = {
+  series7:  require('../../assets/hero/hero_series7.png'),
+  missions: require('../../assets/hero/hero_missions.png'),
+  trade:    require('../../assets/hero/hero_trade.png'),
 };
