@@ -23,6 +23,10 @@ import MascotSplash from '../src/components/MascotSplash';
 import { RankCrest } from '../src/components/RankCrest';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { RippableDailyPack } from '../src/components/RippableDailyPack';
+import { DrippingLogo } from '../src/components/DrippingLogo';
+import { MetalStatPanel } from '../src/components/MetalStatPanel';
+import { SplatTitle } from '../src/components/SplatTitle';
+import { MASCOT_SIGNATURE } from '../src/assets/mascot';
 
 export default function HomeScreen() {
   const { user, loading, login, logout, claimDailyLogin, userCards, refreshData, apiUrl } = useApp();
@@ -262,42 +266,63 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.container}>
       {renderSplash && <MascotSplash holdMs={1500} />}
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.welcomeText}>Welcome back,</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={styles.usernameText}>{user.username}!</Text>
-              <RankCrest rank={user.rank} size="sm" />
+        {/* Header — Ronch avatar + LEVEL + dripping logo + logout */}
+        <View style={styles.topBar}>
+          <View style={styles.avatarBlock}>
+            <Image source={{ uri: MASCOT_SIGNATURE }} style={styles.ronchAvatar} />
+            <View style={styles.levelPill}>
+              <Text style={styles.levelText}>LVL {user.daily_login_streak || 1}</Text>
             </View>
           </View>
+          <DrippingLogo width={220} height={60} />
           <TouchableOpacity onPress={logout} style={styles.logoutButton}>
-            <Ionicons name="log-out-outline" size={24} color="#FF4500" />
+            <Ionicons name="log-out-outline" size={22} color="#9aff5a" />
           </TouchableOpacity>
         </View>
 
-        {/* Stats Cards */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statEmoji}>💰</Text>
-            <Text style={styles.statValue}>{user.coins}</Text>
-            <Text style={styles.statLabel}>Coins</Text>
+        {/* Welcome strip */}
+        <View style={styles.welcomeStrip}>
+          <Text style={styles.welcomeText}>Welcome back,</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text style={styles.usernameText}>{user.username}!</Text>
+            <RankCrest rank={user.rank} size="sm" />
           </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statEmoji}>🔥</Text>
-            <Text style={styles.statValue}>{user.daily_login_streak}</Text>
-            <Text style={styles.statLabel}>Day Streak</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statEmoji}>🃏</Text>
-            <Text style={styles.statValue}>{userCards.length}</Text>
-            <Text style={styles.statLabel}>Cards</Text>
-          </View>
+        </View>
+
+        {/* 4-up Metal Stat Panel grid */}
+        <View style={styles.statsGrid}>
+          <MetalStatPanel
+            iconName="albums"
+            value={userCards.length}
+            label="MY CARDS"
+            style={styles.statCell}
+          />
+          <MetalStatPanel
+            iconName="cash"
+            iconColor="#ffd24a"
+            value={user.coins}
+            label="COINS"
+            style={styles.statCell}
+          />
+          <MetalStatPanel
+            iconName="flame"
+            iconColor="#ff7a3a"
+            value={user.daily_login_streak}
+            label="STREAK"
+            style={styles.statCell}
+          />
+          <MetalStatPanel
+            iconName="trophy"
+            iconColor="#c4ff5a"
+            value={(user.completed_series ?? []).length}
+            label="SERIES DONE"
+            style={styles.statCell}
+          />
         </View>
 
         {/* Daily Login — rip-able pack replaces the legacy button. */}
         <View style={styles.dailyContainer}>
-          <Text style={styles.sectionTitle}>Daily Bonus</Text>
+          <SplatTitle>DAILY BONUS</SplatTitle>
           {dailyMessage && (
             <View style={styles.successMessage}>
               <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
@@ -322,7 +347,7 @@ export default function HomeScreen() {
             the AppContext refresh, so awards reflect immediately on the
             Shop screen the next time it renders. */}
         <View style={styles.miniGamesContainer}>
-          <Text style={styles.sectionTitle}>Mini-Games</Text>
+          <SplatTitle>MINI-GAMES</SplatTitle>
           <TouchableOpacity
             style={styles.miniGameButton}
             onPress={() => {
@@ -358,7 +383,7 @@ export default function HomeScreen() {
         {/* Featured Card Preview — shows pinned slots if user has them set,
             otherwise falls back to the user's first 3 owned cards. */}
         <View style={styles.featuredContainer}>
-          <Text style={styles.sectionTitle}>Featured Cards</Text>
+          <SplatTitle>FEATURED CARDS</SplatTitle>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {(() => {
               const pinnedIds = user.featured_card_ids ?? [];
@@ -541,6 +566,55 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 20,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  avatarBlock: {
+    alignItems: 'center',
+  },
+  ronchAvatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderColor: '#39ff14',
+    backgroundColor: '#0a0d0a',
+  },
+  levelPill: {
+    marginTop: 4,
+    backgroundColor: '#5a1e8a',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: '#9c66cc',
+  },
+  levelText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+  welcomeStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+    marginBottom: 10,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 20,
+    paddingHorizontal: 2,
+  },
+  statCell: {
+    // MetalStatPanel uses flex:1 internally
   },
   welcomeText: {
     fontSize: 14,

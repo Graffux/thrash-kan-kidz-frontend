@@ -16,7 +16,7 @@ export const MASCOT_NAME = 'Ronch';
 export const MASCOT_TAGLINE = 'TRASHED. THRASHED. FOREVER THRASHED.';
 
 // Full art / signature pose — used on splash + onboarding hero
-export const MASCOT_SIGNATURE = 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/7j960efo_Screenshot_20260512_221913_ChatGPT.png';
+export const MASCOT_SIGNATURE = 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/g1st4ssy_enhanced-1778699015354.jpg';
 
 // Logo + character composite — used on splash hero
 export const MASCOT_LOGO_HERO = 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/46t0w978_Screenshot_20260512_222521_ChatGPT.png';

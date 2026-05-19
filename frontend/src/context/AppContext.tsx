@@ -25,6 +25,7 @@ interface User {
   free_packs?: number;
   series_milestone_claimed?: number[];
   featured_card_ids?: string[];
+  completed_series?: number[];
   rank?: {
     id: string;
     name: string;
