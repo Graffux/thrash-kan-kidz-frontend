@@ -31,6 +31,8 @@ _client = AsyncIOMotorClient(os.environ["MONGO_URL"])
 db = _client[os.environ["DB_NAME"]]
 
 MAX_CONTENT_LEN = 200
+MAX_COMMENT_LEN = 200
+MAX_IMAGE_BYTES = 1_500_000  # ~1.5MB base64 (Mongo doc safe size)
 
 
 def _serialize(post: dict, viewer_id: str | None = None) -> dict:
@@ -41,9 +43,22 @@ def _serialize(post: dict, viewer_id: str | None = None) -> dict:
         "user_id": post["user_id"],
         "username": post.get("username", "anon"),
         "content": post.get("content", ""),
+        "image": post.get("image"),  # base64 data URI or None
         "created_at": post.get("created_at"),
         "reaction_count": len(reactors),
         "viewer_reacted": viewer_id in reactors if viewer_id else False,
+        "comment_count": int(post.get("comment_count", 0)),
+    }
+
+
+def _serialize_comment(c: dict) -> dict:
+    return {
+        "id": c["id"],
+        "post_id": c["post_id"],
+        "user_id": c["user_id"],
+        "username": c.get("username", "anon"),
+        "content": c.get("content", ""),
+        "created_at": c.get("created_at"),
     }
 
 
@@ -52,12 +67,19 @@ async def create_post(request: Request):
     body = await request.json()
     user_id = body.get("user_id")
     content = (body.get("content") or "").strip()
+    image = body.get("image")  # optional base64 data URI
     if not user_id:
         raise HTTPException(400, "user_id required")
-    if not content:
-        raise HTTPException(400, "Post content can't be empty")
-    if len(content) > MAX_CONTENT_LEN:
+    if not content and not image:
+        raise HTTPException(400, "Post needs text or an image")
+    if content and len(content) > MAX_CONTENT_LEN:
         raise HTTPException(400, f"Post too long (max {MAX_CONTENT_LEN} chars)")
+    if image:
+        if not isinstance(image, str) or not image.startswith("data:image/"):
+            raise HTTPException(400, "image must be a data:image/...;base64 URI")
+        # Reject anything larger than the cap before it hits Mongo's 16MB doc limit.
+        if len(image) > MAX_IMAGE_BYTES:
+            raise HTTPException(400, "Image too large (max ~1MB after encoding)")
 
     user = await db.users.find_one({"id": user_id})
     if not user:
@@ -68,10 +90,11 @@ async def create_post(request: Request):
         "user_id": user_id,
         "username": user.get("username", "anon"),
         "content": content,
+        "image": image,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "reactors": [],
+        "comment_count": 0,
     }
-    # `insert_one` mutates `post` to add `_id` — exclude it from the response.
     await db.mosh_posts.insert_one(post)
     return _serialize(post, viewer_id=user_id)
 
@@ -127,4 +150,67 @@ async def delete_post(post_id: str, request: Request):
     if post["user_id"] != user_id:
         raise HTTPException(403, "Can only delete your own posts")
     await db.mosh_posts.delete_one({"id": post_id})
+    # Cascade delete comments
+    await db.mosh_comments.delete_many({"post_id": post_id})
+    return {"success": True}
+
+
+# ─── Comments ────────────────────────────────────────────────────────────
+# Flat one-level threads: every comment attaches to a post_id, no nesting.
+
+@router.get("/mosh/posts/{post_id}/comments")
+async def list_comments(post_id: str, limit: int = 100):
+    limit = max(1, min(limit, 500))
+    cursor = db.mosh_comments.find(
+        {"post_id": post_id}, {"_id": 0}
+    ).sort("created_at", 1).limit(limit)
+    return [_serialize_comment(c) for c in await cursor.to_list(limit)]
+
+
+@router.post("/mosh/posts/{post_id}/comments")
+async def create_comment(post_id: str, request: Request):
+    body = await request.json()
+    user_id = body.get("user_id")
+    content = (body.get("content") or "").strip()
+    if not user_id:
+        raise HTTPException(400, "user_id required")
+    if not content:
+        raise HTTPException(400, "Comment can't be empty")
+    if len(content) > MAX_COMMENT_LEN:
+        raise HTTPException(400, f"Comment too long (max {MAX_COMMENT_LEN} chars)")
+
+    post = await db.mosh_posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(404, "Post not found")
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    comment = {
+        "id": str(uuid.uuid4()),
+        "post_id": post_id,
+        "user_id": user_id,
+        "username": user.get("username", "anon"),
+        "content": content,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.mosh_comments.insert_one(comment)
+    await db.mosh_posts.update_one({"id": post_id}, {"$inc": {"comment_count": 1}})
+    return _serialize_comment(comment)
+
+
+@router.delete("/mosh/comments/{comment_id}")
+async def delete_comment(comment_id: str, request: Request):
+    body = await request.json()
+    user_id = body.get("user_id")
+    comment = await db.mosh_comments.find_one({"id": comment_id})
+    if not comment:
+        raise HTTPException(404, "Comment not found")
+    if comment["user_id"] != user_id:
+        raise HTTPException(403, "Can only delete your own comments")
+    await db.mosh_comments.delete_one({"id": comment_id})
+    await db.mosh_posts.update_one(
+        {"id": comment["post_id"]},
+        {"$inc": {"comment_count": -1}},
+    )
     return {"success": True}

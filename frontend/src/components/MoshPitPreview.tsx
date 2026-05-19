@@ -17,6 +17,7 @@ interface MoshPost {
   created_at: string;
   reaction_count: number;
   viewer_reacted: boolean;
+  comment_count: number;
 }
 
 const relativeTime = (iso: string): string => {

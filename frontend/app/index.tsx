@@ -319,12 +319,18 @@ export default function HomeScreen() {
             label="STREAK"
             style={styles.statCell}
           />
-          <MetalStatPanel
-            iconSource={ICONS.statTrophy}
-            value={(user.completed_series ?? []).length}
-            label="SERIES DONE"
+          <TouchableOpacity
             style={styles.statCell}
-          />
+            onPress={() => router.push('/leaderboard')}
+            activeOpacity={0.85}
+            testID="home-stat-leaderboard"
+          >
+            <MetalStatPanel
+              iconSource={ICONS.statTrophy}
+              value={(user.completed_series ?? []).length}
+              label="LEADERBOARD"
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Hero promo carousel — sits right under stats so it's the first
