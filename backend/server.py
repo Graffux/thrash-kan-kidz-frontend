@@ -1476,6 +1476,7 @@ async def update_featured_cards(user_id: str, request: UpdateFeaturedCardsReques
     )
 
     updated_user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    updated_user.pop("password_hash", None)
     updated_user["rank"] = compute_user_rank(updated_user.get("completed_series", []))
     return User(**updated_user)
 
