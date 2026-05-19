@@ -5,9 +5,9 @@ A mobile card-collecting game featuring thrash/death metal parody cards (Garbage
 Pail Kids style). Built with React Native (Expo SDK 54) + FastAPI + MongoDB.
 
 ## Status
-- **Live on Google Play Production** (v80 series shipping; v82 prepared and queued for next push).
+- **Live on Google Play Production**; current prepared build is v1.9.0 / versionCode 84.
 - Custom domain `thrashkankidz.com` mapped via Porkbun → Cloudflare Pages.
-- 567 cards seeded; Series 1–7 FULLY seeded. Series 1–6 released, Series 7 "Grind Edition" unlocks **2026-05-17**.
+- **567 cards seeded**. Series 1–7 FULLY seeded. Series 7 "Grind Edition" unlocked **2026-05-17**.
 - CI/CD: GitHub Actions auto-deploys backend to Render and builds Android `.aab` for free via `eas build --local` on the GitHub runner.
 
 ## Architecture
@@ -15,86 +15,85 @@ Pail Kids style). Built with React Native (Expo SDK 54) + FastAPI + MongoDB.
 /app
 ├── backend
 │   ├── server.py                # Core API + auth + pack/spin/trade logic
-│   ├── series_config.py         # Series release schedule
-│   ├── routers/{cards,diagnostics,static_pages,feedback,friends}.py
-│   ├── tests/test_ranks.py      # Pytest for rank computation
+│   ├── series_config.py         # Series release schedule + rare rewards
+│   ├── routers/cards.py         # /api/cards (cap raised 500→2000)
+│   ├── tests/test_ranks.py
 │   └── data
-│       ├── cards_data.py        # Master catalog (CARD_IMAGE_URLS, backs, variants)
+│       ├── cards_data.py        # 567-card catalog
 │       ├── goals_data.py        # Goals (rewards system)
-│       ├── ranks.py             # 9-rank ladder, compute_user_rank() (NEW)
-│       └── badges.py            # 15 badges with server-evaluated conditions (NEW)
+│       ├── ranks.py             # 9-rank ladder
+│       └── badges.py            # 15 badges
 └── frontend
-    ├── app.json / eas.json      # versionCode 82, version 1.8.9, newArchEnabled
-    ├── app/{index,collection,shop,trade,profile,goals}.tsx
-    └── src
-        ├── components
-        │   ├── ScratchCard.tsx              # SVG-mask scratch-off
-        │   ├── RankCrest.tsx                # Rank badge image (sm/md/lg) (NEW)
-        │   ├── BadgeCabinet.tsx             # Profile achievements grid (NEW)
-        │   ├── MetalButton, OozeProgressBar
-        │   ├── MascotSplash, MascotStamp, MascotEmptyState, RonchTrashTalk
-        │   └── PackRevealWrapper, CoinGainPop
-        └── context/AppContext.tsx
+    ├── app.json                 # version 1.9.0, versionCode 84, newArchEnabled
+    └── src/components
+        ├── RankCrest.tsx, BadgeCabinet.tsx, ScratchCard.tsx
+        └── MetalButton, OozeProgressBar, Mascot* etc.
 ```
 
-## What's been implemented
+## What's been implemented (latest session: 2026-05-17)
 
-### 2026-05-15 (this session) — Ranks + Badges + Build Fixes
-- **Player rank system** (`data/ranks.py` + `<RankCrest>`):
-  - 9 ranks: Poser → Roadie → Fist Banger → Tape Trader → Headbanger → Mosher → Pit Dweller → **Stage Diver** (S7) → Thrash Maniac (S8, future)
-  - Unlock = N series cleared (base cards). Server-authoritative via `compute_user_rank()`.
-  - `GET /api/ranks` lists ladder; `rank` field attached to `/users/{id}`, `/users/search`, `/users/recently-active`.
-  - Crest UI: small badge next to username (Home + Trade), large crest with label on Profile.
-  - 6/6 pytest cases pass.
-- **Badge Cabinet** (`data/badges.py` + `<BadgeCabinet>`):
-  - 15 badges defined with 9 condition types (login streak, trades count, variants owned, series base complete, friend count, total spent, own specific card, etc.).
-  - `GET /api/badges` (catalog), `GET /api/users/{id}/badges` (per-user state).
-  - Visual-only — no rewards (Goals keep their rewards, Badges layer added on top).
-  - Renders on Profile page with Ionicons fallback until custom art is added (`image_url` field on each badge ready for swap).
-- **Bug fix:** Tranquilized Adam back image was showing Sadam Tranquilli's front (URL collision in `CARD_BACK_IMAGE_URLS`). Replaced with correct Butt Feast artwork.
-- **Build unblock:** `app.json` updated with `newArchEnabled: true` (root + `expo-build-properties` for android/ios) — required for `react-native-reanimated` v4. Bumped to v1.8.9 / versionCode 82.
+### Series 7 Grind Edition — fully shipped
+- All 8 bands seeded with 2 base + 8 variants each = 80 cards
+  - Napalm Breath, Cheese Grater Mutilation, Anel Cant, Foreseen Terror,
+    Snasum, Minimal Noise Horror, Brutal Lies, Horrorizer
+- Alien Dubin epic reward card seeded with proper `series: 7` field and correct
+  front/back URLs (front: `i4e0c7o8_...`, back: `vu8xlmum_...`)
+- Series 7 cover image wired into shop's series toggle
+- `SERIES_CONFIG[7].rare_reward = "card_alien_dubin"` — series-completion now
+  auto-grants the epic reward (was silently `None`)
 
-### Earlier in this fork
-- Series 7 fully seeded (all 8 bands + Alien Dubin reward).
-- Scratch-off variant reveal (`react-native-svg`) shipped on pack-opens, spins, trade-ins.
-- Mascot integration: Thrash Man Ronch via MascotSplash, MascotEmptyState, RonchTrashTalk easter eggs.
-- Visual polish: MetalButton, OozeProgressBar, PackRevealWrapper, CoinGainPop.
-- CI/CD pipelines: `deploy-render.yml` (backend auto-deploy on push to `backend/**`), `build-android.yml` (free EAS Android builds on GitHub runner using `eas build --local`).
-- FOREGROUND_SERVICE permissions stripped via `remove-permissions.js` plugin.
+### Player rank + badge systems (earlier this session)
+- 9-rank ladder Poser → Thrash Maniac (Stage Diver at S7, Thrash Maniac future S8)
+- 15-badge cabinet on profile (server-evaluated conditions)
+- Crests shown in home header, profile, trade screen
 
-### Pre-fork
-- Live on Google Play v77.
-- Custom domain + Cloudflare landing page deployed.
-- Mini-games (Daily Wheel, Card Picker) on Home screen.
-- Scheduled series releases via `series_config.py`.
-- Privacy Policy + Delete Account pages on Render.
+### Bugs fixed this session
+- **`/api/cards` 500 limit** — silently truncating responses. Raised to 2000.
+- **Tranquilized Adam back image** swapped to Butt Feast artwork (was Sadam front)
+- **Alien Dubin front/back** swapped (correct orientations now)
+- **Series 7 variant rarity** — 32 cards were tagged `rarity:"common"`, now `"variant"`
+- **Meth Putnam + Shane Embryo rarity** — overcorrected to `"variant"`, restored to `"common"`
+- **Epic reward unlock query** — was only matching `rarity:"rare"`. Now also matches
+  `rarity:"epic"` so Sean Kill-Again, Martin Generic Ain't, Nicklebag Darrell,
+  and Alien Dubin actually unlock when card-count threshold is met. Backfill at
+  startup retroactively granted 30 unlocks.
+- **Series 7 reward backfill** — startup script now grants Alien Dubin to any
+  user who already owns all 16 S7 base cards. Granted retroactively to 2 users.
+- **Sync function** now propagates `rarity` and `series` changes from
+  cards_data.py → MongoDB (previously only URLs + descriptions synced)
+
+### App config updates
+- `version: 1.9.0`, `versionCode: 84`
+- `newArchEnabled: true` (required for Reanimated v4)
+- `expo-build-properties` plugin with android/ios newArch flags
 
 ## API surface (selected)
-- `GET /api/ranks` — rank ladder catalog
-- `GET /api/badges` — badge catalog
-- `GET /api/users/{id}` — now includes `rank` field
-- `GET /api/users/{id}/badges` — `{ badges: [...with earned flag], earned_count }`
-- `GET /api/users/search`, `/users/recently-active` — now include `rank`
-- `GET /api/cards` — variant cards include `scratch_cover_url` when registered
+- `GET /api/cards` — returns all released-series cards (cap 2000)
+- `GET /api/ranks`, `GET /api/badges` — catalogs
+- `GET /api/users/{id}` — includes `rank` field
+- `GET /api/users/{id}/badges` — per-user earned state
+- `POST /api/users/{id}/check-series-completion/{series}` — grants reward on completion
 
 ## Prioritized backlog
 ### P0
-- **Push pending commits** (user is away from desktop): ranks system, badges system, Tranquilized Adam back fix, app.json newArch unblock
-- Verify GitHub Action `.aab` build succeeds with new arch enabled
-- Verify Series 7 reward unlock logic (rarity check) still works
+- **Push backend + frontend repos** — backend has Series 7 reward fix + image
+  swap + multiple critical bug fixes; frontend has S7 cover image + rank/badge
+  UI + versionCode 84 ready to build
+- Build & upload v84 AAB to Play Console after frontend push
 
 ### P1
-- Upload custom badge artwork — drop URLs into `image_url` field per badge in `data/badges.py`
-- Build & upload v82 AAB to Play Console once GH Actions completes
+- Upload custom badge artwork (drop URLs into `image_url` field per badge)
 - Swap app icon to Ronch mascot face (requires new build)
+- Audit if "Series 7 Reward Revealed" celebration triggers properly for users
+  who hit completion organically (not via backfill)
 
 ### P2
 - Landing page upgrades on Cloudflare Pages: screenshots, card grid, email signup
 - Refactor `server.py` into more `/routers/` (users, trades, shop, spin, payments, goals)
-- Upload remaining 28 variant scratch covers
+- Series 7 variant scratch covers (already present for blacklight/chrome/digital/melted)
 
 ### P3
-- iOS App Store release (Apple Developer Program enrollment + StoreKit rebuild)
+- iOS App Store release
 
 ## Test credentials
 See `/app/memory/test_credentials.md`.

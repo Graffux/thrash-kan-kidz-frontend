@@ -38,7 +38,7 @@ BADGES = [
         "tint": "#FFD700",
         "condition_type": COND_SERIES_BASE_COMPLETE,
         "condition_params": {"series_num": 1},
-        "image_url": None,
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/5g83qmi2_enhanced-1779076898405.png",
     },
     {
         "id": "streak_100",
@@ -90,7 +90,7 @@ BADGES = [
         "tint": "#FFD700",
         "condition_type": COND_SERIES_BASE_COMPLETE,
         "condition_params": {"series_num": 2},
-        "image_url": None,
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/tugzi06r_enhanced-1779077203881.png",
     },
     {
         "id": "series_3_master",
@@ -100,7 +100,7 @@ BADGES = [
         "tint": "#FFD700",
         "condition_type": COND_SERIES_BASE_COMPLETE,
         "condition_params": {"series_num": 3},
-        "image_url": None,
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/bjdtkz6n_enhanced-1779077356786.png",
     },
     {
         "id": "series_4_master",
@@ -110,7 +110,7 @@ BADGES = [
         "tint": "#FFD700",
         "condition_type": COND_SERIES_BASE_COMPLETE,
         "condition_params": {"series_num": 4},
-        "image_url": None,
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/de6uw9qg_enhanced-1779077568638.png",
     },
     {
         "id": "series_5_master",
@@ -120,7 +120,7 @@ BADGES = [
         "tint": "#FFD700",
         "condition_type": COND_SERIES_BASE_COMPLETE,
         "condition_params": {"series_num": 5},
-        "image_url": None,
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ym5bexzi_enhanced-1779077842748.png",
     },
     {
         "id": "series_6_master",
@@ -130,7 +130,7 @@ BADGES = [
         "tint": "#FFD700",
         "condition_type": COND_SERIES_BASE_COMPLETE,
         "condition_params": {"series_num": 6},
-        "image_url": None,
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/clxtquwo_enhanced-1779078150758.png",
     },
     {
         "id": "series_7_master",
@@ -140,7 +140,7 @@ BADGES = [
         "tint": "#FFD700",
         "condition_type": COND_SERIES_BASE_COMPLETE,
         "condition_params": {"series_num": 7},
-        "image_url": None,
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/b8qfgszs_enhanced-1779078359336.png",
     },
 
     # --- Easy wins (proactive additions) ---
@@ -152,7 +152,7 @@ BADGES = [
         "tint": "#4CAF50",
         "condition_type": COND_OWN_ANY_CARD,
         "condition_params": {},
-        "image_url": None,
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/8pfbiq6o_enhanced-1779097079250.png",
     },
     {
         "id": "big_spender",
