@@ -3837,11 +3837,13 @@ from routers import cards as cards_routes  # noqa: E402
 from routers import static_pages as static_routes  # noqa: E402
 from routers import feedback as feedback_routes  # noqa: E402
 from routers import friends as friends_routes  # noqa: E402
+from routers import mosh as mosh_routes  # noqa: E402
 from routers import diagnostics as diagnostics_routes  # noqa: E402
 api_router.include_router(cards_routes.router)
 api_router.include_router(static_routes.router)
 api_router.include_router(feedback_routes.router)
 api_router.include_router(friends_routes.router)
+api_router.include_router(mosh_routes.router)
 api_router.include_router(diagnostics_routes.router)
 
 # Include the router in the main app

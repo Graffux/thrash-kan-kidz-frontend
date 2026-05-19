@@ -27,6 +27,9 @@ import { RippableDailyPack } from '../src/components/RippableDailyPack';
 import { DrippingLogo } from '../src/components/DrippingLogo';
 import { MetalStatPanel } from '../src/components/MetalStatPanel';
 import { SplatTitle } from '../src/components/SplatTitle';
+import { HeroCarousel } from '../src/components/HeroCarousel';
+import { ThrashMissionsPreview } from '../src/components/ThrashMissionsPreview';
+import { MoshPitPreview } from '../src/components/MoshPitPreview';
 import { MASCOT_SIGNATURE } from '../src/assets/mascot';
 
 export default function HomeScreen() {
@@ -326,6 +329,10 @@ export default function HomeScreen() {
           />
         </View>
 
+        {/* Hero promo carousel — sits right under stats so it's the first
+            tappable promotion users see when scrolling. */}
+        <HeroCarousel />
+
         {/* Daily Login — rip-able pack replaces the legacy button. */}
         <View style={styles.dailyContainer}>
           <SplatTitle>DAILY BONUS</SplatTitle>
@@ -352,9 +359,11 @@ export default function HomeScreen() {
             want during the session. Both modals manage their own state via
             the AppContext refresh, so awards reflect immediately on the
             Shop screen the next time it renders. */}
+        {/* Thrash Missions preview — top 3 in-progress goals */}
+        <ThrashMissionsPreview />
+
         <View style={styles.miniGamesContainer}>
-          <SplatTitle>MINI-GAMES</SplatTitle>
-          <TouchableOpacity
+          <SplatTitle>MINI-GAMES</SplatTitle>          <TouchableOpacity
             style={styles.miniGameButton}
             onPress={() => {
               buttonTapSound.play();
@@ -385,6 +394,9 @@ export default function HomeScreen() {
             <Ionicons name="chevron-forward" size={18} color="#FFD700" />
           </TouchableOpacity>
         </View>
+
+        {/* Mosh Pit community feed preview — latest 3 posts */}
+        <MoshPitPreview />
 
         {/* Featured Card Preview — shows pinned slots if user has them set,
             otherwise falls back to the user's first 3 owned cards. */}
