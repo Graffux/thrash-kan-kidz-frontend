@@ -625,13 +625,13 @@ export default function ShopScreen() {
                       onPress={() => {
                         const c = spinResult.won_cards[revealIndex].card;
                         closeResult();
-                        router.push({
-                          pathname: '/mosh',
-                          params: {
-                            sharePullName: c.name,
-                            sharePullImage: c.front_image_url,
-                          },
-                        } as any);
+                        // Use query-string URL form — more reliable across
+                        // expo-router versions than the object form.
+                        const name = encodeURIComponent(c.name);
+                        const img = encodeURIComponent(c.front_image_url);
+                        router.push(
+                          `/mosh?sharePullName=${name}&sharePullImage=${img}` as any
+                        );
                       }}
                       testID="share-pull-btn"
                     >

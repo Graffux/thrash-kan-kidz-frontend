@@ -11,7 +11,9 @@ module.exports = function removePermissionsPlugin(config) {
     manifest.$["xmlns:tools"] = "http://schemas.android.com/tools";
     
     const removePermissions = [
-      "android.permission.READ_MEDIA_IMAGES",
+      // NOTE: READ_MEDIA_IMAGES is intentionally NOT in this list — the
+      // Mosh Pit composer needs photo gallery access for users to attach
+      // pull screenshots / card photos.
       "android.permission.READ_MEDIA_VIDEO",
       "android.permission.READ_EXTERNAL_STORAGE",
       "android.permission.WRITE_EXTERNAL_STORAGE",

@@ -23,14 +23,13 @@
     },
     "android": {
       "package": "com.thrashkankidz.app",
-      "versionCode": 95,
+      "versionCode": 96,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
       "permissions": [],
       "blockedPermissions": [
-        "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
@@ -57,6 +56,12 @@
       "./plugins/remove-permissions",
       "expo-audio",
       "expo-iap",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Thrash Kan Kidz to access your photos so you can share your pulls in the Mosh Pit."
+        }
+      ],
       [
         "expo-notifications",
         {
