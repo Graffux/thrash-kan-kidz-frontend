@@ -80,7 +80,6 @@ export const GrungeBackground: React.FC<Props> = ({ children, style, lighten, no
         source={RUST_TEXTURE}
         style={styles.rustTexture}
         resizeMode="cover"
-        pointerEvents="none"
       />
 
       {/* Noise overlay — tiled dots simulate grain without a raster asset.
@@ -111,7 +110,6 @@ export const GrungeBackground: React.FC<Props> = ({ children, style, lighten, no
           source={RONCH_PEEK}
           style={styles.ronchPeek}
           resizeMode="contain"
-          pointerEvents="none"
         />
       )}
 

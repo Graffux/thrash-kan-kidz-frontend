@@ -11,6 +11,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, StyleProp, ViewStyle, TextStyle } from 'react-native';
 import Svg, { Path, Defs, LinearGradient as SvgGrad, Stop } from 'react-native-svg';
+import { FONTS } from '../theme';
 
 interface Props {
   children: React.ReactNode;
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 22,
-    fontFamily: 'MetalMania',
+    fontFamily: FONTS.metal,
     fontWeight: '900',
     letterSpacing: 2,
     paddingHorizontal: 14,

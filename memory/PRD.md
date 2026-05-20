@@ -32,6 +32,18 @@ Pail Kids style). Built with React Native (Expo SDK 54) + FastAPI + MongoDB.
 
 ## What's been implemented
 
+### Visual Overhaul — Batch 3 Final Aesthetic Polish (2026-05-20)
+- `MetalMania` font wired in via `@expo-google-fonts/metal-mania@0.4.1` — `useFonts`
+  hook in `_layout.tsx` blocks splash until font loads (no system-font flash on
+  first render)
+- `theme.ts` central design tokens (toxic slime + anarchy purple + rust palette)
+- `<SplatTitle>` paint-splat section header with drip details, reads `FONTS.metal`
+- `<ToxicBar>` slime-tube progress bar with gradient fill, bubbles, highlight stripe
+- `<SlimeBubbles>` ambient looping animated particles (RN Animated, no Reanimated dep)
+- `<GrungeBackground>` extended with rust texture overlay + Ronch peek silhouette
+  + SlimeBubbles. Removed deprecated `pointerEvents` Image prop.
+- Custom Ronch peek + rust texture art assets generated via Nano Banana
+
 ### Visual Overhaul — Batch 1 (2026-05-19)
 - `featured_card_ids: List[str]` added to User model (max 5, owned-only)
 - `PUT /api/users/{id}/featured-cards` endpoint validates ownership + dedupes
