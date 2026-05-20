@@ -4,6 +4,7 @@ import { AppProvider, useApp } from '../src/context/AppContext';
 import { View, StyleSheet, Text, Platform, Animated, Easing, Image, ImageSourcePropType } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
+import { UpdateBanner } from '../src/components/UpdateBanner';
 import { ICONS } from '../src/assets/icons';
 
 /**
@@ -202,6 +203,7 @@ export default function TabLayout() {
   return (
     <ErrorBoundary>
       <AppProvider>
+        <UpdateBanner />
         <TabsNavigator />
       </AppProvider>
     </ErrorBoundary>
