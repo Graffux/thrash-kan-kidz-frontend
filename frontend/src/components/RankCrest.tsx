@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
+import { FONTS } from '../theme';
 
 // Server-side shape from /api/ranks and the `rank` field on user payloads.
 export interface Rank {
@@ -59,8 +60,9 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#FFD700',
+    fontFamily: FONTS.metal,
     fontWeight: '900',
-    letterSpacing: 1.5,
+    letterSpacing: 2,
     marginTop: 4,
     textShadowColor: '#000',
     textShadowOffset: { width: 1, height: 1 },

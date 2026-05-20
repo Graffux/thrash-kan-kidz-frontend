@@ -30,6 +30,7 @@ const TAB_ICONS: Record<string, ImageSourcePropType> = {
   shop: ICONS.navShop,
   goals: ICONS.navGoals,
   trade: ICONS.navTrade,
+  leaderboard: ICONS.navLeaderboard,
   profile: ICONS.navProfile,
 };
 
@@ -187,6 +188,15 @@ function TabsNavigator() {
         }}
       />
       <Tabs.Screen
+        name="leaderboard"
+        options={{
+          title: 'Ranks',
+          tabBarIcon: ({ focused }) => (
+            <MetalTab iconSource={TAB_ICONS.leaderboard} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
@@ -198,7 +208,6 @@ function TabsNavigator() {
       {/* Hidden screens */}
       <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarButton: () => null }} />
       <Tabs.Screen name="mosh" options={{ title: 'Mosh Pit', tabBarButton: () => null }} />
-      <Tabs.Screen name="leaderboard" options={{ title: 'Leaderboard', tabBarButton: () => null }} />
       <Tabs.Screen name="privacy" options={{ title: 'Privacy Policy', tabBarButton: () => null }} />
       <Tabs.Screen name="payment-success" options={{ title: 'Payment Success', tabBarButton: () => null }} />
     </Tabs>
@@ -259,7 +268,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 2,
-    minWidth: 50,
+    minWidth: 42,
   },
 });
 

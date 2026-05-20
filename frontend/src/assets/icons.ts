@@ -17,6 +17,10 @@ export const ICONS = {
   navGoals:      require('../../assets/icons/nav_goals.png'),
   navTrade:      require('../../assets/icons/nav_trade.png'),
   navProfile:    require('../../assets/icons/nav_profile.png'),
+  // Leaderboard reuses the trophy icon for now — visually consistent with
+  // the rest of the nav and matches the "ranking" concept. Swap in a
+  // dedicated Nano Banana icon later if desired.
+  navLeaderboard: require('../../assets/icons/stat_trophy.png'),
 };
 
 export const HERO_ART = {

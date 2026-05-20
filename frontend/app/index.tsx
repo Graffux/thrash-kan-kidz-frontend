@@ -23,6 +23,7 @@ import { CardPickerModal } from '../src/components/CardPickerModal';
 import MascotSplash from '../src/components/MascotSplash';
 import { RankCrest } from '../src/components/RankCrest';
 import { GrungeBackground } from '../src/components/GrungeBackground';
+import { FONTS } from '../src/theme';
 import { RippableDailyPack } from '../src/components/RippableDailyPack';
 import { DrippingLogo } from '../src/components/DrippingLogo';
 import { MetalStatPanel } from '../src/components/MetalStatPanel';
@@ -643,9 +644,14 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   usernameText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 28,
+    fontFamily: FONTS.metal,
+    fontWeight: '900',
+    color: '#9aff5a',
+    letterSpacing: 1.5,
+    textShadowColor: 'rgba(57,255,20,0.45)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
   },
   logoutButton: {
     padding: 8,

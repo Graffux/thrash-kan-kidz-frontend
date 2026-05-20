@@ -43,6 +43,11 @@ Pail Kids style). Built with React Native (Expo SDK 54) + FastAPI + MongoDB.
 - `<GrungeBackground>` extended with rust texture overlay + Ronch peek silhouette
   + SlimeBubbles. Removed deprecated `pointerEvents` Image prop.
 - Custom Ronch peek + rust texture art assets generated via Nano Banana
+- **Leaderboard promoted to a visible bottom-nav tab** ("Ranks", between Trade
+  and Profile). Reuses `stat_trophy.png` icon. `tabBarItem.minWidth` tightened
+  to 42 so all 7 tabs fit on smaller phones.
+- Metal-font pass on highest-impact headers: Home username greeting + RankCrest
+  label now render in `FONTS.metal` with toxic-slime glow.
 
 ### Visual Overhaul — Batch 1 (2026-05-19)
 - `featured_card_ids: List[str]` added to User model (max 5, owned-only)
