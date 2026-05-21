@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { AppProvider, useApp } from '../src/context/AppContext';
 import { View, StyleSheet, Text, Platform, Animated, Easing, Image, ImageSourcePropType } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFonts } from 'expo-font';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { UpdateBanner } from '../src/components/UpdateBanner';
 import { ICONS } from '../src/assets/icons';
@@ -209,9 +210,22 @@ function TabsNavigator() {
 }
 
 export default function TabLayout() {
-  // Font "MetalMania" is embedded natively at build time via the
-  // expo-font plugin in app.json — no useFonts hook needed, no splash gate.
-  // The font family is available immediately on app launch.
+  // Load Metal Mania font at runtime from local TTF asset.
+  // Graceful fallback: if it fails to load we still render the app with
+  // system font — no splash gate, no crash.
+  const [fontsLoaded, fontError] = useFonts({
+    MetalMania: require('../assets/fonts/MetalMania-Regular.ttf'),
+  });
+
+  // Don't block app render — render either way. SplatTitle will fall back to
+  // system bold if the font isn't ready yet. Stops the "won't even open" crash.
+  // We still log errors for debugging.
+  useEffect(() => {
+    if (fontError) {
+      console.warn('[font] MetalMania failed to load:', fontError);
+    }
+  }, [fontError]);
+
   return (
     <ErrorBoundary>
       <AppProvider>

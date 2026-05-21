@@ -23,7 +23,7 @@
     },
     "android": {
       "package": "com.thrashkankidz.app",
-      "versionCode": 100,
+      "versionCode": 101,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
@@ -44,12 +44,6 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-font",
-        {
-          "fonts": ["./assets/fonts/MetalMania-Regular.ttf"]
-        }
-      ],
       [
         "expo-splash-screen",
         {
