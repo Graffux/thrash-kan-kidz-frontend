@@ -37,6 +37,11 @@ concurrency:
 
 jobs:
   build:
+    # Guard against running in the wrong repo. "Save to GitHub" pushes the
+    # entire /app tree (including .github/workflows/) into BOTH the frontend
+    # and backend repos, so without this filter the workflow attempts to run
+    # in the backend repo too and fails immediately (no EXPO_TOKEN secret).
+    if: endsWith(github.repository, '-frontend')
     runs-on: ubuntu-latest
     # 60 min was tight on first builds — bumped to 120 to absorb cold-cache
     # Gradle + Maven downloads. Cached subsequent runs typically finish in
