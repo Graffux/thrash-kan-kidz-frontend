@@ -30,6 +30,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import axios from 'axios';
 import { useApp } from '../src/context/AppContext';
 import { RankCrest } from '../src/components/RankCrest';
@@ -38,6 +40,7 @@ import { GrungeBackground } from '../src/components/GrungeBackground';
 import { FeaturedCards } from '../src/components/FeaturedCards';
 import { SplatTitle } from '../src/components/SplatTitle';
 import { MASCOT_SIGNATURE } from '../src/assets/mascot';
+import { FONTS } from '../src/theme';
 
 interface PublicUser {
   id: string;
@@ -55,7 +58,7 @@ interface PublicUser {
 
 export default function ProfileScreen() {
   const params = useLocalSearchParams<{ userId?: string }>();
-  const { user: currentUser, userCards, userGoals, allCards, apiUrl } = useApp();
+  const { user: currentUser, userCards, userGoals, allCards, apiUrl, updateAvatar } = useApp();
 
   const viewingUserId = params.userId && typeof params.userId === 'string' ? params.userId : null;
   const isOwn = !viewingUserId || (currentUser && viewingUserId === currentUser.id);
@@ -66,6 +69,49 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(false);
   const [friendStatus, setFriendStatus] = useState<'none' | 'pending' | 'friends'>('none');
   const [addingFriend, setAddingFriend] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  // Lets the user pick an image from device → resize → base64 → save.
+  // Available only on own profile (tap blocked on others below).
+  const handleChangeAvatar = async () => {
+    if (!isOwn || uploadingAvatar) return;
+    try {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        return Alert.alert('Permission needed', 'Photo access required.');
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+      if (result.canceled || !result.assets?.length) return;
+      setUploadingAvatar(true);
+      const manipulated = await ImageManipulator.manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: 400, height: 400 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true },
+      );
+      if (!manipulated.base64) throw new Error('No base64');
+      const dataUri = `data:image/jpeg;base64,${manipulated.base64}`;
+      // Mongo doc ceiling is 16MB but anything >500KB is overkill for an
+      // avatar; the 400x400 0.7 JPEG should land around 30-80KB.
+      if (dataUri.length > 600_000) {
+        setUploadingAvatar(false);
+        return Alert.alert('Too large', 'Try a different image.');
+      }
+      await updateAvatar(dataUri);
+      // Optimistic local update — the AppContext setUser already happened
+      // but we need to reflect it in this screen's publicUser state too.
+      setPublicUser((prev) => prev ? { ...prev, avatar_url: dataUri } : prev);
+    } catch (err) {
+      console.warn('Avatar upload failed:', err);
+      Alert.alert('Error', 'Could not save avatar.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -163,12 +209,34 @@ export default function ProfileScreen() {
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Header — avatar, username, level pill, Add Friend, rank */}
           <View style={styles.header}>
-            <View style={styles.avatarWrap}>
-              <Image source={{ uri: MASCOT_SIGNATURE }} style={styles.avatar} />
+            <TouchableOpacity
+              style={styles.avatarWrap}
+              onPress={handleChangeAvatar}
+              disabled={!isOwn || uploadingAvatar}
+              activeOpacity={isOwn ? 0.7 : 1}
+              testID="profile-avatar-btn"
+            >
+              <Image
+                source={
+                  publicUser.avatar_url
+                    ? { uri: publicUser.avatar_url }
+                    : { uri: MASCOT_SIGNATURE }
+                }
+                style={styles.avatar}
+              />
+              {isOwn && (
+                <View style={styles.avatarEditBadge}>
+                  {uploadingAvatar ? (
+                    <ActivityIndicator size="small" color="#000" />
+                  ) : (
+                    <Ionicons name="camera" size={14} color="#000" />
+                  )}
+                </View>
+              )}
               <View style={styles.levelPill}>
                 <Text style={styles.levelText}>LVL {publicUser.daily_login_streak || 1}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={styles.nameRow}>
               <Text style={styles.username} testID="profile-username">
                 {publicUser.username}
@@ -298,6 +366,19 @@ const styles = StyleSheet.create({
     borderColor: '#39ff14',
     backgroundColor: '#0a0d0a',
   },
+  avatarEditBadge: {
+    position: 'absolute',
+    bottom: 36,
+    right: '32%',
+    backgroundColor: '#39ff14',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#0a0d0a',
+  },
   levelPill: {
     marginTop: 6,
     backgroundColor: '#5a1e8a',
@@ -322,13 +403,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   username: {
-    color: '#fff',
-    fontSize: 24,
+    color: '#9aff5a',
+    fontSize: 30,
+    fontFamily: FONTS.metal,
     fontWeight: '900',
-    letterSpacing: 1,
-    textShadowColor: 'rgba(57,255,20,0.4)',
+    letterSpacing: 1.5,
+    textShadowColor: 'rgba(57,255,20,0.5)',
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
+    textShadowRadius: 10,
   },
   addFriendBtn: {
     flexDirection: 'row',

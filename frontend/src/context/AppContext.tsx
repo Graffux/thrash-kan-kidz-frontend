@@ -125,6 +125,7 @@ interface AppContextType {
   claimDailyLogin: () => Promise<{ streak: number; bonus_coins: number; message: string }>;
   purchaseCard: (cardId: string) => Promise<any>;
   updateProfile: (bio: string) => Promise<void>;
+  updateAvatar: (avatarDataUri: string) => Promise<void>;
   updateFeaturedCards: (cardIds: string[]) => Promise<void>;
   createTrade: (toUserId: string, offeredCardIds: string[], requestedCardIds: string[]) => Promise<void>;
   acceptTrade: (tradeId: string) => Promise<void>;
@@ -314,6 +315,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setUserGoals(goalsRes.data);
   };
 
+  const updateAvatar = async (avatarDataUri: string) => {
+    if (!user) throw new Error('Not logged in');
+    const response = await axios.put(
+      `${API_URL}/api/users/${user.id}/profile`,
+      { avatar_url: avatarDataUri },
+    );
+    setUser(response.data);
+  };
+
   const updateFeaturedCards = async (cardIds: string[]) => {
     if (!user) throw new Error('Not logged in');
     const response = await axios.put(
@@ -417,6 +427,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         claimDailyLogin,
         purchaseCard,
         updateProfile,
+        updateAvatar,
         updateFeaturedCards,
         createTrade,
         acceptTrade,

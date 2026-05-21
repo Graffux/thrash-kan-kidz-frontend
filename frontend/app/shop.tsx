@@ -15,6 +15,7 @@ import {
 import { Image as ExpoImage } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GrungeBackground } from '../src/components/GrungeBackground';
+import { FONTS } from '../src/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -1534,11 +1535,17 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   packCardName: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '600',
+    color: '#9aff5a',
+    fontSize: 18,
+    fontFamily: FONTS.metal,
+    fontWeight: '900',
+    letterSpacing: 1.2,
     textAlign: 'center',
-    marginTop: 6,  },
+    marginTop: 6,
+    textShadowColor: 'rgba(57,255,20,0.5)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
+  },
   packCardDupeLabel: {
     color: '#FF9800',
     fontSize: 9,
