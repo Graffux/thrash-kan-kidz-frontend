@@ -2,7 +2,7 @@
   "expo": {
     "name": "Thrash Kan Kidz",
     "slug": "thrash-kan-kidz-ctau-atpauygk5ki6209",
-    "version": "1.19.0",
+    "version": "1.20.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "thrashkankidz",
@@ -23,7 +23,7 @@
     },
     "android": {
       "package": "com.thrashkankidz.app",
-      "versionCode": 96,
+      "versionCode": 97,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
