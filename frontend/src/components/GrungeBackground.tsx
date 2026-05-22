@@ -139,11 +139,11 @@ const styles = StyleSheet.create({
   },
   ronchPeek: {
     position: 'absolute',
-    bottom: 80, // sits above the bottom nav
-    right: -10,
-    width: 180,
-    height: 110,
-    opacity: 0.55,
+    bottom: 70, // sits above the bottom nav, lower so more of him is visible
+    right: 0,
+    width: 220,
+    height: 200, // taller so we see full face/shoulders, not just forehead
+    opacity: 0.6,
   },
   noiseDot: {
     position: 'absolute',

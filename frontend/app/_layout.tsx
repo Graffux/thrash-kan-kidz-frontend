@@ -127,13 +127,16 @@ function TabsNavigator() {
           styles.tabBar,
           {
             paddingBottom: bottomPadding,
-            height: 72 + bottomPadding,
+            height: 64 + bottomPadding,
             marginBottom: Platform.OS === 'android' ? 0 : 0,
           },
         ],
         tabBarActiveTintColor: '#39ff14',
         tabBarInactiveTintColor: '#7a7',
-        tabBarLabelStyle: styles.tabBarLabel,
+        // Icon-only nav. With 7 tabs on a phone screen there isn't room
+        // for labels — they truncate to "Ho.../Ca.../Sh..." which looks
+        // worse than no labels. The art is distinct enough to navigate by.
+        tabBarShowLabel: false,
         tabBarItemStyle: styles.tabBarItem,
       }}
     >
@@ -277,9 +280,9 @@ const tabStyles = StyleSheet.create({
     paddingTop: 4,
   },
   iconPlate: {
-    width: 36,
-    height: 28,
-    borderRadius: 6,
+    width: 48,
+    height: 38,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#241a14',
