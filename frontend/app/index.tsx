@@ -24,6 +24,7 @@ import MascotSplash from '../src/components/MascotSplash';
 import { RankCrest } from '../src/components/RankCrest';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { FONTS } from '../src/theme';
+import { cardThumb } from '../src/utils/cardImage';
 import { RippableDailyPack } from '../src/components/RippableDailyPack';
 import { DrippingLogo } from '../src/components/DrippingLogo';
 import { MetalStatPanel } from '../src/components/MetalStatPanel';
@@ -417,7 +418,7 @@ export default function HomeScreen() {
               return displayCards.map((uc) => (
                 <View key={uc.user_card_id} style={styles.featuredCard}>
                   <Image
-                    source={{ uri: uc.card.front_image_url }}
+                    source={{ uri: cardThumb(uc.card, 240) }}
                     style={styles.featuredImage}
                     resizeMode="cover"
                   />

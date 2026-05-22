@@ -22,6 +22,7 @@ import {
 import { Image as ExpoImage } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
+import { cardThumb } from '../utils/cardImage';
 
 const SLOTS = 5;
 
@@ -120,7 +121,7 @@ export const FeaturedCards: React.FC<Props> = ({ readOnly = false, featuredIds, 
             {card ? (
               <>
                 <ExpoImage
-                  source={{ uri: card.front_image_url }}
+                  source={{ uri: cardThumb(card, 360) }}
                   style={styles.slotImage}
                   contentFit="cover"
                   cachePolicy="memory-disk"
@@ -191,7 +192,7 @@ export const FeaturedCards: React.FC<Props> = ({ readOnly = false, featuredIds, 
                       testID={`featured-pick-${uc.card.id}`}
                     >
                       <ExpoImage
-                        source={{ uri: uc.card.front_image_url }}
+                        source={{ uri: cardThumb(uc.card, 160) }}
                         style={styles.gridImage}
                         contentFit="cover"
                         cachePolicy="memory-disk"

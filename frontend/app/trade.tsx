@@ -17,6 +17,7 @@ import { GrungeBackground } from '../src/components/GrungeBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
 import { useApp } from '../src/context/AppContext';
+import { cardThumb } from '../src/utils/cardImage';
 import { RankCrest } from '../src/components/RankCrest';
 
 const BACKGROUND_IMAGE = 'https://customer-assets.emergentagent.com/job_earn-cards/artifacts/zgy2com2_enhanced-1771247671181.jpg';
@@ -295,7 +296,7 @@ export default function TradeScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {trade.offered_cards.map((card: any) => (
               <View key={card.id} style={styles.miniCard}>
-                <Image source={{ uri: card.front_image_url }} style={styles.miniCardImage} resizeMode="cover" />
+                <Image source={{ uri: cardThumb(card, 160) }} style={styles.miniCardImage} resizeMode="cover" />
               </View>
             ))}
           </ScrollView>
@@ -306,7 +307,7 @@ export default function TradeScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {trade.requested_cards.map((card: any) => (
               <View key={card.id} style={styles.miniCard}>
-                <Image source={{ uri: card.front_image_url }} style={styles.miniCardImage} resizeMode="cover" />
+                <Image source={{ uri: cardThumb(card, 160) }} style={styles.miniCardImage} resizeMode="cover" />
               </View>
             ))}
           </ScrollView>
@@ -611,7 +612,7 @@ export default function TradeScreen() {
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {userCards.map(uc => (
                   <TouchableOpacity key={uc.card.id} style={[styles.selectableCard, offeredCards.includes(uc.card.id) && styles.selectableCardSelected]} onPress={() => toggleOfferedCard(uc.card.id)}>
-                    <Image source={{ uri: uc.card.front_image_url }} style={styles.selectableCardImage} resizeMode="cover" />
+                    <Image source={{ uri: cardThumb(uc.card, 160) }} style={styles.selectableCardImage} resizeMode="cover" />
                     {offeredCards.includes(uc.card.id) && (<View style={styles.selectedOverlay}><Ionicons name="checkmark-circle" size={24} color="#4CAF50" /></View>)}
                   </TouchableOpacity>
                 ))}
@@ -629,7 +630,7 @@ export default function TradeScreen() {
                         const card = uc.card || uc;
                         return (
                           <TouchableOpacity key={`req_${card.id}`} style={[styles.selectableCard, requestedCards.includes(card.id) && styles.selectableCardSelected]} onPress={() => toggleRequestedCard(card.id)}>
-                            <Image source={{ uri: card.front_image_url }} style={styles.selectableCardImage} resizeMode="cover" />
+                            <Image source={{ uri: cardThumb(card, 160) }} style={styles.selectableCardImage} resizeMode="cover" />
                             {requestedCards.includes(card.id) && (<View style={styles.selectedOverlay}><Ionicons name="checkmark-circle" size={24} color="#4CAF50" /></View>)}
                           </TouchableOpacity>
                         );

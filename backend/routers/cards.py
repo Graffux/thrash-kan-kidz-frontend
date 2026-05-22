@@ -4,18 +4,25 @@ Fully self-contained — no business logic, just reads from db.cards. Cards
 belonging to unreleased series are filtered out so content can be seeded
 ahead of launch without leaking to clients.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
+from io import BytesIO
+from functools import lru_cache
 import uuid
 import os
+import logging
+import requests
+from PIL import Image
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from series_config import released_series_nums
 from data.cards_data import VARIANT_SCRATCH_COVERS
 
 router = APIRouter()
+log = logging.getLogger(__name__)
 
 # Reuse the same mongo connection. Both this module and server.py read/write
 # the same logical database via the shared env vars.
@@ -115,3 +122,74 @@ async def get_card(card_id: str):
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
     return Card(**_attach_scratch_cover(card))
+
+
+# ---------------------------------------------------------------------------
+# Thumbnail endpoint
+#
+# Card images in the catalog point to full-resolution PNGs on S3 (3-5 MB each).
+# Rendering a 542-card grid on cellular = ~1.5 GB of pulls = images never finish
+# loading on weak signal. This endpoint:
+#   1. Fetches the original from S3 (server-side, fast pipe)
+#   2. Resizes to a sane width (default 360px wide ~= 25-50 KB JPEG)
+#   3. Returns JPEG with aggressive HTTP cache headers
+#   4. Caches the resized bytes in-process (LRU 600 entries) so repeat hits skip
+#      the S3 round-trip entirely
+#
+# Trade-off: original PNGs lose transparency, but card faces don't use alpha.
+# Pack-reveal screens and zoomed views should keep hitting the original URL.
+# ---------------------------------------------------------------------------
+
+# In-process LRU. Each entry ~50 KB × 600 = ~30 MB max — well under Render
+# free tier RAM. Cleared on process restart, which is fine since clients also
+# cache via HTTP headers.
+@lru_cache(maxsize=600)
+def _resize_image(url: str, width: int) -> bytes:
+    """Synchronously fetch + resize. Cached by (url, width)."""
+    r = requests.get(url, timeout=15)
+    r.raise_for_status()
+    img = Image.open(BytesIO(r.content))
+    # Flatten alpha to white so JPEG conversion doesn't trash transparent pixels.
+    if img.mode in ("RGBA", "LA", "P"):
+        bg = Image.new("RGB", img.size, (255, 255, 255))
+        bg.paste(img, mask=img.convert("RGBA").split()[-1] if img.mode != "P" else None)
+        img = bg
+    elif img.mode != "RGB":
+        img = img.convert("RGB")
+    # Preserve aspect ratio; only constrain by width.
+    if img.width > width:
+        ratio = width / img.width
+        new_h = int(img.height * ratio)
+        img = img.resize((width, new_h), Image.LANCZOS)
+    out = BytesIO()
+    img.save(out, format="JPEG", quality=78, optimize=True)
+    return out.getvalue()
+
+
+@router.get("/cards/{card_id}/thumb")
+async def get_card_thumb(
+    card_id: str,
+    w: int = Query(360, ge=80, le=800, description="Target width in pixels"),
+):
+    """Return a small JPEG thumbnail of the card's front image.
+
+    Aggressive caching: response carries `Cache-Control: public, max-age=31536000,
+    immutable` so the device + CDN cache it for a year. Card-image URLs are
+    content-addressed on S3, so they never change — safe to cache forever.
+    """
+    card = await db.cards.find_one({"id": card_id}, {"front_image_url": 1, "_id": 0})
+    if not card or not card.get("front_image_url"):
+        raise HTTPException(status_code=404, detail="Card or image not found")
+    try:
+        jpeg_bytes = _resize_image(card["front_image_url"], w)
+    except Exception as e:
+        log.warning("thumb fetch failed for %s: %s", card_id, e)
+        raise HTTPException(status_code=502, detail="Upstream image fetch failed")
+    return Response(
+        content=jpeg_bytes,
+        media_type="image/jpeg",
+        headers={
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "Vary": "Accept",
+        },
+    )

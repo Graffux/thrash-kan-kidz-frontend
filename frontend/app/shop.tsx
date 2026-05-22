@@ -16,6 +16,7 @@ import { Image as ExpoImage } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { FONTS } from '../src/theme';
+import { cardThumb } from '../src/utils/cardImage';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -898,7 +899,7 @@ export default function ShopScreen() {
                   ]}
                 >
                   <Image
-                    source={{ uri: card.front_image_url }}
+                    source={{ uri: cardThumb(card, 160) }}
                     style={[
                       styles.cardImage,
                       !card.owned && styles.cardImageLocked

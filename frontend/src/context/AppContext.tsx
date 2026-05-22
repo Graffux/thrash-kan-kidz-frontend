@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { Image as ExpoImage } from 'expo-image';
+import { cardThumb } from '../utils/cardImage';
 
 // Set global axios timeout for Render cold starts
 axios.defaults.timeout = 30000;
@@ -216,15 +217,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setTrades(tradesRes.data);
       setAllUsers(usersRes.data.filter((u: User) => u.id !== user.id));
 
-      // Prefetch all owned card images into expo-image's disk cache in the
-      // background. First-time load fills the cache; subsequent renders
-      // are instant. Failures are silently swallowed — fallback is the
-      // normal lazy load when the component mounts.
+      // Prefetch all owned card thumbnails into expo-image's disk cache in
+      // the background. We prefetch thumb URLs (~50KB each) rather than the
+      // original PNGs (~3MB) so cellular users actually finish the prefetch.
+      // First-time load fills the cache; subsequent renders are instant.
       try {
         const urls: string[] = [];
-        for (const uc of cardsRes.data as { card?: { front_image_url?: string } }[]) {
-          const url = uc?.card?.front_image_url;
-          if (url) urls.push(url);
+        for (const uc of cardsRes.data as { card?: { id?: string; front_image_url?: string } }[]) {
+          if (uc?.card) {
+            const url = cardThumb(uc.card, 240);
+            if (url) urls.push(url);
+          }
         }
         if (urls.length > 0) {
           ExpoImage.prefetch(urls, 'memory-disk').catch(() => {});

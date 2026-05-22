@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import type { SeriesCatalogEntry } from '../src/context/AppContext';
 import { useSoundPlayer } from '../src/utils/sounds';
+import { cardThumb } from '../src/utils/cardImage';
 import ScratchCard from '../src/components/ScratchCard';
 import OozeProgressBar from '../src/components/OozeProgressBar';
 import MetalButton from '../src/components/MetalButton';
@@ -236,7 +237,7 @@ const SimpleCardOwned = React.memo(({
         ]}
       >
         <ExpoImage
-          source={{ uri: card.front_image_url }}
+          source={{ uri: cardThumb(card, 240) }}
           style={styles.cardImage}
           contentFit="cover"
           cachePolicy="memory-disk"
@@ -252,7 +253,7 @@ const SimpleCardOwned = React.memo(({
           ]}
         >
           <ExpoImage
-            source={{ uri: card.back_image_url || card.front_image_url }}
+            source={{ uri: card.back_image_url || cardThumb(card, 240) }}
             style={styles.cardImage}
             contentFit="cover"
             cachePolicy="memory-disk"
@@ -873,7 +874,7 @@ export default function CollectionScreen() {
             {tradeInEligible.map((item) => (
               <View key={item.card.id} style={styles.tradeInCard}>
                 <ExpoImage
-                  source={{ uri: item.card.front_image_url }}
+                  source={{ uri: cardThumb(item.card, 160) }}
                   style={styles.tradeInImage}
                   contentFit="cover"
                 />

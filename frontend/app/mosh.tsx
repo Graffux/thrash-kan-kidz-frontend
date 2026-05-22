@@ -30,6 +30,7 @@ import { useApp } from '../src/context/AppContext';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { SplatTitle } from '../src/components/SplatTitle';
 import { MoshComments } from '../src/components/MoshComments';
+import { cardThumb } from '../src/utils/cardImage';
 
 interface MoshPost {
   id: string;
@@ -470,7 +471,7 @@ export default function MoshPitScreen() {
                     testID={`card-pick-${uc.card.id}`}
                   >
                     <Image
-                      source={{ uri: uc.card.front_image_url }}
+                      source={{ uri: cardThumb(uc.card, 160) }}
                       style={styles.cardPickImg}
                       resizeMode="cover"
                     />
