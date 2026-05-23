@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#39ff14',
     borderTopWidth: 1,
     paddingTop: 6,
+    justifyContent: 'space-evenly',
     // Subtle dark shadow above for separation from screen content
     shadowColor: '#000',
     shadowOpacity: 0.4,
@@ -265,7 +266,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
   tabBarItem: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 2,
