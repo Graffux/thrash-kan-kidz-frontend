@@ -1357,7 +1357,20 @@ async def login(request: LoginRequest):
     # Verify password
     if not verify_password(request.password, user['password_hash']):
         raise HTTPException(status_code=401, detail="Invalid username or password")
-    
+
+    # Self-heal: re-evaluate series completion for every released series so
+    # users who finished a series before the unlock logic was deployed (or
+    # before a new series went live) get their next-series unlock + reward
+    # backfilled on next login. Idempotent — function no-ops if reward
+    # already granted. Failures are logged but don't block login.
+    try:
+        for sn in released_series_nums():
+            await check_series_completion(user['id'], sn)
+    except Exception as e:
+        logging.warning(f"Series unlock backfill failed for {user.get('id')}: {e}")
+    # Re-fetch user so the response reflects any unlocks the backfill applied.
+    user = await db.users.find_one({"id": user['id']}) or user
+
     # Return user without password hash
     user_data = User(**user).model_dump()
     del user_data['password_hash']
@@ -3218,6 +3231,33 @@ async def admin_add_coins(user_id: str, request: Request):
     new_coins = user.get("coins", 0) + amount
     await db.users.update_one({"id": user_id}, {"$set": {"coins": new_coins}})
     return {"username": user["username"], "coins": new_coins}
+
+
+@api_router.post("/admin/set-streak/{user_id}")
+async def admin_set_streak(user_id: str, request: Request):
+    """Admin endpoint to restore a user's daily login streak.
+
+    Used to make users whole after they were locked out of the app for several
+    days by broken testing-track builds. Sets streak + dates atomically so the
+    next login on a new calendar day will increment, not reset.
+    """
+    body = await request.json()
+    streak = body.get("streak", 0)
+    if streak < 0 or streak > 9999:
+        raise HTTPException(status_code=400, detail="Streak out of range")
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    # Set last_login_date to YESTERDAY so the next /login bumps streak to N+1
+    # rather than resetting to 1. If we set today, the next login would short-
+    # circuit ("already logged in today") and leave the value alone — fine but
+    # less satisfying. Yesterday gives the user immediate "Day N+1!" gratification.
+    yesterday = (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"daily_login_streak": streak, "last_login_date": yesterday}},
+    )
+    return {"username": user["username"], "daily_login_streak": streak}
 
 # Feedback and Friends endpoints live in /app/backend/routers/feedback.py and friends.py
 # They are mounted onto api_router at server startup (see end of this file).

@@ -246,6 +246,11 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   // Rusted-metal bottom bar. Solid color reads cleaner than a gradient
   // for a small bar; the green top border simulates oxidized copper trim.
+  // `justifyContent: space-evenly` is belt-and-suspenders with flex:1 on
+  // tabBarItem — React Navigation's tab bar sometimes ignores per-item
+  // flex when labels are hidden, leaving tabs clustered with a gap on
+  // the right. Forcing the parent layout to space-evenly guarantees they
+  // spread across the full bar width.
   tabBar: {
     backgroundColor: '#1a1410',
     borderTopColor: '#39ff14',
