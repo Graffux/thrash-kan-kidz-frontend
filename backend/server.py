@@ -3219,6 +3219,33 @@ async def admin_add_coins(user_id: str, request: Request):
     await db.users.update_one({"id": user_id}, {"$set": {"coins": new_coins}})
     return {"username": user["username"], "coins": new_coins}
 
+
+@api_router.post("/admin/set-streak/{user_id}")
+async def admin_set_streak(user_id: str, request: Request):
+    """Admin endpoint to restore a user's daily login streak.
+
+    Used to make users whole after they were locked out of the app for several
+    days by broken testing-track builds. Sets streak + dates atomically so the
+    next login on a new calendar day will increment, not reset.
+    """
+    body = await request.json()
+    streak = body.get("streak", 0)
+    if streak < 0 or streak > 9999:
+        raise HTTPException(status_code=400, detail="Streak out of range")
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    # Set last_login_date to YESTERDAY so the next /login bumps streak to N+1
+    # rather than resetting to 1. If we set today, the next login would short-
+    # circuit ("already logged in today") and leave the value alone — fine but
+    # less satisfying. Yesterday gives the user immediate "Day N+1!" gratification.
+    yesterday = (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"daily_login_streak": streak, "last_login_date": yesterday}},
+    )
+    return {"username": user["username"], "daily_login_streak": streak}
+
 # Feedback and Friends endpoints live in /app/backend/routers/feedback.py and friends.py
 # They are mounted onto api_router at server startup (see end of this file).
 
