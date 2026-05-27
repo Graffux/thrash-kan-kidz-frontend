@@ -20,6 +20,8 @@ interface Comment {
   username: string;
   content: string;
   created_at: string;
+  reaction_count?: number;
+  viewer_reacted?: boolean;
 }
 
 const MAX_COMMENT = 200;
@@ -51,7 +53,8 @@ export const MoshComments: React.FC<Props> = ({ postId, initialCount, onCountCha
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${apiUrl}/api/mosh/posts/${postId}/comments`);
+      const q = user?.id ? `?viewer_id=${user.id}` : '';
+      const res = await axios.get(`${apiUrl}/api/mosh/posts/${postId}/comments${q}`);
       setComments(res.data);
       setLoaded(true);
     } catch {
@@ -59,7 +62,7 @@ export const MoshComments: React.FC<Props> = ({ postId, initialCount, onCountCha
     } finally {
       setLoading(false);
     }
-  }, [apiUrl, postId]);
+  }, [apiUrl, postId, user?.id]);
 
   useEffect(() => {
     if (expanded && !loaded) load();
@@ -113,6 +116,42 @@ export const MoshComments: React.FC<Props> = ({ postId, initialCount, onCountCha
     ]);
   };
 
+  // Toggle 💀 reaction on a comment. Optimistic update so the heart fills
+  // immediately even on slow networks; reverts if the server call fails.
+  const handleReact = async (comment: Comment) => {
+    if (!user) return;
+    const willReact = !comment.viewer_reacted;
+    setComments((prev) =>
+      prev.map((c) =>
+        c.id === comment.id
+          ? {
+              ...c,
+              viewer_reacted: willReact,
+              reaction_count: Math.max(0, (c.reaction_count || 0) + (willReact ? 1 : -1)),
+            }
+          : c,
+      ),
+    );
+    try {
+      await axios.post(`${apiUrl}/api/mosh/comments/${comment.id}/react`, {
+        user_id: user.id,
+      });
+    } catch {
+      // Roll back optimistic update on error
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === comment.id
+            ? {
+                ...c,
+                viewer_reacted: !willReact,
+                reaction_count: Math.max(0, (c.reaction_count || 0) + (willReact ? -1 : 1)),
+              }
+            : c,
+        ),
+      );
+    }
+  };
+
   return (
     <View>
       <TouchableOpacity
@@ -160,6 +199,27 @@ export const MoshComments: React.FC<Props> = ({ postId, initialCount, onCountCha
                     )}
                   </View>
                   <Text style={styles.commentContent}>{c.content}</Text>
+                  {user && (
+                    <TouchableOpacity
+                      style={styles.commentReact}
+                      onPress={() => handleReact(c)}
+                      testID={`mosh-comment-react-${c.id}`}
+                    >
+                      <Ionicons
+                        name={c.viewer_reacted ? 'skull' : 'skull-outline'}
+                        size={14}
+                        color={c.viewer_reacted ? '#39ff14' : '#789'}
+                      />
+                      {(c.reaction_count || 0) > 0 && (
+                        <Text style={[
+                          styles.commentReactCount,
+                          c.viewer_reacted && { color: '#39ff14' },
+                        ]}>
+                          {c.reaction_count}
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  )}
                 </View>
               ))}
               <View style={styles.composer}>
@@ -250,6 +310,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#39ff14',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  commentReact: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+    paddingVertical: 2,
+    paddingRight: 8,
+    alignSelf: 'flex-start',
+  },
+  commentReactCount: {
+    fontSize: 11,
+    color: '#789',
+    fontWeight: '700',
   },
 });
 
