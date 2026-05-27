@@ -1357,7 +1357,20 @@ async def login(request: LoginRequest):
     # Verify password
     if not verify_password(request.password, user['password_hash']):
         raise HTTPException(status_code=401, detail="Invalid username or password")
-    
+
+    # Self-heal: re-evaluate series completion for every released series so
+    # users who finished a series before the unlock logic was deployed (or
+    # before a new series went live) get their next-series unlock + reward
+    # backfilled on next login. Idempotent — function no-ops if reward
+    # already granted. Failures are logged but don't block login.
+    try:
+        for sn in released_series_nums():
+            await check_series_completion(user['id'], sn)
+    except Exception as e:
+        logging.warning(f"Series unlock backfill failed for {user.get('id')}: {e}")
+    # Re-fetch user so the response reflects any unlocks the backfill applied.
+    user = await db.users.find_one({"id": user['id']}) or user
+
     # Return user without password hash
     user_data = User(**user).model_dump()
     del user_data['password_hash']
