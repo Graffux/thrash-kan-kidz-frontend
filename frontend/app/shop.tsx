@@ -1538,7 +1538,7 @@ const styles = StyleSheet.create({
   packCardName: {
     color: '#9aff5a',
     fontSize: 18,
-    fontFamily: FONTS.metal,
+    fontFamily: FONTS.death,
     fontWeight: '900',
     letterSpacing: 1.2,
     textAlign: 'center',

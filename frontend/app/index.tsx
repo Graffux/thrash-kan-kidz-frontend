@@ -641,12 +641,15 @@ const styles = StyleSheet.create({
     // MetalStatPanel uses flex:1 internally
   },
   welcomeText: {
-    fontSize: 14,
-    color: '#888',
+    fontSize: 16,
+    fontFamily: FONTS.metal,
+    color: '#9aff5a',
+    letterSpacing: 1,
+    opacity: 0.85,
   },
   usernameText: {
     fontSize: 28,
-    fontFamily: FONTS.metal,
+    fontFamily: FONTS.death,
     fontWeight: '900',
     color: '#9aff5a',
     letterSpacing: 1.5,

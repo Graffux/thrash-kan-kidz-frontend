@@ -35,9 +35,26 @@ export const THEME = {
 };
 
 export const FONTS = {
-  /** Distressed metal font for headings — loaded via expo-font in _layout.tsx */
-  // Display font for headers / display copy. Must match the TTF's
-  // PostScript name (nameID 6) for Android lookup to succeed in production.
+  /**
+   * Primary death-metal display font for the BIG headers/titles
+   * (section titles, big usernames, pack names). Jagged, dripping,
+   * legitimately death-metal — sourced from Braver Grave (.otf).
+   *
+   * MUST match the font's internal PostScript name (nameID 6).
+   * Android production builds silently fall back to the system font
+   * if the key doesn't match exactly.
+   */
+  death: 'BraverGrave',
+  /**
+   * Alternate horror-style display font (Critica). Use sparingly for
+   * variant titles or special accents where a more chiseled look is wanted.
+   */
+  critica: 'Critica',
+  /**
+   * Legacy "metal" font — still used for smaller accents (rank labels,
+   * the small "Welcome" greeting) where Braver Grave would be too aggressive.
+   * Keeping it loaded so existing references continue to render.
+   */
   metal: 'MetalMania-Regular',
   /** System fallback for body copy / inputs (better legibility) */
   body: undefined as string | undefined,

@@ -51,7 +51,8 @@ def _serialize(post: dict, viewer_id: str | None = None) -> dict:
     }
 
 
-def _serialize_comment(c: dict) -> dict:
+def _serialize_comment(c: dict, viewer_id: str | None = None) -> dict:
+    reactors = c.get("reactors") or []
     return {
         "id": c["id"],
         "post_id": c["post_id"],
@@ -59,6 +60,8 @@ def _serialize_comment(c: dict) -> dict:
         "username": c.get("username", "anon"),
         "content": c.get("content", ""),
         "created_at": c.get("created_at"),
+        "reaction_count": len(reactors),
+        "viewer_reacted": viewer_id in reactors if viewer_id else False,
     }
 
 
@@ -159,12 +162,47 @@ async def delete_post(post_id: str, request: Request):
 # Flat one-level threads: every comment attaches to a post_id, no nesting.
 
 @router.get("/mosh/posts/{post_id}/comments")
-async def list_comments(post_id: str, limit: int = 100):
+async def list_comments(post_id: str, limit: int = 100, viewer_id: str | None = None):
     limit = max(1, min(limit, 500))
     cursor = db.mosh_comments.find(
         {"post_id": post_id}, {"_id": 0}
     ).sort("created_at", 1).limit(limit)
-    return [_serialize_comment(c) for c in await cursor.to_list(limit)]
+    return [_serialize_comment(c, viewer_id=viewer_id) for c in await cursor.to_list(limit)]
+
+
+@router.post("/mosh/comments/{comment_id}/react")
+async def react_comment(comment_id: str, request: Request):
+    """Toggle a 💀 reaction on a comment.
+
+    Mirrors the post-level /react endpoint: idempotent toggle keyed by user_id.
+    Stored as a list of user_ids in `reactors` on the comment doc — same shape
+    as posts so future analytics can union the two collections easily.
+    """
+    body = await request.json()
+    user_id = body.get("user_id")
+    if not user_id:
+        raise HTTPException(400, "user_id required")
+    comment = await db.mosh_comments.find_one({"id": comment_id})
+    if not comment:
+        raise HTTPException(404, "Comment not found")
+    reactors = comment.get("reactors") or []
+    if user_id in reactors:
+        # Un-react (toggle off)
+        await db.mosh_comments.update_one(
+            {"id": comment_id}, {"$pull": {"reactors": user_id}}
+        )
+        reactors = [u for u in reactors if u != user_id]
+    else:
+        # React (toggle on) — $addToSet keeps it idempotent on retries.
+        await db.mosh_comments.update_one(
+            {"id": comment_id}, {"$addToSet": {"reactors": user_id}}
+        )
+        reactors = reactors + [user_id]
+    return {
+        "id": comment_id,
+        "reaction_count": len(reactors),
+        "viewer_reacted": user_id in reactors,
+    }
 
 
 @router.post("/mosh/posts/{post_id}/comments")

@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   username: {
     color: '#9aff5a',
     fontSize: 30,
-    fontFamily: FONTS.metal,
+    fontFamily: FONTS.death,
     fontWeight: '900',
     letterSpacing: 1.5,
     textShadowColor: 'rgba(57,255,20,0.5)',

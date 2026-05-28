@@ -141,12 +141,19 @@ export default function MoshPitScreen() {
   //
   // Trade-off: we skip the resize step, so the base64 is bigger. That's fine
   // for the 5-second user flow and well under the 16MB Mongo doc cap.
+  //
+  // CDN gotcha: customer-assets.emergentagent.com sometimes serves images
+  // with Content-Type: application/octet-stream instead of image/png. The
+  // backend Mosh endpoint requires a `data:image/...` prefix. So we extract
+  // the raw base64 payload from FileReader and rebuild the data URI with a
+  // forced image/jpeg MIME type. The bytes are still the original image —
+  // only the URI label changes.
   const attachFromUrl = async (url: string) => {
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const blob = await response.blob();
-      const dataUri = await new Promise<string>((resolve, reject) => {
+      const rawDataUri = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
           const r = reader.result;
@@ -156,6 +163,12 @@ export default function MoshPitScreen() {
         reader.onerror = () => reject(reader.error ?? new Error('Read failed'));
         reader.readAsDataURL(blob);
       });
+      // Strip off whatever MIME the CDN gave us (octet-stream, png, jpeg)
+      // and rebuild with image/jpeg so the backend accepts it. The Base64
+      // payload is unchanged — just relabeling the wrapper.
+      const base64Payload = rawDataUri.split(',', 2)[1] ?? '';
+      if (!base64Payload) throw new Error('Empty image payload');
+      const dataUri = `data:image/jpeg;base64,${base64Payload}`;
       setAttachedImage(dataUri);
       setShowCardPicker(false);
       setShowAttachMenu(false);

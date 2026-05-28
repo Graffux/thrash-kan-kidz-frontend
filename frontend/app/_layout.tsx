@@ -217,11 +217,16 @@ export default function TabLayout() {
   // Graceful fallback: if it fails to load we still render the app with
   // system font — no splash gate, no crash.
   const [fontsLoaded, fontError] = useFonts({
-    // Key MUST match the TTF's internal PostScript name (nameID 6).
-    // Inspected with the name table parser — it's `MetalMania-Regular`,
-    // NOT `MetalMania`. Using the wrong key causes Android to fall back
-    // to system font silently in production builds.
+    // Key MUST match the font's internal PostScript name (nameID 6).
+    // Verified with the fontTools name parser:
+    //   MetalMania-Regular.ttf  -> PS name "MetalMania-Regular"
+    //   BraverGrave.otf         -> PS name "BraverGrave"
+    //   Critica.otf             -> PS name "Critica"
+    // Using the wrong key causes Android to silently fall back to the
+    // system font in production builds.
     'MetalMania-Regular': require('../assets/fonts/MetalMania-Regular.ttf'),
+    'BraverGrave': require('../assets/fonts/BraverGrave.otf'),
+    'Critica': require('../assets/fonts/Critica.otf'),
   });
 
   // Don't block app render — render either way. SplatTitle will fall back to
@@ -246,17 +251,17 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   // Rusted-metal bottom bar. Solid color reads cleaner than a gradient
   // for a small bar; the green top border simulates oxidized copper trim.
-  // `justifyContent: space-evenly` is belt-and-suspenders with flex:1 on
-  // tabBarItem — React Navigation's tab bar sometimes ignores per-item
-  // flex when labels are hidden, leaving tabs clustered with a gap on
-  // the right. Forcing the parent layout to space-evenly guarantees they
-  // spread across the full bar width.
+  // `justifyContent: space-around` adds equal space on both sides of each
+  // tab (vs space-evenly which crams them). React Navigation's tab bar
+  // sometimes ignores per-item flex when labels are hidden, leaving tabs
+  // clustered with a gap on the right.
   tabBar: {
     backgroundColor: '#1a1410',
     borderTopColor: '#39ff14',
     borderTopWidth: 1,
     paddingTop: 6,
-    justifyContent: 'space-evenly',
+    paddingHorizontal: 4,
+    justifyContent: 'space-around',
     // Subtle dark shadow above for separation from screen content
     shadowColor: '#000',
     shadowOpacity: 0.4,

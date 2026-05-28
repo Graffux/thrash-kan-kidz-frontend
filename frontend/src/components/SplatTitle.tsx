@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 22,
-    fontFamily: FONTS.metal,
+    fontFamily: FONTS.death,
     fontWeight: '900',
     letterSpacing: 2,
     paddingHorizontal: 14,

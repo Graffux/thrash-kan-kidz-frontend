@@ -139,11 +139,11 @@ const styles = StyleSheet.create({
   },
   ronchPeek: {
     position: 'absolute',
-    bottom: 70, // sits above the bottom nav, lower so more of him is visible
-    right: 0,
-    width: 220,
-    height: 200, // taller so we see full face/shoulders, not just forehead
-    opacity: 0.6,
+    bottom: 56, // hugs the top of the bottom-nav so face starts above it
+    right: -20, // slight bleed off-screen, more body visible
+    width: 280,
+    height: 280, // square aspect ratio for the asset shows the full character
+    opacity: 0.65,
   },
   noiseDot: {
     position: 'absolute',
