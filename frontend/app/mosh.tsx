@@ -480,7 +480,10 @@ export default function MoshPitScreen() {
                   <TouchableOpacity
                     key={uc.user_card_id}
                     style={styles.cardPick}
-                    onPress={() => attachFromUrl(uc.card.front_image_url)}
+                    // Use the backend thumbnail (~80KB) instead of the full
+                    // 3-5 MB CDN image. Required to stay under the backend's
+                    // 1 MB cap on post images after base64 encoding.
+                    onPress={() => attachFromUrl(cardThumb(uc.card, 540))}
                     testID={`card-pick-${uc.card.id}`}
                   >
                     <Image

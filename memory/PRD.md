@@ -1,130 +1,130 @@
 # Thrash Kan Kidz — Product Requirements
 
 ## Original problem statement
-A mobile card-collecting game featuring thrash/death metal parody cards (Garbage
-Pail Kids style). Built with React Native (Expo SDK 54) + FastAPI + MongoDB.
+A mobile card-collecting game featuring thrash/death metal parody cards
+(Garbage Pail Kids style). Built with React Native (Expo SDK 54) +
+FastAPI + MongoDB.
 
 ## Status
-- **Live on Google Play Production**; current prepared build is v1.9.0 / versionCode 84.
-- Custom domain `thrashkankidz.com` mapped via Porkbun → Cloudflare Pages.
-- **567 cards seeded**. Series 1–7 FULLY seeded. Series 7 "Grind Edition" unlocked **2026-05-17**.
-- CI/CD: GitHub Actions auto-deploys backend to Render and builds Android `.aab` for free via `eas build --local` on the GitHub runner.
+- **Live on Google Play Production**.
+- Current live build on devices: **v1.20.0 / versionCode 111**.
+- Next build prepared in repo: **v1.20.0 / versionCode 114**.
+- **567 cards seeded**, Series 1–7 fully released.
+- Backend hosted on Render (`https://thrash-kan-kidz-api.onrender.com`).
+- MongoDB Atlas (`thrash_kan_kidz` DB).
+- Custom domain `thrashkankidz.com` via Cloudflare Pages.
 
 ## Architecture
 ```
 /app
 ├── backend
-│   ├── server.py                # Core API + auth + pack/spin/trade logic
-│   ├── series_config.py         # Series release schedule + rare rewards
-│   ├── routers/cards.py         # /api/cards (cap raised 500→2000)
-│   ├── tests/test_ranks.py
-│   └── data
-│       ├── cards_data.py        # 567-card catalog
-│       ├── goals_data.py        # Goals (rewards system)
-│       ├── ranks.py             # 9-rank ladder
-│       └── badges.py            # 15 badges
+│   ├── server.py                       # Monolithic core (~4040 lines, still to split)
+│   ├── routers/
+│   │   ├── cards.py                    # /api/cards/{id}/thumb (Pillow resize)
+│   │   ├── mosh.py                     # Feed + comment likes
+│   │   └── leaderboard.py
+│   ├── data/{cards_data,goals_data,ranks,badges}.py
+│   └── tests/
 └── frontend
-    ├── app.json                 # version 1.9.0, versionCode 84, newArchEnabled
-    └── src/components
-        ├── RankCrest.tsx, BadgeCabinet.tsx, ScratchCard.tsx
-        └── MetalButton, OozeProgressBar, Mascot* etc.
+    ├── app.json                        # v1.20.0, versionCode 113, READ_MEDIA_IMAGES blocked
+    ├── assets/fonts/                   # Local TTF/OTF loaded via useFonts (NO expo-font plugin)
+    │   ├── MetalMania-Regular.ttf      # FONTS.metal — small accents only
+    │   ├── BraverGrave.otf             # FONTS.death — primary jagged death-metal display
+    │   └── Critica.otf                 # FONTS.critica — available, not yet placed
+    ├── app/
+    │   ├── _layout.tsx                 # useFonts + bottom-tab spacing
+    │   ├── index.tsx                   # Home (Welcome + big username use FONTS)
+    │   ├── shop.tsx                    # Pack opening + Free Pack badge/redeem
+    │   ├── mosh.tsx                    # Feed (MIME fix on share)
+    │   └── profile.tsx                 # Username uses FONTS.death
+    └── src/
+        ├── theme.ts                    # FONTS.{death,critica,metal,body}
+        ├── components/
+        │   ├── CardPickerModal.tsx     # Mini-game (free-pack prize redeem)
+        │   ├── MoshComments.tsx        # Comment 💀 reactions
+        │   ├── GrungeBackground.tsx    # Ronch peek (asset needs eyes)
+        │   ├── SplatTitle.tsx          # Section titles → FONTS.death
+        │   └── FeaturedCards.tsx
+        └── utils/cardImage.ts          # cardThumb(card, w) helper
 ```
 
-## What's been implemented
+## Last session changes (2026-05-28)
 
-### Visual Overhaul — Batch 3 Final Aesthetic Polish (2026-05-20)
-- `MetalMania` font wired in via `@expo-google-fonts/metal-mania@0.4.1` — `useFonts`
-  hook in `_layout.tsx` blocks splash until font loads (no system-font flash on
-  first render)
-- `theme.ts` central design tokens (toxic slime + anarchy purple + rust palette)
-- `<SplatTitle>` paint-splat section header with drip details, reads `FONTS.metal`
-- `<ToxicBar>` slime-tube progress bar with gradient fill, bubbles, highlight stripe
-- `<SlimeBubbles>` ambient looping animated particles (RN Animated, no Reanimated dep)
-- `<GrungeBackground>` extended with rust texture overlay + Ronch peek silhouette
-  + SlimeBubbles. Removed deprecated `pointerEvents` Image prop.
-- Custom Ronch peek + rust texture art assets generated via Nano Banana
-- **Leaderboard promoted to a visible bottom-nav tab** ("Ranks", between Trade
-  and Profile). Reuses `stat_trophy.png` icon. `tabBarItem.minWidth` tightened
-  to 42 so all 7 tabs fit on smaller phones.
-- Metal-font pass on highest-impact headers: Home username greeting + RankCrest
-  label now render in `FONTS.metal` with toxic-slime glow.
+### Code changes (in `/app`, pushed to GitHub iff user clicks Save to GitHub)
+- **Death metal font integration** — Braver Grave (`.otf`) + Critica (`.otf`)
+  loaded via local `useFonts` (PostScript names verified with `fontTools`).
+  `FONTS.death` (Braver Grave) now applied to:
+   - `SplatTitle` (all section headers)
+   - Home screen big username (28 px)
+   - Profile page username (30 px)
+   - Shop pack card name (18 px)
+  `FONTS.metal` (Metal Mania) retained for small accents (Welcome, rank crest).
+- **Mosh Pit image upload fixes** — when sharing a pull from the pack-reveal
+  modal OR attaching a card from the in-Mosh picker, we now base64 the
+  backend thumbnail (`cardThumb(card, 540)`, ~80 KB) instead of the original
+  3–5 MB CDN image, which was tripping the backend's 1 MB cap.
+- **Free Pack visibility** — added a tappable toxic-green pill in the shop
+  header showing `freePacks` count. Tapping triggers a confirm + opens a free
+  pack from the currently-selected series, reusing the existing pack-reveal
+  animation. Backend already had `/redeem-free-pack`; the UI just wasn't
+  exposing it, making prizes from the card-picker mini-game appear lost.
+  `handleOpenPack({useFreePack:true})` calls `/redeem-free-pack`; otherwise
+  the regular `/spin` flow runs unchanged.
+- **Admin streak endpoint** — `POST /api/admin/set-streak/{user_id}` now
+  also calls `check_and_update_goals(user_id, "daily_login", streak)` so the
+  Goals tab reflects restored streaks.
+- **`app.json` versionCode bumped 111 → 113.**
 
-### Visual Overhaul — Batch 1 (2026-05-19)
-- `featured_card_ids: List[str]` added to User model (max 5, owned-only)
-- `PUT /api/users/{id}/featured-cards` endpoint validates ownership + dedupes
-- `<GrungeBackground>` shared wrapper (dark base + slime vignette + rust corners
-  + noise overlay) — applied to Home & Profile screens
-- `<FeaturedCards>` 5-slot showcase on Profile with picker modal (own-only)
-- `<RippableDailyPack>` drag-to-tear daily bonus on Home (reuses SVG mask tech
-  from `<ScratchCard>` — no new image assets needed)
-- Bottom nav redesigned: rusted-metal plates per tab, Ionicons (skull/flame/
-  flash/swap/person-circle), animated slime drip on the active tab only
-- pytest `tests/test_featured_cards.py` (5 integration tests, all passing)
+### Production database fixes (already live)
+- Graffux daily_login_streak set to **52** (was 51 from auto-tick).
+- Dripping daily_login_streak set to **41** (was 1; restored via admin endpoint;
+  `last_login_date` = yesterday so next login increments to 42).
+- Both users' `daily_login` goal progress updated directly in MongoDB
+  (`goal_daily_login_30` → completed; `goal_daily_login_60` → 52/60 + 41/60).
 
-## What's been implemented (previous session: 2026-05-17)
-
-### Series 7 Grind Edition — fully shipped
-- All 8 bands seeded with 2 base + 8 variants each = 80 cards
-  - Napalm Breath, Cheese Grater Mutilation, Anel Cant, Foreseen Terror,
-    Snasum, Minimal Noise Horror, Brutal Lies, Horrorizer
-- Alien Dubin epic reward card seeded with proper `series: 7` field and correct
-  front/back URLs (front: `i4e0c7o8_...`, back: `vu8xlmum_...`)
-- Series 7 cover image wired into shop's series toggle
-- `SERIES_CONFIG[7].rare_reward = "card_alien_dubin"` — series-completion now
-  auto-grants the epic reward (was silently `None`)
-
-### Player rank + badge systems (earlier this session)
-- 9-rank ladder Poser → Thrash Maniac (Stage Diver at S7, Thrash Maniac future S8)
-- 15-badge cabinet on profile (server-evaluated conditions)
-- Crests shown in home header, profile, trade screen
-
-### Bugs fixed this session
-- **`/api/cards` 500 limit** — silently truncating responses. Raised to 2000.
-- **Tranquilized Adam back image** swapped to Butt Feast artwork (was Sadam front)
-- **Alien Dubin front/back** swapped (correct orientations now)
-- **Series 7 variant rarity** — 32 cards were tagged `rarity:"common"`, now `"variant"`
-- **Meth Putnam + Shane Embryo rarity** — overcorrected to `"variant"`, restored to `"common"`
-- **Epic reward unlock query** — was only matching `rarity:"rare"`. Now also matches
-  `rarity:"epic"` so Sean Kill-Again, Martin Generic Ain't, Nicklebag Darrell,
-  and Alien Dubin actually unlock when card-count threshold is met. Backfill at
-  startup retroactively granted 30 unlocks.
-- **Series 7 reward backfill** — startup script now grants Alien Dubin to any
-  user who already owns all 16 S7 base cards. Granted retroactively to 2 users.
-- **Sync function** now propagates `rarity` and `series` changes from
-  cards_data.py → MongoDB (previously only URLs + descriptions synced)
-
-### App config updates
-- `version: 1.9.0`, `versionCode: 84`
-- `newArchEnabled: true` (required for Reanimated v4)
-- `expo-build-properties` plugin with android/ios newArch flags
-
-## API surface (selected)
-- `GET /api/cards` — returns all released-series cards (cap 2000)
-- `GET /api/ranks`, `GET /api/badges` — catalogs
-- `GET /api/users/{id}` — includes `rank` field
-- `GET /api/users/{id}/badges` — per-user earned state
-- `POST /api/users/{id}/check-series-completion/{series}` — grants reward on completion
+## Open issues
+- **Save to GitHub failing for FRONTEND repo** — user reported clicking 3+
+  times pushed to `thrash-kan-kidz-backend` (the "Last used" repo) but
+  `thrash-kan-kidz-frontend` was never updated. User now knows to select
+  the frontend repo from the dropdown and merge via PR (branch + merge,
+  NOT force-push, to keep `main` aligned with the live build).
+- **Ronch peek asset** — `frontend/assets/decor/ronch_peek.png` does NOT
+  contain Ronch's eyes (image shows top of head + dreadlocks + hands only).
+  Needs a new image-generated asset with eyes/forehead prominently visible.
+- **Card picker reward "not distributed" perception** — root cause was the
+  missing free-pack UI in shop; fix landed this session. Reward DID land
+  in DB, user just couldn't see it.
 
 ## Prioritized backlog
-### P0
-- **Push backend + frontend repos** — backend has Series 7 reward fix + image
-  swap + multiple critical bug fixes; frontend has S7 cover image + rank/badge
-  UI + versionCode 84 ready to build
-- Build & upload v84 AAB to Play Console after frontend push
 
-### P1
-- Upload custom badge artwork (drop URLs into `image_url` field per badge)
-- Swap app icon to Ronch mascot face (requires new build)
-- Audit if "Series 7 Reward Revealed" celebration triggers properly for users
-  who hit completion organically (not via backfill)
+### P0 — pending user action
+- User clicks **Save to GitHub** → selects `thrash-kan-kidz-frontend` →
+  reviews PR diff → merges to `main` → triggers EAS build via expo.dev
+  from phone OR `eas build --platform android --profile production` locally.
+- User does the same for `thrash-kan-kidz-backend` so Render redeploys with
+  comment-likes endpoint, updated admin/set-streak, and Pillow thumbnails.
+
+### P1 (after build lands)
+- Generate new `ronch_peek.png` asset with eyes visible (image generation
+  via Gemini Nano Banana / GPT Image 1 — emergent LLM key works for both).
+- Decide where to use `FONTS.critica` (alternate horror display) — possibly
+  swap for the brand title on splash, or for Crypt-Card titles.
+- Audit composite-score leaderboard rendering after backend redeploy.
 
 ### P2
-- Landing page upgrades on Cloudflare Pages: screenshots, card grid, email signup
-- Refactor `server.py` into more `/routers/` (users, trades, shop, spin, payments, goals)
-- Series 7 variant scratch covers (already present for blacklight/chrome/digital/melted)
+- **Crypt Cards** — hidden rare cards (monetization upgrade).
+- **Coin-Purchase Bonus Cards** — guaranteed drops based on IAP tier.
 
 ### P3
-- iOS App Store release
+- Refactor monolithic `server.py` into `/app/backend/routers/` (users,
+  trades, shop, spin, payments, goals).
+- iOS App Store release.
+
+## API surface (recent additions)
+- `GET  /api/cards/{id}/thumb?w={px}` — Pillow-resized JPEG thumbnail.
+- `POST /api/mosh/comments/{id}/react` — toggle 💀 reaction on a comment.
+- `POST /api/admin/set-streak/{user_id}` — restore streak + sync goal progress.
+- `POST /api/users/{id}/redeem-free-pack` — redeem one free pack into series.
 
 ## Test credentials
 See `/app/memory/test_credentials.md`.

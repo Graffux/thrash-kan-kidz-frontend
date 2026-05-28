@@ -251,18 +251,26 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   // Rusted-metal bottom bar. Solid color reads cleaner than a gradient
   // for a small bar; the green top border simulates oxidized copper trim.
-  // `justifyContent: space-around` adds equal space on both sides of each
-  // tab (vs space-evenly which crams them). React Navigation's tab bar
-  // sometimes ignores per-item flex when labels are hidden, leaving tabs
-  // clustered with a gap on the right.
+  //
+  // Spacing rationale (we kept iterating on this for weeks):
+  //   - The PARENT tabBarStyle is the WRAPPER, not the row container.
+  //     React Navigation v7 renders items inside an inner View with
+  //     `flex: 1, flexDirection: 'row'` — so `justifyContent` on
+  //     tabBarStyle has no effect on item distribution. Setting it
+  //     here was a no-op.
+  //   - Each item gets `flex: 1` by default, so 7 items ARE evenly
+  //     distributed across the row mathematically. What made them
+  //     LOOK squished was the old 48×38 iconPlate eating ~94% of the
+  //     ~52dp wide per-tab cell on a 400dp Android phone, leaving
+  //     no breathing room between plates.
+  //   - Fix below: smaller iconPlate (38×34) + zero paddingHorizontal
+  //     on the bar so the cells are full width.
   tabBar: {
     backgroundColor: '#1a1410',
     borderTopColor: '#39ff14',
     borderTopWidth: 1,
     paddingTop: 6,
-    paddingHorizontal: 4,
-    justifyContent: 'space-around',
-    // Subtle dark shadow above for separation from screen content
+    paddingHorizontal: 0,
     shadowColor: '#000',
     shadowOpacity: 0.4,
     shadowRadius: 8,
@@ -276,6 +284,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
   tabBarItem: {
+    // flex:1 is also applied by RN's default `styles.bottomItem` —
+    // re-declaring it explicitly so it can't get overridden by RN's
+    // merge order. Each tab gets exactly screenWidth/7 of horizontal
+    // space; the icon centers inside that cell.
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 2,
@@ -290,8 +303,12 @@ const tabStyles = StyleSheet.create({
     paddingTop: 4,
   },
   iconPlate: {
-    width: 48,
-    height: 38,
+    // Smaller plate so 7 tabs on a 360-400dp Android phone have visible
+    // gaps between them. Was 48×38 (cramped — only ~3dp between plates).
+    // 38×34 leaves ~14dp of breathing room per cell so the tabs LOOK
+    // spread out as the user expects.
+    width: 38,
+    height: 34,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
@@ -305,13 +322,13 @@ const tabStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   iconImage: {
-    width: 26,
-    height: 26,
+    width: 22,
+    height: 22,
     opacity: 0.72,
   },
   iconImageActive: {
-    width: 30,
-    height: 30,
+    width: 26,
+    height: 26,
     opacity: 1,
   },
   iconPlateActive: {

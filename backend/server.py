@@ -3239,7 +3239,9 @@ async def admin_set_streak(user_id: str, request: Request):
 
     Used to make users whole after they were locked out of the app for several
     days by broken testing-track builds. Sets streak + dates atomically so the
-    next login on a new calendar day will increment, not reset.
+    next login on a new calendar day will increment, not reset. Also propagates
+    the new value to the user's `daily_login` goal progress so the Goals tab
+    reflects the restored streak (and any streak-milestone goals can complete).
     """
     body = await request.json()
     streak = body.get("streak", 0)
@@ -3257,6 +3259,10 @@ async def admin_set_streak(user_id: str, request: Request):
         {"id": user_id},
         {"$set": {"daily_login_streak": streak, "last_login_date": yesterday}},
     )
+    # Propagate to Goals so the daily-login streak milestones reflect the
+    # restored value (previously the goal progress would stay frozen at
+    # whatever it was before the restore, making the Goals tab look wrong).
+    await check_and_update_goals(user_id, "daily_login", streak)
     return {"username": user["username"], "daily_login_streak": streak}
 
 # Feedback and Friends endpoints live in /app/backend/routers/feedback.py and friends.py

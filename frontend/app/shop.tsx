@@ -261,11 +261,18 @@ export default function ShopScreen() {
     setShowFrontImage(false);
   };
 
-  const handleOpenPack = async () => {
+  const handleOpenPack = async (opts?: { useFreePack?: boolean }) => {
     if (!user || spinning || !spinPool) return;
-    
-    if (user.coins < spinConfig.spin_cost) {
+    const useFreePack = !!opts?.useFreePack;
+
+    // Coin-gate only applies for paid pulls. Free-pack pulls bypass it
+    // (the free pack itself is the entitlement, no coins charged).
+    if (!useFreePack && user.coins < spinConfig.spin_cost) {
       setShowBuyCoins(true);
+      return;
+    }
+    if (useFreePack && freePacks <= 0) {
+      Alert.alert('No Free Packs', 'You don\'t have any free packs to redeem.');
       return;
     }
 
@@ -308,12 +315,24 @@ export default function ShopScreen() {
       
       shakeAnimation.start();
 
-      // Call API while shaking
-      const seriesParam = spinPool?.current_series ? `?series=${spinPool.current_series}` : '';
-      const response = await fetch(`${apiUrl}/api/users/${user.id}/spin${seriesParam}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      // Call API while shaking — either the paid /spin endpoint or the
+      // /redeem-free-pack endpoint depending on which entitlement the user
+      // chose. Response shape is the same (won_cards[]) so downstream
+      // reveal logic doesn't need to branch.
+      let response: Response;
+      if (useFreePack) {
+        response = await fetch(`${apiUrl}/api/users/${user.id}/redeem-free-pack`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ series: spinPool?.current_series || 1 }),
+        });
+      } else {
+        const seriesParam = spinPool?.current_series ? `?series=${spinPool.current_series}` : '';
+        response = await fetch(`${apiUrl}/api/users/${user.id}/spin${seriesParam}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
       
       const result = await response.json();
       
@@ -325,6 +344,18 @@ export default function ShopScreen() {
       if (result.success) {
         setSpinResult(result);
         setPackState('opening');
+        // If we just spent a free pack, the server returns the new balance;
+        // mirror it locally so the badge updates immediately even before the
+        // post-modal refreshData() resync. If the server didn't echo it
+        // (older deploy), fall back to a -1 decrement so the UI still
+        // reflects the consumption.
+        if (useFreePack) {
+          if (typeof result.remaining_free_packs === 'number') {
+            setFreePacks(result.remaining_free_packs);
+          } else {
+            setFreePacks((n) => Math.max(0, n - 1));
+          }
+        }
 
         // Prefetch every won card's front image BEFORE the reveal animation.
         // Tester report: "when I tap the card to reveal it, it is always blank"
@@ -630,7 +661,12 @@ export default function ShopScreen() {
                         // Use query-string URL form — more reliable across
                         // expo-router versions than the object form.
                         const name = encodeURIComponent(c.name);
-                        const img = encodeURIComponent(c.front_image_url);
+                        // Pass the BACKEND THUMBNAIL URL (~80KB JPEG) instead
+                        // of the original 3-5 MB CDN image. base64-encoding
+                        // the original puts us well over the backend's 1 MB
+                        // post-image limit, which is why "Save to Mosh" was
+                        // failing for users with the error "Image too large".
+                        const img = encodeURIComponent(cardThumb(c, 540));
                         router.push(
                           `/mosh?sharePullName=${name}&sharePullImage=${img}` as any
                         );
@@ -713,6 +749,33 @@ export default function ShopScreen() {
                 <Ionicons name="medal" size={16} color="#FF9800" />
                 <Text style={styles.medalText}>{medals}</Text>
               </View>
+            )}
+            {freePacks > 0 && (
+              // Free pack badge. Tappable — confirms then redeems one free pack
+              // from the currently-selected series, reusing the normal pack-
+              // opening animation so the experience is indistinguishable from
+              // a paid pull (just no coin cost).
+              <TouchableOpacity
+                style={styles.freePackDisplay}
+                onPress={() => {
+                  if (spinning) return;
+                  Alert.alert(
+                    'Open Free Pack',
+                    `Spend 1 free pack to open a ${spinPool?.series_name || 'pack'}?`,
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'OPEN',
+                        onPress: () => handleOpenPack({ useFreePack: true }),
+                      },
+                    ]
+                  );
+                }}
+                testID="free-pack-redeem-btn"
+              >
+                <Ionicons name="gift" size={16} color="#39ff14" />
+                <Text style={styles.freePackText}>{freePacks}</Text>
+              </TouchableOpacity>
             )}
             <TouchableOpacity 
               style={styles.buyCoinsButton}
@@ -858,7 +921,7 @@ export default function ShopScreen() {
               (spinning || packState !== 'idle') && styles.openPackButtonDisabled,
               user.coins < spinConfig.spin_cost && styles.openPackButtonDisabled
             ]}
-            onPress={handleOpenPack}
+            onPress={() => handleOpenPack()}
             disabled={spinning || packState !== 'idle' || user.coins < spinConfig.spin_cost}
             data-testid="open-pack-btn"
           >
@@ -1119,6 +1182,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#FF9800',
+  },
+  freePackDisplay: {
+    // Tappable "free packs in your inventory" pill. Toxic-green to signal
+    // it's a redeem affordance (not just a passive counter).
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(26, 26, 46, 0.9)',
+    borderWidth: 1,
+    borderColor: '#39ff14',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 4,
+  },
+  freePackText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#39ff14',
   },
   buyCoinsButton: {
     flexDirection: 'row',
