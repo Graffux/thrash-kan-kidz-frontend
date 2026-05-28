@@ -23,7 +23,7 @@
     },
     "android": {
       "package": "com.thrashkankidz.app",
-      "versionCode": 114,
+      "versionCode": 115,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
