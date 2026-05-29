@@ -13,6 +13,7 @@
     },
     "updates": {
       "enabled": true,
+      "url": "https://u.expo.dev/1a56af79-9611-437c-93d8-e781a78d99bf",
       "checkAutomatically": "ON_LOAD",
       "fallbackToCacheTimeout": 0
     },
@@ -23,7 +24,7 @@
     },
     "android": {
       "package": "com.thrashkankidz.app",
-      "versionCode": 115,
+      "versionCode": 116,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
@@ -82,7 +83,8 @@
           }
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

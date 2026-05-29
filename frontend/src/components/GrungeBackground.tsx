@@ -18,7 +18,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SlimeBubbles } from './SlimeBubbles';
 
 const RUST_TEXTURE = require('../../assets/decor/rust_texture.png');
-const RONCH_PEEK = require('../../assets/decor/ronch_peek.png');
+// v2 image generated with Gemini Nano Banana — the previous `ronch_peek.png`
+// was cropped above the eyes (only forehead + dreadlocks visible). v2 places
+// the FULL face (eyes, nose, grinning mouth, slime) in the lower 60% of the
+// canvas with hands gripping the bottom edge, so when positioned at the
+// bottom of the screen the character clearly reads as "peeking up" rather
+// than as a faceless forehead.
+const RONCH_PEEK = require('../../assets/decor/ronch_peek_v2.png');
 
 interface Props {
   children: React.ReactNode;

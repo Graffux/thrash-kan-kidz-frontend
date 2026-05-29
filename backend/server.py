@@ -27,6 +27,19 @@ db = client[os.environ['DB_NAME']]
 # Create the main app without a prefix
 app = FastAPI()
 
+# Mount static asset directory so we can serve fonts (and any future
+# heavy binary assets) directly off the backend. Frontend points at
+# `https://thrash-kan-kidz-api.onrender.com/static/fonts/*.{ttf,otf}` for
+# its remote font registration via expo-font. Hosting them here (instead
+# of jsDelivr off GitHub) lets us keep the user's frontend repo PRIVATE.
+# Path resolves relative to this file so it works the same on local dev
+# and on Render (where cwd may differ).
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path as _StaticPath
+_STATIC_DIR = _StaticPath(__file__).resolve().parent / "static"
+_STATIC_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 

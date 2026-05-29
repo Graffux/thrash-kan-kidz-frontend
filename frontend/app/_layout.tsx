@@ -4,6 +4,7 @@ import { AppProvider, useApp } from '../src/context/AppContext';
 import { View, StyleSheet, Text, Platform, Animated, Easing, Image, ImageSourcePropType } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
+import { Image as ExpoImage } from 'expo-image';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { UpdateBanner } from '../src/components/UpdateBanner';
 import { ICONS } from '../src/assets/icons';
@@ -213,20 +214,33 @@ function TabsNavigator() {
 }
 
 export default function TabLayout() {
-  // Load Metal Mania font at runtime from local TTF asset.
-  // Graceful fallback: if it fails to load we still render the app with
-  // system font — no splash gate, no crash.
+  // FONT LOADING — production fix v116 (remote URI via Render backend).
+  //
+  // PROBLEM: In EAS Android production builds the local `require()` path
+  // for fonts silently fails (the file is bundled but never registered with
+  // the Android font system), so every TextStyle that references our
+  // custom fontFamily falls back to the OS default (Roboto / Arial Rounded).
+  // This has been broken since v92 — neither Metal Mania nor Braver Grave
+  // has ever rendered on a real production device, despite the bundle
+  // containing the files. Same code works fine in Expo Go / dev / Metro
+  // export, which is why nobody caught it before shipping.
+  //
+  // FIX: Load every custom font from a remote URI instead of the local
+  // require(). expo-font/useFonts accepts a string URI as the source value
+  // and registers the downloaded font with the OS at runtime. This path
+  // does NOT have the bundling bug. The fonts are served as static files
+  // from the existing Render backend (`/static/fonts/*`) so the user's
+  // frontend repo can stay PRIVATE — no need to make GitHub fonts public.
+  //
+  // Tradeoff: first launch on a fresh install needs ~500 KB of font
+  // download before headers render correctly. After that they're cached.
+  // We don't block render on it so the app is usable immediately and
+  // headers "snap" to the metal font once cached.
+  const FONT_CDN = 'https://thrash-kan-kidz-api.onrender.com/static/fonts';
   const [fontsLoaded, fontError] = useFonts({
-    // Key MUST match the font's internal PostScript name (nameID 6).
-    // Verified with the fontTools name parser:
-    //   MetalMania-Regular.ttf  -> PS name "MetalMania-Regular"
-    //   BraverGrave.otf         -> PS name "BraverGrave"
-    //   Critica.otf             -> PS name "Critica"
-    // Using the wrong key causes Android to silently fall back to the
-    // system font in production builds.
-    'MetalMania-Regular': require('../assets/fonts/MetalMania-Regular.ttf'),
-    'BraverGrave': require('../assets/fonts/BraverGrave.otf'),
-    'Critica': require('../assets/fonts/Critica.otf'),
+    'MetalMania-Regular': `${FONT_CDN}/MetalMania-Regular.ttf`,
+    'BraverGrave': `${FONT_CDN}/BraverGrave.otf`,
+    'Critica': `${FONT_CDN}/Critica.otf`,
   });
 
   // Don't block app render — render either way. SplatTitle will fall back to
@@ -234,9 +248,41 @@ export default function TabLayout() {
   // We still log errors for debugging.
   useEffect(() => {
     if (fontError) {
-      console.warn('[font] MetalMania failed to load:', fontError);
+      console.warn('[font] Custom font failed to load:', fontError);
     }
-  }, [fontError]);
+    if (fontsLoaded) {
+      console.log('[font] Metal fonts loaded from CDN');
+    }
+  }, [fontError, fontsLoaded]);
+
+  // BLACK-SCREENS SAFETY NET
+  //
+  // Some devices end up with a corrupted expo-image disk cache after the
+  // app is force-quit mid-prefetch (or after an OS-level uninstall/reinstall
+  // cycle, or after a WSL/local build is installed on top of an EAS build —
+  // the keystore mismatch trashes the cache directory's permissions). Symptom
+  // is "all card images and badges are black squares" on one specific device
+  // while every other device of the same build renders fine. Backend is
+  // healthy, network is fine — the local cache just hands back nothing.
+  //
+  // On first launch after this build is installed, do a one-shot wipe of both
+  // memory + disk caches so the next image fetch repopulates from scratch.
+  // It's idempotent — wiping an empty cache is a no-op. We log so QA can
+  // confirm it ran on cold start.
+  const cacheClearedRef = useRef(false);
+  useEffect(() => {
+    if (cacheClearedRef.current) return;
+    cacheClearedRef.current = true;
+    (async () => {
+      try {
+        await ExpoImage.clearMemoryCache();
+        await ExpoImage.clearDiskCache();
+        console.log('[image] Caches cleared on cold start');
+      } catch (e) {
+        console.warn('[image] Cache clear failed (non-fatal):', e);
+      }
+    })();
+  }, []);
 
   return (
     <ErrorBoundary>
@@ -303,33 +349,43 @@ const tabStyles = StyleSheet.create({
     paddingTop: 4,
   },
   iconPlate: {
-    // Smaller plate so 7 tabs on a 360-400dp Android phone have visible
-    // gaps between them. Was 48×38 (cramped — only ~3dp between plates).
-    // 38×34 leaves ~14dp of breathing room per cell so the tabs LOOK
-    // spread out as the user expects.
+    // Plain transparent wrapper — no background, no border. Earlier we kept
+    // a rusted-metal rectangle around each icon for the "studded plate" look,
+    // but with 7 tabs on a phone-width bar the visible rectangles butted up
+    // against each other and made the bar read as a solid wall of buttons
+    // instead of clearly-separated tabs. Stripping the background reveals
+    // the real spacing between icons.
     width: 38,
     height: 34,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#241a14',
-    borderWidth: 1,
-    borderColor: '#3a2a20',
-    // Rusted-rivet inset look via inner shadow trick: use border-top lighter
-    // and border-bottom darker (RN can't do real insets but this fakes it).
-    borderTopColor: '#4a3527',
-    borderBottomColor: '#1a0e08',
-    overflow: 'hidden',
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    overflow: 'visible',
   },
   iconImage: {
-    width: 22,
-    height: 22,
+    width: 26,
+    height: 26,
     opacity: 0.72,
   },
   iconImageActive: {
-    width: 26,
-    height: 26,
+    width: 30,
+    height: 30,
     opacity: 1,
+  },
+  iconPlateActive: {
+    // Only the active tab gets the green glow — a soft halo behind the icon,
+    // not a hard-edged rectangle. Translucent green fill + colored shadow
+    // gives the "this tab is hot" cue without re-introducing the wall-of-
+    // buttons problem.
+    backgroundColor: 'rgba(57, 255, 20, 0.12)',
+    borderRadius: 10,
+    shadowColor: '#39ff14',
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 8,
   },
   iconPlateActive: {
     backgroundColor: '#1a2a14',
