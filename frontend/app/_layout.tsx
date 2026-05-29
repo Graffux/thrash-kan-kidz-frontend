@@ -383,10 +383,12 @@ const tabStyles = StyleSheet.create({
     opacity: 1,
   },
   iconPlateActive: {
-    // Only the active tab gets the green glow — a soft halo behind the icon,
-    // not a hard-edged rectangle. Translucent green fill + colored shadow
-    // gives the "this tab is hot" cue without re-introducing the wall-of-
-    // buttons problem.
+    // Only the active tab gets a subtle green glow — translucent fill + shadow.
+    // Earlier the file had a SECOND `iconPlateActive` definition further down
+    // that JS silently overrode this one with (object key collision: last
+    // wins). The override painted an OPAQUE dark-green rectangle on the
+    // active tab which read as a hard square button stuck to its neighbours.
+    // The duplicate has been deleted so this style now actually applies.
     backgroundColor: 'rgba(57, 255, 20, 0.12)',
     borderRadius: 10,
     shadowColor: '#39ff14',
@@ -394,15 +396,6 @@ const tabStyles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 0 },
     elevation: 8,
-  },
-  iconPlateActive: {
-    backgroundColor: '#1a2a14',
-    borderColor: '#39ff14',
-    shadowColor: '#39ff14',
-    shadowOpacity: 0.6,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 6,
   },
   drip: {
     position: 'absolute',
