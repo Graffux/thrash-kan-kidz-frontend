@@ -18,13 +18,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SlimeBubbles } from './SlimeBubbles';
 
 const RUST_TEXTURE = require('../../assets/decor/rust_texture.png');
-// v2 image generated with Gemini Nano Banana — the previous `ronch_peek.png`
-// was cropped above the eyes (only forehead + dreadlocks visible). v2 places
-// the FULL face (eyes, nose, grinning mouth, slime) in the lower 60% of the
-// canvas with hands gripping the bottom edge, so when positioned at the
-// bottom of the screen the character clearly reads as "peeking up" rather
-// than as a faceless forehead.
-const RONCH_PEEK = require('../../assets/decor/ronch_peek_v2.png');
+// v3 image generated with Gemini Nano Banana — using the user's actual
+// Ronch reference image as a multimodal input so the character likeness is
+// preserved (same dirty-blonde dreadlocks, tan skin, TKK forehead patch,
+// crazy asymmetric eyes, tongue out, white goatee, punk vest with pins).
+// Re-composed in a "peeking up from the bottom of the screen" pose with
+// hands gripping the bottom edge, on a fully transparent background. The
+// checkerboard pattern visible in gallery apps is the transparency
+// indicator — in the live app this composites cleanly over the dark
+// grunge background with no checkerboard visible.
+const RONCH_PEEK = require('../../assets/decor/ronch_peek_v3.png');
 
 interface Props {
   children: React.ReactNode;
