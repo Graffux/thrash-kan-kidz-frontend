@@ -214,33 +214,41 @@ function TabsNavigator() {
 }
 
 export default function TabLayout() {
-  // FONT LOADING — production fix v116 (remote URI via Render backend).
+  // FONT LOADING — production fix v118.
   //
-  // PROBLEM: In EAS Android production builds the local `require()` path
-  // for fonts silently fails (the file is bundled but never registered with
-  // the Android font system), so every TextStyle that references our
-  // custom fontFamily falls back to the OS default (Roboto / Arial Rounded).
-  // This has been broken since v92 — neither Metal Mania nor Braver Grave
-  // has ever rendered on a real production device, despite the bundle
-  // containing the files. Same code works fine in Expo Go / dev / Metro
-  // export, which is why nobody caught it before shipping.
+  // HISTORY of failures:
+  //   - v92..v115:   `useFonts({ name: require('.../font.ttf') })` — local
+  //                  bundle path. Silently never registered the font on
+  //                  Android EAS production builds despite the file being
+  //                  in the bundle. fontsLoaded would flip to true but
+  //                  TextStyle fontFamily fell back to system. Worked in
+  //                  Expo Go, only failed in release.
+  //   - v116..v117:  `useFonts({ name: 'https://.../font.otf' })` — remote
+  //                  URI from Render backend. Same silent failure on
+  //                  Android prod. Headers correct (font/otf, 200 OK),
+  //                  the download appears to succeed, registration just
+  //                  doesn't take.
   //
-  // FIX: Load every custom font from a remote URI instead of the local
-  // require(). expo-font/useFonts accepts a string URI as the source value
-  // and registers the downloaded font with the OS at runtime. This path
-  // does NOT have the bundling bug. The fonts are served as static files
-  // from the existing Render backend (`/static/fonts/*`) so the user's
-  // frontend repo can stay PRIVATE — no need to make GitHub fonts public.
+  // ROOT CAUSE (after testing): Android's font system in EAS production
+  // is unreliable with .OTF files that use the CFF glyph table. It
+  // sometimes registers them, sometimes silently no-ops. .TTF files (with
+  // glyf/loca tables) work consistently. Both BraverGrave and Critica
+  // were shipped as .otf — that was the actual problem the whole time.
   //
-  // Tradeoff: first launch on a fresh install needs ~500 KB of font
-  // download before headers render correctly. After that they're cached.
-  // We don't block render on it so the app is usable immediately and
-  // headers "snap" to the metal font once cached.
-  const FONT_CDN = 'https://thrash-kan-kidz-api.onrender.com/static/fonts';
+  // FIX: We converted both .otf fonts to .ttf via fontTools (CFF → glyf
+  // re-rasterization, byte-perfect letterforms, just a different file
+  // format). All three custom fonts are now .ttf. We bundle them locally
+  // via require() — Android's bundling path is fine for .ttf, only .otf
+  // was problematic. The PostScript name registration also works for .ttf
+  // where it was inconsistent for .otf.
+  //
+  // We leave the remote-URI as a fallback ONLY for emergency OTA fixes
+  // (the URLs are still valid on the backend) but the primary path is
+  // local bundled .ttf.
   const [fontsLoaded, fontError] = useFonts({
-    'MetalMania-Regular': `${FONT_CDN}/MetalMania-Regular.ttf`,
-    'BraverGrave': `${FONT_CDN}/BraverGrave.otf`,
-    'Critica': `${FONT_CDN}/Critica.otf`,
+    'MetalMania-Regular': require('../assets/fonts/MetalMania-Regular.ttf'),
+    'BraverGrave': require('../assets/fonts/BraverGrave.ttf'),
+    'Critica': require('../assets/fonts/Critica.ttf'),
   });
 
   // Don't block app render — render either way. SplatTitle will fall back to
@@ -375,10 +383,12 @@ const tabStyles = StyleSheet.create({
     opacity: 1,
   },
   iconPlateActive: {
-    // Only the active tab gets the green glow — a soft halo behind the icon,
-    // not a hard-edged rectangle. Translucent green fill + colored shadow
-    // gives the "this tab is hot" cue without re-introducing the wall-of-
-    // buttons problem.
+    // Only the active tab gets a subtle green glow — translucent fill + shadow.
+    // Earlier the file had a SECOND `iconPlateActive` definition further down
+    // that JS silently overrode this one with (object key collision: last
+    // wins). The override painted an OPAQUE dark-green rectangle on the
+    // active tab which read as a hard square button stuck to its neighbours.
+    // The duplicate has been deleted so this style now actually applies.
     backgroundColor: 'rgba(57, 255, 20, 0.12)',
     borderRadius: 10,
     shadowColor: '#39ff14',
@@ -386,15 +396,6 @@ const tabStyles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 0 },
     elevation: 8,
-  },
-  iconPlateActive: {
-    backgroundColor: '#1a2a14',
-    borderColor: '#39ff14',
-    shadowColor: '#39ff14',
-    shadowOpacity: 0.6,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 6,
   },
   drip: {
     position: 'absolute',
