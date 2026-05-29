@@ -263,34 +263,15 @@ export default function TabLayout() {
     }
   }, [fontError, fontsLoaded]);
 
-  // BLACK-SCREENS SAFETY NET
-  //
-  // Some devices end up with a corrupted expo-image disk cache after the
-  // app is force-quit mid-prefetch (or after an OS-level uninstall/reinstall
-  // cycle, or after a WSL/local build is installed on top of an EAS build —
-  // the keystore mismatch trashes the cache directory's permissions). Symptom
-  // is "all card images and badges are black squares" on one specific device
-  // while every other device of the same build renders fine. Backend is
-  // healthy, network is fine — the local cache just hands back nothing.
-  //
-  // On first launch after this build is installed, do a one-shot wipe of both
-  // memory + disk caches so the next image fetch repopulates from scratch.
-  // It's idempotent — wiping an empty cache is a no-op. We log so QA can
-  // confirm it ran on cold start.
-  const cacheClearedRef = useRef(false);
-  useEffect(() => {
-    if (cacheClearedRef.current) return;
-    cacheClearedRef.current = true;
-    (async () => {
-      try {
-        await ExpoImage.clearMemoryCache();
-        await ExpoImage.clearDiskCache();
-        console.log('[image] Caches cleared on cold start');
-      } catch (e) {
-        console.warn('[image] Cache clear failed (non-fatal):', e);
-      }
-    })();
-  }, []);
+  // NOTE: an earlier version of this layout (v118 attempt) called
+  //   ExpoImage.clearMemoryCache() + clearDiskCache() here on every cold
+  //   start as a "safety net" for the WSL-build-corruption issue. That was
+  //   a mistake — it ran on EVERY app launch, not just the first one after
+  //   reinstall, which meant the app re-downloaded every card image and
+  //   badge on every open. On a slow connection this read as "card and
+  //   badge images don't load at all." Removed. If a future build needs
+  //   a one-shot cache reset, gate it behind AsyncStorage so it actually
+  //   runs ONCE per build, not every launch.
 
   return (
     <ErrorBoundary>
