@@ -169,6 +169,34 @@ FastAPI + MongoDB.
 - `/api/badges` lists `founding_thrasher` (18 total badges).
 - `/api/users/{Graffux}/badges` → `founding_thrasher.earned = True`.
 
+## Session 2026-05-30 (continued — Daily Boost UX)
+
+### Home countdown chip
+- VIP chip on home expanded from `VIP` → `VIP · 28d` (or whatever the
+  current `boostDaysLeft(user.coin_boost_expires_at)` returns).
+- Same chip auto-disappears the moment `coin_boost_expires_at` passes —
+  no extra plumbing, falls out of the date math.
+
+### Shop status card (new)
+- One inline state card lives between the shop header and the series
+  toggle. Three visual variants:
+  - `active`  (>7d left) → amber chip "VIP Boost active · Nd left · 25 coins/day"
+  - `expiring` (≤7d left) → amber bordered tappable card "Boost expires in N days — buy any pack to refresh" → opens BuyCoinsModal.
+  - `inactive` (no boost / expired) → green bordered tappable card "Unlock the VIP Daily Boost — buy any coin pack" → opens BuyCoinsModal.
+
+### Shared util
+- New `frontend/src/utils/vipBoost.ts` exports `boostDaysLeft`,
+  `isBoostActive`, `boostState`. Re-used by Home + Shop. No new API
+  surface, all derived from `user.coin_boost_expires_at`.
+
+### Frontend User type
+- `is_vip_supporter?` and `coin_boost_expires_at?` added to
+  `AppContext.User` so the rest of the app can read both directly.
+
+### versionCode stays 122
+- All boost UX ships in the same EAS build as the VIP/Series-8/header
+  batch — no extra build needed.
+
 ### Production database fixes (already live)
 - Graffux daily_login_streak set to **52** (was 51 from auto-tick).
 - Dripping daily_login_streak set to **41** (was 1; restored via admin endpoint;
