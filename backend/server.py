@@ -224,7 +224,7 @@ from series_config import (  # noqa: E402
     persist_release_date as persist_series_release_date,
 )
 from data.ranks import RANKS, compute_user_rank  # noqa: E402
-from data.badges import BADGES, COND_SERIES_BASE_COMPLETE, COND_LOGIN_STREAK, COND_TRADES_ACCEPTED, COND_VARIANTS_OWNED, COND_CREATED_BEFORE_SERIES, COND_OWN_ANY_CARD, COND_TOTAL_SPENT, COND_FRIEND_COUNT, COND_OWN_SPECIFIC_CARD  # noqa: E402
+from data.badges import BADGES, COND_SERIES_BASE_COMPLETE, COND_LOGIN_STREAK, COND_TRADES_ACCEPTED, COND_VARIANTS_OWNED, COND_CREATED_BEFORE_SERIES, COND_OWN_ANY_CARD, COND_TOTAL_SPENT, COND_FRIEND_COUNT, COND_OWN_SPECIFIC_CARD, COND_GRANTED  # noqa: E402
 
 class CoinPurchaseRequest(BaseModel):
     user_id: str
@@ -1328,6 +1328,11 @@ async def _evaluate_badge(badge: dict, user: dict) -> bool:
         elif cutoff.tzinfo is None and created.tzinfo is not None:
             cutoff = cutoff.replace(tzinfo=created.tzinfo)
         return created < cutoff
+
+    if ct == COND_GRANTED:
+        # Manually granted via users.granted_badges (founders, contest
+        # winners, etc.). Not auto-earnable.
+        return badge["id"] in (user.get("granted_badges") or [])
 
     return False
 

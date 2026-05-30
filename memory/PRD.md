@@ -152,6 +152,23 @@ FastAPI + MongoDB.
   future `coin_boost_expires_at` is set (boost set on Graffux for the
   user's in-app verification — expires ~2026-06-29).
 
+## Session 2026-05-30 (continued — Founding Thrasher badge)
+
+### New Founders' badge (tester rewards)
+- **`founding_thrasher`** added to `data/badges.py` with the user-supplied
+  spiked-shield artwork.
+- New condition type **`COND_GRANTED`** — non-auto-earnable, evaluated
+  against `users.granted_badges[]`. Future-proofs admin/contest awards
+  beyond just founders.
+- **`_evaluate_badge` updated** to handle `COND_GRANTED` (returns True
+  iff `badge.id in user.granted_badges`).
+- **Database backfill**: ran `$addToSet` on all 57 current users so every
+  tester sees the badge immediately. Idempotent on re-run.
+
+### Verified
+- `/api/badges` lists `founding_thrasher` (18 total badges).
+- `/api/users/{Graffux}/badges` → `founding_thrasher.earned = True`.
+
 ### Production database fixes (already live)
 - Graffux daily_login_streak set to **52** (was 51 from auto-tick).
 - Dripping daily_login_streak set to **41** (was 1; restored via admin endpoint;
