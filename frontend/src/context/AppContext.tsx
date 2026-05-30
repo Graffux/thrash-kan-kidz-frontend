@@ -34,6 +34,12 @@ interface User {
     crest_url: string;
     min_series_cleared: number;
   } | null;
+  // Daily-login coin boost (VIP supporter). When `coin_boost_expires_at`
+  // is in the future, the user earns 25 coins/day instead of 10 and gets
+  // a VIP chip in Mosh Pit + on Home. Cleared automatically once the
+  // timestamp passes.
+  is_vip_supporter?: boolean;
+  coin_boost_expires_at?: string | null;
 }
 
 interface Card {

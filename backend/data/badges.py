@@ -26,6 +26,7 @@ COND_OWN_ANY_CARD = "own_any_card"                   # params: {}
 COND_TOTAL_SPENT = "total_spent"                     # params: {"min": int}
 COND_FRIEND_COUNT = "friend_count"                   # params: {"min": int}
 COND_OWN_SPECIFIC_CARD = "own_specific_card"         # params: {"card_id": str}
+COND_GRANTED = "granted"                             # params: {}; admin/founder-granted via users.granted_badges
 
 
 BADGES = [
@@ -204,6 +205,19 @@ BADGES = [
         "condition_type": COND_TOTAL_SPENT,
         "condition_params": {"min": 25000},
         "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/yaz6fygi_enhanced-1779154497137.png",
+    },
+    # Founders' badge — granted to every existing internal tester at
+    # the moment of release. Not auto-earnable; stamped on user docs
+    # via the `granted_badges` array.
+    {
+        "id": "founding_thrasher",
+        "name": "Founding Thrasher",
+        "description": "Day-one banger — slammed the pit before the gates opened.",
+        "icon": "trophy",
+        "tint": "#FFD24A",
+        "condition_type": COND_GRANTED,
+        "condition_params": {},
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/5lqglpcu_Screenshot_20260530_171350_ChatGPT.png",
     },
 ]
 

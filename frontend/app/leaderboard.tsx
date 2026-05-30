@@ -100,7 +100,13 @@ export default function LeaderboardScreen() {
           <TouchableOpacity onPress={() => router.back()} testID="lb-back-btn">
             <Ionicons name="chevron-back" size={28} color="#9aff5a" />
           </TouchableOpacity>
-          <Text style={styles.pageTitle}>LEADERBOARD</Text>
+          <Image
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            source={require('../src/assets/headers/leaderboard_logo.jpg')}
+            style={styles.headerLogo}
+            resizeMode="contain"
+            testID="leaderboard-header-logo"
+          />
           <View style={{ width: 28 }} />
         </View>
 
@@ -220,6 +226,7 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   pageTitle: { color: '#39ff14', fontSize: 18, fontWeight: '900', letterSpacing: 3 },
+  headerLogo: { width: 200, height: 64 },
   tabsRow: {
     paddingHorizontal: 12,
     paddingVertical: 8,

@@ -19,13 +19,19 @@ RANKS = [
         "id": "poser",
         "name": "Poser",
         "min_series_cleared": 0,
-        "crest_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/y52tavwo_enhanced-1778794141957.jpg",
+        # NOTE 2026-05-29: The poser/roadie crest_url values were uploaded
+        # swapped. The `y52tavwo_enhanced...jpg` artifact actually has the
+        # word ROADIE rendered on it, and `ymgx5byn_enhanced...jpg` has
+        # POSER. We now point each rank at the URL whose IMAGE matches its
+        # name (verified by Gemini OCR analyzer). Bug surfaced when user
+        # Dante89 (Roadie rank, 1 series complete) saw the Poser badge.
+        "crest_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ymgx5byn_enhanced-1778794218378.jpg",
     },
     {
         "id": "roadie",
         "name": "Roadie",
         "min_series_cleared": 1,
-        "crest_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ymgx5byn_enhanced-1778794218378.jpg",
+        "crest_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/y52tavwo_enhanced-1778794141957.jpg",
     },
     {
         "id": "fist_banger",

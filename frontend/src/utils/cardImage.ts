@@ -34,3 +34,25 @@ export function cardThumb(card: CardImageSource | undefined | null, width = 360)
   const w = width <= 160 ? 160 : width <= 240 ? 240 : width <= 360 ? 360 : 540;
   return `${API_BASE}/api/cards/${card.id}/thumb?w=${w}`;
 }
+
+/**
+ * Build a thumbnail URL for the variant scratch-cover image. The raw
+ * scratch_cover_url on S3 is a 4-5 MB enhanced JPEG, which the
+ * react-native-svg <Image> tag fails to render reliably on Android
+ * (silent no-op, leaving a blank scratch surface even though the
+ * pan-responder still fires). This helper returns a ~80 KB JPEG
+ * served by the backend Pillow resizer — same image, small enough
+ * for SVG to actually paint.
+ *
+ * Returns null if the card isn't a variant (caller should skip the
+ * scratch overlay entirely in that case).
+ */
+export function scratchCoverThumb(
+  card: (CardImageSource & { is_variant?: boolean; variant_name?: string }) | undefined | null,
+  width = 540,
+): string | null {
+  if (!card || !card.id) return null;
+  if (!card.is_variant && !card.variant_name) return null;
+  const w = width <= 240 ? 240 : width <= 360 ? 360 : width <= 540 ? 540 : 1024;
+  return `${API_BASE}/api/cards/${card.id}/scratch-cover?w=${w}`;
+}

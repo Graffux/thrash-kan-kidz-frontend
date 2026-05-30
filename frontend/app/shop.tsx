@@ -16,7 +16,7 @@ import { Image as ExpoImage } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { FONTS } from '../src/theme';
-import { cardThumb } from '../src/utils/cardImage';
+import { cardThumb, scratchCoverThumb } from '../src/utils/cardImage';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -596,8 +596,16 @@ export default function ShopScreen() {
                           key={`scratch-${revealIndex}-${spinResult.won_cards[revealIndex].card.id}`}
                           width={140}
                           height={200}
-                          imageUri={spinResult.won_cards[revealIndex].card.front_image_url}
-                          coverUri={spinResult.won_cards[revealIndex].card.scratch_cover_url}
+                          imageUri={cardThumb(spinResult.won_cards[revealIndex].card, 540)}
+                          coverUri={
+                            // Use the backend resizer so we serve an 80 KB
+                            // JPEG to react-native-svg instead of the 4-5 MB
+                            // original (SVG <Image> silently fails on large
+                            // remote JPEGs). Falls back to the raw URL if the
+                            // card somehow has no id.
+                            scratchCoverThumb(spinResult.won_cards[revealIndex].card, 540) ||
+                            spinResult.won_cards[revealIndex].card.scratch_cover_url
+                          }
                           onComplete={() => setScratched(true)}
                         />
                       ) : (

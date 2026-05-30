@@ -75,6 +75,100 @@ FastAPI + MongoDB.
   Goals tab reflects restored streaks.
 - **`app.json` versionCode bumped 111 → 113.**
 
+## Session 2026-05-30 (batch fixes for build v121)
+
+### Code changes
+- **Card art corrections** — `card_martin_wankyier` and `card_daring_travis`
+  front_image_url pointed to swapped/wrong artwork (old job_d9b7563a URLs).
+  Updated `CARD_IMAGE_URLS["martin_wankyier"]` and `["daring_travis"]` in
+  `backend/data/cards_data.py` to the correct customer-asset URLs supplied
+  by the user. Backend `sync_card_assets` startup hook auto-pushed both
+  rows to MongoDB on reload (confirmed via curl).
+- **New "Thrash Kan Kidz" header** — replaced the SVG `DrippingLogo` with
+  a raster Image component pointing to the new slime-drip metal logo
+  artwork at `frontend/src/assets/headers/tkk_logo.jpg` (900×900, 145 KB
+  JPG). All existing call-sites continue to work (auth screen + home).
+- **New Leaderboard header + privacy** — `frontend/app/leaderboard.tsx`
+  now renders `headers/leaderboard_logo.jpg` (900×709, 145 KB JPG)
+  instead of the plain text title. Removed `COINS` from the public
+  metric tabs and stripped the `coins` field from the `Row` interface +
+  `metricLabel`. Backend still accepts `metric=coins` for older clients;
+  the UI just no longer surfaces it.
+- **versionCode 120 → 121** in `app.json`.
+
+### Asset notes
+- Source PNG for the leaderboard header had a corrupt `eXIf` chunk that
+  failed PIL parsing. We stripped the chunk, then re-encoded as JPEG to
+  avoid future AAPT2 build failures on Android.
+
+## Session 2026-05-30 (continued — VIP boost + Series 8 banner) — versionCode 122
+
+### Daily Login Bonus Multiplier (P0, monetization)
+- **`User.coin_boost_expires_at`** added (Optional[datetime]). Activated
+  by ANY coin pack purchase, lasts 30 days. Each new purchase RESETS the
+  expiry to now+30d (does NOT stack — per Q2b spec).
+- **`_is_vip_active(user)`** helper module-level in `server.py` —
+  computes VIP status from `coin_boost_expires_at`. Handles both
+  datetime and ISO string formats.
+- **`_activate_coin_boost(user_id)`** helper — wired into ALL THREE
+  fulfillment paths:
+  - `/api/users/{user_id}/verify-purchase` (Google Play live path)
+  - `/api/checkout/status/{session_id}` (Stripe success poll)
+  - `/api/webhook/stripe` (Stripe webhook)
+- **Daily login claim** — `bonus_coins` now 25 when boost active else 10.
+  Response includes `vip_boost_active` and `vip_boost_expires_at`.
+  ⚠️ NOTE: pre-existing code had `bonus_coins = 50`. User specified
+  10 (base) / 25 (boost) literally so we honored that. If user prefers
+  to preserve the old economy and just multiply, change the constants
+  in `claim_daily_login`.
+
+### VIP Supporter tag (P0, social proof)
+- **`/api/users/{user_id}`** and **`/api/users/username/{username}`**
+  now return `is_vip_supporter` boolean (computed, not stored).
+- **`/api/mosh/feed`**, **`/api/mosh/posts/{id}`**,
+  **`/api/mosh/posts/{id}/comments`** now decorate each post/comment
+  author with `is_vip_supporter`. Single batched `db.users.find` per
+  feed render, no per-row queries.
+- **Frontend chip**: amber star pill rendered next to author name on
+  Home, Mosh feed posts, and Mosh comments when `is_vip_supporter`.
+
+### Series 8: Slam Edition announcement (P0, hype)
+- **Home banner** — amber-bordered card under the welcome strip,
+  always visible.
+- **Mosh Pit pinned system post** — backend `/api/mosh/feed` injects a
+  synthetic `system_series8_announcement` post at index 0. Frontend
+  renders it as a no-interaction broadcast card (no react/comment/
+  delete buttons) with an "OFFICIAL" megaphone badge.
+
+### versionCode 121 → 122
+- Ships VIP boost + announcements on top of the previous batch (cards,
+  headers, leaderboard).
+
+### Verified end-to-end
+- Direct MongoDB tests pass: VIP flag flips correctly on set, unset,
+  and past-expiry.
+- `/api/mosh/feed` returns the pinned announcement at index 0.
+- `/api/users/username/Graffux` returns `is_vip_supporter=True` when a
+  future `coin_boost_expires_at` is set (boost set on Graffux for the
+  user's in-app verification — expires ~2026-06-29).
+
+## Session 2026-05-30 (continued — Founding Thrasher badge)
+
+### New Founders' badge (tester rewards)
+- **`founding_thrasher`** added to `data/badges.py` with the user-supplied
+  spiked-shield artwork.
+- New condition type **`COND_GRANTED`** — non-auto-earnable, evaluated
+  against `users.granted_badges[]`. Future-proofs admin/contest awards
+  beyond just founders.
+- **`_evaluate_badge` updated** to handle `COND_GRANTED` (returns True
+  iff `badge.id in user.granted_badges`).
+- **Database backfill**: ran `$addToSet` on all 57 current users so every
+  tester sees the badge immediately. Idempotent on re-run.
+
+### Verified
+- `/api/badges` lists `founding_thrasher` (18 total badges).
+- `/api/users/{Graffux}/badges` → `founding_thrasher.earned = True`.
+
 ### Production database fixes (already live)
 - Graffux daily_login_streak set to **52** (was 51 from auto-tick).
 - Dripping daily_login_streak set to **41** (was 1; restored via admin endpoint;
@@ -98,11 +192,12 @@ FastAPI + MongoDB.
 ## Prioritized backlog
 
 ### P0 — pending user action
-- User clicks **Save to GitHub** → selects `thrash-kan-kidz-frontend` →
-  reviews PR diff → merges to `main` → triggers EAS build via expo.dev
-  from phone OR `eas build --platform android --profile production` locally.
-- User does the same for `thrash-kan-kidz-backend` so Render redeploys with
-  comment-likes endpoint, updated admin/set-streak, and Pillow thumbnails.
+- User clicks **Save to GitHub** for BOTH `thrash-kan-kidz-frontend` AND
+  `thrash-kan-kidz-backend`, merges via PR, then triggers ONE consolidated
+  EAS build for `versionCode 121`. All batched fixes (.ttf fonts, tab
+  spacing, ronch cleanup, audio WAVs, scratch-cover endpoint, free pack
+  UI, rank badge swap, Martin/Travis art, new home + leaderboard
+  headers, coins removed from leaderboard) ship together.
 
 ### P1 (after build lands)
 - Generate new `ronch_peek.png` asset with eyes visible (image generation
