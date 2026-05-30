@@ -75,6 +75,32 @@ FastAPI + MongoDB.
   Goals tab reflects restored streaks.
 - **`app.json` versionCode bumped 111 → 113.**
 
+## Session 2026-05-30 (batch fixes for build v121)
+
+### Code changes
+- **Card art corrections** — `card_martin_wankyier` and `card_daring_travis`
+  front_image_url pointed to swapped/wrong artwork (old job_d9b7563a URLs).
+  Updated `CARD_IMAGE_URLS["martin_wankyier"]` and `["daring_travis"]` in
+  `backend/data/cards_data.py` to the correct customer-asset URLs supplied
+  by the user. Backend `sync_card_assets` startup hook auto-pushed both
+  rows to MongoDB on reload (confirmed via curl).
+- **New "Thrash Kan Kidz" header** — replaced the SVG `DrippingLogo` with
+  a raster Image component pointing to the new slime-drip metal logo
+  artwork at `frontend/src/assets/headers/tkk_logo.jpg` (900×900, 145 KB
+  JPG). All existing call-sites continue to work (auth screen + home).
+- **New Leaderboard header + privacy** — `frontend/app/leaderboard.tsx`
+  now renders `headers/leaderboard_logo.jpg` (900×709, 145 KB JPG)
+  instead of the plain text title. Removed `COINS` from the public
+  metric tabs and stripped the `coins` field from the `Row` interface +
+  `metricLabel`. Backend still accepts `metric=coins` for older clients;
+  the UI just no longer surfaces it.
+- **versionCode 120 → 121** in `app.json`.
+
+### Asset notes
+- Source PNG for the leaderboard header had a corrupt `eXIf` chunk that
+  failed PIL parsing. We stripped the chunk, then re-encoded as JPEG to
+  avoid future AAPT2 build failures on Android.
+
 ### Production database fixes (already live)
 - Graffux daily_login_streak set to **52** (was 51 from auto-tick).
 - Dripping daily_login_streak set to **41** (was 1; restored via admin endpoint;
@@ -98,11 +124,12 @@ FastAPI + MongoDB.
 ## Prioritized backlog
 
 ### P0 — pending user action
-- User clicks **Save to GitHub** → selects `thrash-kan-kidz-frontend` →
-  reviews PR diff → merges to `main` → triggers EAS build via expo.dev
-  from phone OR `eas build --platform android --profile production` locally.
-- User does the same for `thrash-kan-kidz-backend` so Render redeploys with
-  comment-likes endpoint, updated admin/set-streak, and Pillow thumbnails.
+- User clicks **Save to GitHub** for BOTH `thrash-kan-kidz-frontend` AND
+  `thrash-kan-kidz-backend`, merges via PR, then triggers ONE consolidated
+  EAS build for `versionCode 121`. All batched fixes (.ttf fonts, tab
+  spacing, ronch cleanup, audio WAVs, scratch-cover endpoint, free pack
+  UI, rank badge swap, Martin/Travis art, new home + leaderboard
+  headers, coins removed from leaderboard) ship together.
 
 ### P1 (after build lands)
 - Generate new `ronch_peek.png` asset with eyes visible (image generation
