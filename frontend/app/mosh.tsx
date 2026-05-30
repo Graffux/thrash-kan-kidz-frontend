@@ -42,6 +42,9 @@ interface MoshPost {
   reaction_count: number;
   viewer_reacted: boolean;
   comment_count: number;
+  is_vip_supporter?: boolean;
+  is_system?: boolean;
+  is_pinned?: boolean;
 }
 
 const relativeTime = (iso: string): string => {
@@ -355,13 +358,39 @@ export default function MoshPitScreen() {
               <Text style={styles.emptySub}>Be the first to post!</Text>
             </View>
           ) : (
-            posts.map((p) => (
+            posts.map((p) => {
+              // System-pinned posts (Series 8 announcement, etc.) render as
+              // a no-interaction broadcast card at the top of the feed.
+              if (p.is_system) {
+                return (
+                  <View
+                    key={p.id}
+                    style={[styles.post, styles.systemPost]}
+                    testID={`mosh-system-${p.id}`}
+                  >
+                    <View style={styles.systemBadgeRow}>
+                      <Ionicons name="megaphone" size={14} color="#0a1a02" />
+                      <Text style={styles.systemBadgeText}>OFFICIAL</Text>
+                    </View>
+                    <Text style={styles.systemUser}>{p.username}</Text>
+                    <Text style={styles.systemContent}>{p.content}</Text>
+                  </View>
+                );
+              }
+              return (
               <View key={p.id} style={styles.post} testID={`mosh-post-${p.id}`}>
                 <View style={styles.postHead}>
                   <TouchableOpacity
+                    style={styles.postUserRow}
                     onPress={() => router.push(`/profile?userId=${p.user_id}` as any)}
                   >
                     <Text style={styles.postUser}>{p.username}</Text>
+                    {p.is_vip_supporter && (
+                      <View style={styles.vipChip} testID={`mosh-vip-${p.id}`}>
+                        <Ionicons name="star" size={9} color="#0a1a02" />
+                        <Text style={styles.vipChipText}>VIP</Text>
+                      </View>
+                    )}
                   </TouchableOpacity>
                   <View style={styles.postHeadRight}>
                     <Text style={styles.postTime}>{relativeTime(p.created_at)}</Text>
@@ -412,7 +441,8 @@ export default function MoshPitScreen() {
                   }
                 />
               </View>
-            ))
+              );
+            })
           )}
           <View style={{ height: 24 }} />
         </ScrollView>
@@ -720,4 +750,61 @@ const styles = StyleSheet.create({
   },
   reactBtnActive: { borderColor: '#39ff14', backgroundColor: 'rgba(57,255,20,0.08)' },
   reactCount: { color: '#789', fontSize: 12, fontWeight: '700' },
+
+  // VIP supporter chip — small star pill rendered right of the username
+  // on any Mosh post/comment whose author has an active coin boost.
+  postUserRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  vipChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#ffd24a',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  vipChipText: {
+    color: '#0a1a02',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+
+  // System / pinned-announcement card (Series 8 etc.). Different palette
+  // from user posts so it reads as a broadcast, not a peer post.
+  systemPost: {
+    borderColor: '#ffd24a',
+    borderWidth: 2,
+    backgroundColor: 'rgba(40, 30, 5, 0.95)',
+  },
+  systemBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    alignSelf: 'flex-start',
+    backgroundColor: '#ffd24a',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  systemBadgeText: {
+    color: '#0a1a02',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+  },
+  systemUser: {
+    color: '#ffd24a',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  systemContent: {
+    color: '#fff5d4',
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '500',
+  },
 });

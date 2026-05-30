@@ -100,6 +100,7 @@ class User(BaseModel):
     completed_series: List[int] = Field(default_factory=list)  # Series user has fully completed
     series_milestone_claimed: List[int] = Field(default_factory=list)  # Series the user has claimed the 100% completion milestone bonus for
     featured_card_ids: List[str] = Field(default_factory=list)  # Up to 5 card IDs the player has pinned to their Profile showcase
+    coin_boost_expires_at: Optional[datetime] = None  # Activated by ANY coin pack purchase. While in the future, daily login bonus is 25/day and the user gets a "VIP SUPPORTER" tag in Mosh Pit. Resets (not stacks) on each new purchase.
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 # Auth request models
@@ -1197,11 +1198,49 @@ async def get_user(user_id: str):
     user_data['medals'] = user.get('medals', 0)
     user_data['free_packs'] = user.get('free_packs', 0)
     user_data['rank'] = compute_user_rank(user_data.get('completed_series', []))
+    user_data['is_vip_supporter'] = _is_vip_active(user)
     friend_count = await db.friends.count_documents({
         "$or": [{"user_id": user_id}, {"friend_id": user_id}]
     })
     user_data['friend_count'] = friend_count
     return user_data
+
+
+def _is_vip_active(user: dict) -> bool:
+    """True when the user has an active coin-pack-purchase boost.
+
+    Activated by any coin pack purchase (Google Play or Stripe). Lasts 30
+    days from the most recent qualifying purchase. While active, daily
+    login bonus is 25/day (vs 10/day base) and the user shows up with a
+    "VIP SUPPORTER" badge in the Mosh Pit feed.
+    """
+    expires = user.get("coin_boost_expires_at")
+    if not expires:
+        return False
+    if isinstance(expires, str):
+        try:
+            expires = datetime.fromisoformat(expires.replace("Z", "+00:00"))
+        except Exception:
+            return False
+    if expires.tzinfo is not None:
+        expires = expires.replace(tzinfo=None)
+    return expires > datetime.utcnow()
+
+
+async def _activate_coin_boost(user_id: str) -> datetime:
+    """Refresh the 30-day daily-login coin boost for a user.
+
+    Each new coin pack purchase RESETS the expiry to now + 30 days
+    (does not stack on top of any remaining window). Returns the new
+    expiry timestamp so callers can include it in the response.
+    """
+    new_expiry = datetime.utcnow() + timedelta(days=30)
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"coin_boost_expires_at": new_expiry}},
+    )
+    logger.info(f"VIP boost (re)activated for user {user_id} until {new_expiry.isoformat()}")
+    return new_expiry
 
 @api_router.get("/ranks")
 async def list_ranks():
@@ -1437,7 +1476,9 @@ async def get_user_by_username(username: str):
     user = await db.users.find_one({"username": username})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return User(**user)
+    payload = User(**user).model_dump()
+    payload['is_vip_supporter'] = _is_vip_active(user)
+    return payload
 
 @api_router.get("/users")
 async def get_all_users():
@@ -1535,8 +1576,13 @@ async def claim_daily_login(user_id: str):
     else:
         new_streak = 1
     
-    # Calculate bonus coins - flat 50 coins per day
-    bonus_coins = 50
+    # Calculate bonus coins.
+    # Base is 10/day. After ANY coin pack purchase, the user enters a
+    # 30-day "VIP SUPPORTER" boost window where daily login is 25/day.
+    # Note: streak milestone / wheel / pack rewards are NOT scaled — by
+    # design (Q4a in batch-feature spec).
+    boost_active = _is_vip_active(user)
+    bonus_coins = 25 if boost_active else 10
     
     new_coins = user.get("coins", 0) + bonus_coins
     
@@ -1576,7 +1622,17 @@ async def claim_daily_login(user_id: str):
         "streak": new_streak,
         "bonus_coins": bonus_coins,
         "total_coins": new_coins,
-        "message": f"Day {new_streak} streak! +{bonus_coins} coins",
+        "vip_boost_active": boost_active,
+        "vip_boost_expires_at": (
+            user.get("coin_boost_expires_at").isoformat()
+            if boost_active and isinstance(user.get("coin_boost_expires_at"), datetime)
+            else (user.get("coin_boost_expires_at") if boost_active else None)
+        ),
+        "message": (
+            f"Day {new_streak} streak! +{bonus_coins} coins (VIP boost active!)"
+            if boost_active
+            else f"Day {new_streak} streak! +{bonus_coins} coins"
+        ),
         "newly_unlocked_epic_card": newly_unlocked_epic,
         "engagement_unlock": engagement_unlock
     }
@@ -3753,7 +3809,10 @@ async def verify_google_play_purchase(user_id: str, request: GooglePlayPurchaseR
         {"id": user_id},
         {"$inc": {"coins": total_coins}}
     )
-    
+
+    # Activate / refresh the 30-day daily-login coin boost (VIP supporter).
+    await _activate_coin_boost(user_id)
+
     logger.info(f"Google Play purchase verified: {total_coins} coins for user {user_id}")
     
     updated_user = await db.users.find_one({"id": user_id}, {"_id": 0})
@@ -3823,6 +3882,8 @@ async def get_payment_status(session_id: str):
                 {"$inc": {"coins": coins_amount}}
             )
             coins_credited = coins_amount
+            # Activate / refresh the 30-day daily-login coin boost (VIP supporter).
+            await _activate_coin_boost(user_id)
             logger.info(f"Credited {coins_amount} coins to user {user_id} for session {session_id}")
         
         return {
@@ -3881,7 +3942,10 @@ async def stripe_webhook(request: Request):
                         {"id": user_id},
                         {"$inc": {"coins": coins_amount}}
                     )
-                    
+
+                    # Activate / refresh the 30-day daily-login coin boost.
+                    await _activate_coin_boost(user_id)
+
                     # Update transaction
                     await db.payment_transactions.update_one(
                         {"session_id": session_id},

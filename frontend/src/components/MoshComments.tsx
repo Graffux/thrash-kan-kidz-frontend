@@ -22,6 +22,7 @@ interface Comment {
   created_at: string;
   reaction_count?: number;
   viewer_reacted?: boolean;
+  is_vip_supporter?: boolean;
 }
 
 const MAX_COMMENT = 200;
@@ -187,6 +188,12 @@ export const MoshComments: React.FC<Props> = ({ postId, initialCount, onCountCha
                 <View key={c.id} style={styles.comment} testID={`mosh-comment-${c.id}`}>
                   <View style={styles.commentHead}>
                     <Text style={styles.commentUser}>{c.username}</Text>
+                    {c.is_vip_supporter && (
+                      <View style={styles.commentVipChip} testID={`mosh-comment-vip-${c.id}`}>
+                        <Ionicons name="star" size={8} color="#0a1a02" />
+                        <Text style={styles.commentVipText}>VIP</Text>
+                      </View>
+                    )}
                     <Text style={styles.commentTime}>{relativeTime(c.created_at)}</Text>
                     {user && c.user_id === user.id && (
                       <TouchableOpacity
@@ -279,6 +286,21 @@ const styles = StyleSheet.create({
   comment: { paddingVertical: 6 },
   commentHead: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 },
   commentUser: { color: '#9aff5a', fontSize: 11, fontWeight: '900' },
+  commentVipChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    backgroundColor: '#ffd24a',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 3,
+  },
+  commentVipText: {
+    color: '#0a1a02',
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+  },
   commentTime: { color: '#456', fontSize: 10 },
   commentContent: { color: '#cde', fontSize: 12, lineHeight: 16 },
   composer: {

@@ -298,6 +298,27 @@ export default function HomeScreen() {
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Text style={styles.usernameText}>{user.username}!</Text>
             <RankCrest rank={user.rank} size="sm" />
+            {user.is_vip_supporter && (
+              <View style={styles.homeVipChip} testID="home-vip-chip">
+                <Ionicons name="star" size={10} color="#0a1a02" />
+                <Text style={styles.homeVipChipText}>VIP</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        {/* Series 8 Slam Edition announcement banner — always visible
+            on Home until the next series launches. Tappable so we can
+            wire it to a teaser/details screen later without an EAS
+            build. */}
+        <View style={styles.seriesBanner} testID="series8-banner">
+          <View style={styles.seriesBannerInner}>
+            <Ionicons name="flame" size={18} color="#ffd24a" />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.seriesBannerTitle}>SERIES 8 — SLAM EDITION</Text>
+              <Text style={styles.seriesBannerSub}>Coming soon. Stay tuned, banger.</Text>
+            </View>
+            <Ionicons name="flame" size={18} color="#ffd24a" />
           </View>
         </View>
 
@@ -630,6 +651,53 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 6,
     marginBottom: 10,
+  },
+
+  // Series 8 announcement banner — full-width, glows amber so it stands
+  // out from the otherwise green/slime palette.
+  seriesBanner: {
+    backgroundColor: 'rgba(40, 28, 4, 0.92)',
+    borderWidth: 1.5,
+    borderColor: '#ffd24a',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 14,
+  },
+  seriesBannerInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  seriesBannerTitle: {
+    color: '#ffd24a',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 1.6,
+  },
+  seriesBannerSub: {
+    color: '#fff5d4',
+    fontSize: 11,
+    marginTop: 1,
+  },
+
+  // VIP supporter chip rendered on home next to the user's name when
+  // their 30-day coin boost is active.
+  homeVipChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#ffd24a',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 5,
+    marginLeft: 4,
+  },
+  homeVipChipText: {
+    color: '#0a1a02',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.8,
   },
   statsGrid: {
     flexDirection: 'row',

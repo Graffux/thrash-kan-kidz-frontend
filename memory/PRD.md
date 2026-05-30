@@ -101,6 +101,57 @@ FastAPI + MongoDB.
   failed PIL parsing. We stripped the chunk, then re-encoded as JPEG to
   avoid future AAPT2 build failures on Android.
 
+## Session 2026-05-30 (continued — VIP boost + Series 8 banner) — versionCode 122
+
+### Daily Login Bonus Multiplier (P0, monetization)
+- **`User.coin_boost_expires_at`** added (Optional[datetime]). Activated
+  by ANY coin pack purchase, lasts 30 days. Each new purchase RESETS the
+  expiry to now+30d (does NOT stack — per Q2b spec).
+- **`_is_vip_active(user)`** helper module-level in `server.py` —
+  computes VIP status from `coin_boost_expires_at`. Handles both
+  datetime and ISO string formats.
+- **`_activate_coin_boost(user_id)`** helper — wired into ALL THREE
+  fulfillment paths:
+  - `/api/users/{user_id}/verify-purchase` (Google Play live path)
+  - `/api/checkout/status/{session_id}` (Stripe success poll)
+  - `/api/webhook/stripe` (Stripe webhook)
+- **Daily login claim** — `bonus_coins` now 25 when boost active else 10.
+  Response includes `vip_boost_active` and `vip_boost_expires_at`.
+  ⚠️ NOTE: pre-existing code had `bonus_coins = 50`. User specified
+  10 (base) / 25 (boost) literally so we honored that. If user prefers
+  to preserve the old economy and just multiply, change the constants
+  in `claim_daily_login`.
+
+### VIP Supporter tag (P0, social proof)
+- **`/api/users/{user_id}`** and **`/api/users/username/{username}`**
+  now return `is_vip_supporter` boolean (computed, not stored).
+- **`/api/mosh/feed`**, **`/api/mosh/posts/{id}`**,
+  **`/api/mosh/posts/{id}/comments`** now decorate each post/comment
+  author with `is_vip_supporter`. Single batched `db.users.find` per
+  feed render, no per-row queries.
+- **Frontend chip**: amber star pill rendered next to author name on
+  Home, Mosh feed posts, and Mosh comments when `is_vip_supporter`.
+
+### Series 8: Slam Edition announcement (P0, hype)
+- **Home banner** — amber-bordered card under the welcome strip,
+  always visible.
+- **Mosh Pit pinned system post** — backend `/api/mosh/feed` injects a
+  synthetic `system_series8_announcement` post at index 0. Frontend
+  renders it as a no-interaction broadcast card (no react/comment/
+  delete buttons) with an "OFFICIAL" megaphone badge.
+
+### versionCode 121 → 122
+- Ships VIP boost + announcements on top of the previous batch (cards,
+  headers, leaderboard).
+
+### Verified end-to-end
+- Direct MongoDB tests pass: VIP flag flips correctly on set, unset,
+  and past-expiry.
+- `/api/mosh/feed` returns the pinned announcement at index 0.
+- `/api/users/username/Graffux` returns `is_vip_supporter=True` when a
+  future `coin_boost_expires_at` is set (boost set on Graffux for the
+  user's in-app verification — expires ~2026-06-29).
+
 ### Production database fixes (already live)
 - Graffux daily_login_streak set to **52** (was 51 from auto-tick).
 - Dripping daily_login_streak set to **41** (was 1; restored via admin endpoint;

@@ -34,8 +34,65 @@ MAX_CONTENT_LEN = 200
 MAX_COMMENT_LEN = 200
 MAX_IMAGE_BYTES = 1_500_000  # ~1.5MB base64 (Mongo doc safe size)
 
+# ----------------------------------------------------------------------
+# Pinned system announcement injected at the top of the feed.
+#
+# Returned as a synthetic post with id "system_series8_announcement" so
+# the client can style it differently (no reactions, no comments, no
+# delete). Updating the copy or removing it is a one-line backend change.
+# ----------------------------------------------------------------------
+SERIES8_ANNOUNCEMENT = {
+    "id": "system_series8_announcement",
+    "user_id": "system",
+    "username": "Thrash Kan HQ",
+    "content": (
+        "🔥 SERIES 8: SLAM EDITION 🔥\n\n"
+        "Coming soon — brand-new parody kidz, fresh variants, and the "
+        "filthiest mosh-pit pulls yet. Stay tuned, banger."
+    ),
+    "image": None,
+    "is_system": True,
+    "is_pinned": True,
+    "reaction_count": 0,
+    "viewer_reacted": False,
+    "comment_count": 0,
+    "is_vip_supporter": False,
+}
 
-def _serialize(post: dict, viewer_id: str | None = None) -> dict:
+
+def _vip_active_from_doc(user: dict) -> bool:
+    """Inline copy of server._is_vip_active to avoid a cross-router import.
+
+    Cheap enough — used inside batched lookups for feed/comment renders.
+    """
+    from datetime import datetime as _dt
+    expires = user.get("coin_boost_expires_at")
+    if not expires:
+        return False
+    if isinstance(expires, str):
+        try:
+            expires = _dt.fromisoformat(expires.replace("Z", "+00:00"))
+        except Exception:
+            return False
+    if expires.tzinfo is not None:
+        expires = expires.replace(tzinfo=None)
+    return expires > _dt.utcnow()
+
+
+async def _vip_set_for_user_ids(user_ids: list[str]) -> set[str]:
+    """One-shot lookup of which of the given user ids currently have an
+    active VIP coin-boost. Used to decorate feed/comment author cells."""
+    if not user_ids:
+        return set()
+    cursor = db.users.find(
+        {"id": {"$in": list(set(user_ids))}},
+        {"id": 1, "coin_boost_expires_at": 1, "_id": 0},
+    )
+    docs = await cursor.to_list(None)
+    return {d["id"] for d in docs if _vip_active_from_doc(d)}
+
+
+def _serialize(post: dict, viewer_id: str | None = None, is_vip: bool = False) -> dict:
     """Strip Mongo internals + add viewer-specific reaction flag."""
     reactors = post.get("reactors") or []
     return {
@@ -48,10 +105,11 @@ def _serialize(post: dict, viewer_id: str | None = None) -> dict:
         "reaction_count": len(reactors),
         "viewer_reacted": viewer_id in reactors if viewer_id else False,
         "comment_count": int(post.get("comment_count", 0)),
+        "is_vip_supporter": bool(is_vip),
     }
 
 
-def _serialize_comment(c: dict, viewer_id: str | None = None) -> dict:
+def _serialize_comment(c: dict, viewer_id: str | None = None, is_vip: bool = False) -> dict:
     reactors = c.get("reactors") or []
     return {
         "id": c["id"],
@@ -62,6 +120,7 @@ def _serialize_comment(c: dict, viewer_id: str | None = None) -> dict:
         "created_at": c.get("created_at"),
         "reaction_count": len(reactors),
         "viewer_reacted": viewer_id in reactors if viewer_id else False,
+        "is_vip_supporter": bool(is_vip),
     }
 
 
@@ -107,7 +166,12 @@ async def get_feed(limit: int = 20, viewer_id: str | None = None):
     limit = max(1, min(limit, 100))
     cursor = db.mosh_posts.find({}, {"_id": 0}).sort("created_at", -1).limit(limit)
     posts = await cursor.to_list(limit)
-    return [_serialize(p, viewer_id=viewer_id) for p in posts]
+    vip_set = await _vip_set_for_user_ids([p["user_id"] for p in posts])
+    # Pin the Series 8 announcement to the top of the feed. Always there
+    # until the copy is updated server-side.
+    return [SERIES8_ANNOUNCEMENT] + [
+        _serialize(p, viewer_id=viewer_id, is_vip=p["user_id"] in vip_set) for p in posts
+    ]
 
 
 @router.get("/mosh/posts/{post_id}")
@@ -115,7 +179,8 @@ async def get_post(post_id: str, viewer_id: str | None = None):
     post = await db.mosh_posts.find_one({"id": post_id}, {"_id": 0})
     if not post:
         raise HTTPException(404, "Post not found")
-    return _serialize(post, viewer_id=viewer_id)
+    vip_set = await _vip_set_for_user_ids([post["user_id"]])
+    return _serialize(post, viewer_id=viewer_id, is_vip=post["user_id"] in vip_set)
 
 
 @router.post("/mosh/posts/{post_id}/react")
@@ -167,7 +232,12 @@ async def list_comments(post_id: str, limit: int = 100, viewer_id: str | None = 
     cursor = db.mosh_comments.find(
         {"post_id": post_id}, {"_id": 0}
     ).sort("created_at", 1).limit(limit)
-    return [_serialize_comment(c, viewer_id=viewer_id) for c in await cursor.to_list(limit)]
+    comments = await cursor.to_list(limit)
+    vip_set = await _vip_set_for_user_ids([c["user_id"] for c in comments])
+    return [
+        _serialize_comment(c, viewer_id=viewer_id, is_vip=c["user_id"] in vip_set)
+        for c in comments
+    ]
 
 
 @router.post("/mosh/comments/{comment_id}/react")
