@@ -193,3 +193,46 @@ async def get_card_thumb(
             "Vary": "Accept",
         },
     )
+
+
+@router.get("/cards/{card_id}/scratch-cover")
+async def get_card_scratch_cover(
+    card_id: str,
+    w: int = Query(540, ge=80, le=1024, description="Target width in pixels"),
+):
+    """Return a small JPEG of the card's variant scratch-cover image.
+
+    Why: scratch_cover_url on S3 points at 4-5 MB enhanced JPEGs. When the
+    React Native SVG <Image> tag tries to load that as its mask source on a
+    slower device or flaky network, it often silently fails to render —
+    the user sees no scratch overlay, just the revealed card art, but the
+    pan-responder still fires onComplete once enough scratch gestures hit
+    the coverage threshold. Net effect: "blank screen, nothing to scratch,
+    but the variant still got awarded." Returning a ~80 KB compressed JPEG
+    instead makes load reliable on the SVG side and eliminates the bug.
+
+    Only variant cards have a scratch_cover_url. Non-variant requests get
+    a 404 so the client knows to render without the scratch overlay.
+    """
+    card = await db.cards.find_one(
+        {"id": card_id}, {"variant_name": 1, "is_variant": 1, "_id": 0}
+    )
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+    _attach_scratch_cover(card)
+    scratch_url = card.get("scratch_cover_url")
+    if not scratch_url:
+        raise HTTPException(status_code=404, detail="No scratch cover for this card")
+    try:
+        jpeg_bytes = _resize_image(scratch_url, w)
+    except Exception as e:
+        log.warning("scratch-cover fetch failed for %s: %s", card_id, e)
+        raise HTTPException(status_code=502, detail="Upstream image fetch failed")
+    return Response(
+        content=jpeg_bytes,
+        media_type="image/jpeg",
+        headers={
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "Vary": "Accept",
+        },
+    )

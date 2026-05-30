@@ -160,11 +160,24 @@ export const ScratchCard: React.FC<Props> = ({
         cachePolicy="memory-disk"
         transition={150}
       />
-      {/* Top layer: scratch cover with mask cut by drag */}
+      {/* Top layer: scratch cover.
+          - SOLID FALLBACK behind the SVG <Image>: if the cover image fails
+            to render (large remote JPEG + react-native-svg's flaky
+            href loading), the user still sees something obvious to scratch
+            off, not a "blank screen, nothing happens" state. The SVG
+            image renders on top of this fallback when it does load — same
+            visual either way. */}
       <Animated.View
         pointerEvents={revealed ? 'none' : 'auto'}
         style={[StyleSheet.absoluteFill, { opacity: coverOpacity }]}
       >
+        {/* Visible fallback layer — always shown until enough is scratched. */}
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            styles.coverFallback,
+          ]}
+        />
         <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
           <Defs>
             <Mask id="scratchMask" x="0" y="0" width={width} height={height}>
@@ -178,6 +191,8 @@ export const ScratchCard: React.FC<Props> = ({
               </G>
             </Mask>
           </Defs>
+          {/* The fancy cover image. May fail to render on slow devices, in
+              which case the solid coverFallback above carries the load. */}
           <SvgImage
             href={coverUri}
             x="0"
@@ -185,6 +200,19 @@ export const ScratchCard: React.FC<Props> = ({
             width={width}
             height={height}
             preserveAspectRatio="xMidYMid slice"
+            mask="url(#scratchMask)"
+          />
+          {/* Belt-and-suspenders: a translucent dark overlay clipped by the
+              SAME mask so even on devices where <SvgImage href> silently
+              no-ops, there's a visible "thing" being scratched off and the
+              user gets the dot-feedback they expect. */}
+          <Rect
+            x="0"
+            y="0"
+            width={width}
+            height={height}
+            fill="#2a1e16"
+            opacity={0.85}
             mask="url(#scratchMask)"
           />
         </Svg>
@@ -199,6 +227,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#0a0a0a',
     borderRadius: 8,
+  },
+  coverFallback: {
+    // Toxic-grunge "scratch-off" surface. Solid color so it ALWAYS renders
+    // even if the SVG cover image fails. The masked overlays on top of
+    // this also use a translucent dark color so the composite reads as a
+    // textured rust/grunge plate even without the fancy art.
+    backgroundColor: '#3a2a1d',
   },
 });
 

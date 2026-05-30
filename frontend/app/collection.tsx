@@ -21,7 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import type { SeriesCatalogEntry } from '../src/context/AppContext';
 import { useSoundPlayer } from '../src/utils/sounds';
-import { cardThumb } from '../src/utils/cardImage';
+import { cardThumb, scratchCoverThumb } from '../src/utils/cardImage';
 import ScratchCard from '../src/components/ScratchCard';
 import OozeProgressBar from '../src/components/OozeProgressBar';
 import MetalButton from '../src/components/MetalButton';
@@ -1009,8 +1009,11 @@ export default function CollectionScreen() {
                       key={`trade-scratch-${tradeInResult.won_variant?.id}`}
                       width={200}
                       height={300}
-                      imageUri={tradeInResult.won_variant?.front_image_url}
-                      coverUri={tradeInResult.won_variant?.scratch_cover_url}
+                      imageUri={cardThumb(tradeInResult.won_variant, 540)}
+                      coverUri={
+                        scratchCoverThumb(tradeInResult.won_variant, 540) ||
+                        tradeInResult.won_variant?.scratch_cover_url
+                      }
                       brushRadius={28}
                       onComplete={() => setTradeScratched(true)}
                     />
