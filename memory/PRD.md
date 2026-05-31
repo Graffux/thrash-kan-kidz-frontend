@@ -197,6 +197,38 @@ FastAPI + MongoDB.
 - All boost UX ships in the same EAS build as the VIP/Series-8/header
   batch — no extra build needed.
 
+## Session 2026-05-30 (continued — Leaderboard crash fix + header rasters → v123)
+
+### Critical fix: Leaderboard "Property 'Image' doesn't exist"
+- `app/leaderboard.tsx` used `<Image>` in the redesigned header but I
+  forgot to add it to the `react-native` import block in the previous
+  session. Crash reproduced from user screenshot. Added `Image` to the
+  import statement. **Trivially testable in v123 build.**
+
+### New raster headers (the user is giving up on custom fonts)
+- `assets/headers/tkk_home.jpg` (137 KB, 900×471) — the trash-can /
+  rusted-metal / slime-dripping "Thrash Kan Kidz" wordmark.
+- `assets/headers/moshpit.jpg` (165 KB, 900×647) — matching
+  "MOSHPIT" wordmark.
+- `DrippingLogo` now sources `tkk_home.jpg` (was `tkk_logo.jpg`).
+  Default dimensions bumped 260×110 → 280×146 to suit the new artwork's
+  aspect ratio (~1.91:1).
+- Mosh Pit screen top-bar replaces the text `<Text>MOSH PIT</Text>`
+  title with the raster image (200×70).
+- Both PNGs source were sanitized (eXIf/iCCP/iTXt chunks stripped)
+  before re-encoding to JPEG-on-black to dodge AAPT2 PNG-validation
+  failures we hit on previous builds.
+
+### versionCode 122 → 123
+- Forces a fresh build so the crash fix actually ships.
+
+### Open issue (FYI)
+- User reported "all other headers were gone" in v121 — i.e. shop,
+  trade, profile etc that still rely on the Critica / BraverGrave TTF
+  fonts. We did NOT touch those in this round (user only asked for
+  Home + Mosh Pit). If those screens still look broken in v123, the
+  remediation is to commission matching raster headers for each.
+
 ### Production database fixes (already live)
 - Graffux daily_login_streak set to **52** (was 51 from auto-tick).
 - Dripping daily_login_streak set to **41** (was 1; restored via admin endpoint;
