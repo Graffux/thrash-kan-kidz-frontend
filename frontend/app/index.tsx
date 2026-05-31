@@ -14,6 +14,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image as ExpoImage } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -324,6 +325,14 @@ export default function HomeScreen() {
             <Ionicons name="flame" size={18} color="#ffd24a" />
           </View>
         </View>
+
+        {/* "YOUR STATS" raster banner above the 4-up stat grid. */}
+        <ExpoImage
+          source={{ uri: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xy3yb7n4_enhanced-1776904351419.png' }}
+          style={styles.yourStatsHeader}
+          contentFit="contain"
+          testID="your-stats-header"
+        />
 
         {/* 4-up Metal Stat Panel grid */}
         <View style={styles.statsGrid}>
@@ -648,6 +657,14 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 0.8,
   },
+  // YOUR STATS raster banner sitting above the 4-up stat grid.
+  // Wide-but-short aspect (~3:1) so it doesn't dominate the screen.
+  yourStatsHeader: {
+    width: '100%',
+    height: 80,
+    marginBottom: 8,
+  },
+
   welcomeStrip: {
     flexDirection: 'row',
     alignItems: 'center',

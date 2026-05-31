@@ -338,7 +338,7 @@ export default function TradeScreen() {
     <GrungeBackground>
       <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <ExpoImage source={{ uri: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/z4mb78cz_enhanced-1776904246547.png' }} style={styles.headerImage} contentFit="contain" />
+        <ExpoImage source={{ uri: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/a7zxlvom_enhanced-1776903865079.png' }} style={styles.headerImage} contentFit="contain" />
       </View>
 
       {/* Tab Switcher */}
