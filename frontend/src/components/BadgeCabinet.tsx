@@ -54,7 +54,7 @@ export const BadgeCabinet: React.FC<Props> = ({ userId, apiUrl }) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingWrap} data-testid="badge-cabinet-loading">
+      <View style={styles.loadingWrap} testID="badge-cabinet-loading">
         <ActivityIndicator color="#FFD700" />
       </View>
     );
