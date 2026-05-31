@@ -281,7 +281,7 @@ export default function MoshPitScreen() {
           </TouchableOpacity>
           <Image
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            source={require('../src/assets/headers/moshpit.jpg')}
+            source={require('../src/assets/headers/moshpit.png')}
             style={styles.headerLogo}
             resizeMode="contain"
             testID="moshpit-header-logo"
