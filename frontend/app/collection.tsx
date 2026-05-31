@@ -1092,6 +1092,8 @@ export default function CollectionScreen() {
                         source={{ uri: selectedCard.card.front_image_url }}
                         style={styles.modalCardImage}
                         contentFit="contain"
+                        cachePolicy="memory-disk"
+                        transition={150}
                       />
                     </Animated.View>
                     <Animated.View
@@ -1108,6 +1110,8 @@ export default function CollectionScreen() {
                         source={{ uri: selectedCard.card.back_image_url || selectedCard.card.front_image_url }}
                         style={styles.modalCardImage}
                         contentFit="contain"
+                        cachePolicy="memory-disk"
+                        transition={150}
                       />
                     </Animated.View>
                   </View>
@@ -1852,8 +1856,12 @@ const styles = StyleSheet.create({
   },
   // Share-this-card button inside Card Detail modal
   modalFlipWrap: {
-    width: '100%',
-    aspectRatio: 1,
+    // Match the explicit image size so the absolutely-positioned faces
+    // have real dimensions to fill. Earlier this was `width: '100%'`
+    // inside a parent with no width, which collapsed to 0×0 and
+    // silently hid the front/back card images.
+    width: width * 0.7,
+    height: width * 1.05,
     alignItems: 'center',
     justifyContent: 'center',
   },

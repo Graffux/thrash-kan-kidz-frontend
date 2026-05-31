@@ -24,7 +24,7 @@ import { useApp } from '../src/context/AppContext';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { SplatTitle } from '../src/components/SplatTitle';
 
-type Metric = 'composite' | 'cards' | 'coins' | 'series' | 'streak';
+type Metric = 'composite' | 'cards' | 'series' | 'streak';
 
 interface Row {
   rank: number;
@@ -32,7 +32,6 @@ interface Row {
   username: string;
   score: number;
   cards_count: number;
-  coins: number;
   completed_series: number;
   daily_streak: number;
 }
@@ -40,7 +39,6 @@ interface Row {
 const TABS: { id: Metric; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { id: 'composite', label: 'OVERALL', icon: 'trophy' },
   { id: 'cards', label: 'CARDS', icon: 'albums' },
-  { id: 'coins', label: 'COINS', icon: 'cash' },
   { id: 'series', label: 'SERIES', icon: 'medal' },
   { id: 'streak', label: 'STREAK', icon: 'flame' },
 ];
@@ -48,7 +46,6 @@ const TABS: { id: Metric; label: string; icon: keyof typeof Ionicons.glyphMap }[
 const metricLabel = (m: Metric, r: Row): string => {
   switch (m) {
     case 'cards': return `${r.cards_count} cards`;
-    case 'coins': return `${r.coins.toLocaleString()} 🪙`;
     case 'series': return `${r.completed_series} complete`;
     case 'streak': return `${r.daily_streak}d streak`;
     default: return `${r.score.toLocaleString()} pts`;
@@ -112,7 +109,12 @@ export default function LeaderboardScreen() {
         </View>
 
         {/* Metric tabs */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsRow}
+          style={styles.tabsScroll}
+        >
           {TABS.map((t) => {
             const active = metric === t.id;
             return (
@@ -228,10 +230,23 @@ const styles = StyleSheet.create({
   },
   pageTitle: { color: '#39ff14', fontSize: 18, fontWeight: '900', letterSpacing: 3 },
   headerLogo: { width: 200, height: 64 },
+  // Horizontal tab strip — give it an explicit min height so the
+  // child tabs don't get clipped to a few pixels when the parent
+  // flex layout calculates a 0 height for an unconstrained horizontal
+  // ScrollView (this is what was causing "only barely see the top of
+  // the words" in the previous build). `tabsScroll` (the outer style)
+  // pins the wrapper to a fixed max height so it can't be squashed by
+  // siblings.
+  tabsScroll: {
+    flexGrow: 0,
+    maxHeight: 56,
+  },
   tabsRow: {
     paddingHorizontal: 12,
     paddingVertical: 8,
     gap: 10,
+    alignItems: 'center',
+    minHeight: 52,
   },
   tab: {
     flexDirection: 'row',

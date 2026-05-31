@@ -877,6 +877,8 @@ export default function ShopScreen() {
                     source={{ uri: PACK_COVERS[s] || PACK_COVERS[1] }}
                     style={styles.seriesCoverImage}
                     contentFit="cover"
+                    cachePolicy="memory-disk"
+                    transition={150}
                   />
                   <View style={[
                     styles.seriesCoverLabel,
