@@ -15,7 +15,7 @@ import {
   Share,
 } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
-import { headerUri } from '../src/assets/headerCatalog';
+import { headerSource } from '../src/assets/headerCatalog';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { Ionicons } from '@expo/vector-icons';
@@ -849,7 +849,7 @@ export default function CollectionScreen() {
     <GrungeBackground>
       <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <ExpoImage source={{ uri: headerUri('myCollection') }} style={styles.headerImage} contentFit="contain" />
+        <ExpoImage source={headerSource('myCollection')} style={styles.headerImage} contentFit="contain" />
         <Text style={styles.subtitle}>
           {totalOwned} Cards Collected
         </Text>

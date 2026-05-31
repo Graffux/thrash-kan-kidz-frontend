@@ -5,7 +5,6 @@ import { View, StyleSheet, Text, Platform, Animated, Easing, Image, ImageSourceP
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { Image as ExpoImage } from 'expo-image';
-import { HEADER_URLS } from '../src/assets/headerCatalog';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { UpdateBanner } from '../src/components/UpdateBanner';
 import { ICONS } from '../src/assets/icons';
@@ -267,19 +266,10 @@ export default function TabLayout() {
     }
   }, [fontError, fontsLoaded]);
 
-  // Warm the image cache for every screen header on cold boot. The
-  // splash screen is still up while this runs, so by the time the user
-  // navigates to Mosh Pit / Shop / Trade / etc the JPG is already in
-  // memory and renders instantly with no shimmer. Cheap one-shot effect
-  // — `ExpoImage.prefetch` is a no-op if the URL is already cached.
-  useEffect(() => {
-    const urls = Object.values(HEADER_URLS);
-    ExpoImage.prefetch(urls).catch((err) => {
-      // Non-fatal — the header will just lazy-load on first view. Log
-      // for debugging in case the CDN ever has an outage.
-      console.warn('[header-prefetch] failed:', err);
-    });
-  }, []);
+  // Headers are now bundled locally (see src/assets/headerCatalog.ts), so
+  // there is no remote-image prefetch to perform. Previous versions called
+  // `ExpoImage.prefetch(HEADER_URLS)` here — that approach is gone along
+  // with the remote string-URL header catalog.
 
   // NOTE: an earlier version of this layout (v118 attempt) called
   //   ExpoImage.clearMemoryCache() + clearDiskCache() here on every cold
