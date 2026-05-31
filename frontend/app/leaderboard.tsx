@@ -103,7 +103,7 @@ export default function LeaderboardScreen() {
           </TouchableOpacity>
           <Image
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            source={require('../src/assets/headers/leaderboard_logo.jpg')}
+            source={require('../src/assets/headers/leaderboard_logo.png')}
             style={styles.headerLogo}
             resizeMode="contain"
             testID="leaderboard-header-logo"

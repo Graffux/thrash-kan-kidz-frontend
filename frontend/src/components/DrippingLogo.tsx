@@ -24,7 +24,7 @@ export const DrippingLogo: React.FC<Props> = ({ width = 280, height = 146, style
     <View style={[styles.wrap, { width, height }, style]} testID="dripping-logo">
       <Image
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        source={require('../assets/headers/tkk_home.jpg')}
+        source={require('../assets/headers/tkk_home.png')}
         style={styles.img}
         resizeMode="contain"
       />
