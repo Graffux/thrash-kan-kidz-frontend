@@ -204,11 +204,17 @@ function TabsNavigator() {
           ),
         }}
       />
-      {/* Hidden screens */}
-      <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarButton: () => null }} />
-      <Tabs.Screen name="mosh" options={{ title: 'Mosh Pit', tabBarButton: () => null }} />
-      <Tabs.Screen name="privacy" options={{ title: 'Privacy Policy', tabBarButton: () => null }} />
-      <Tabs.Screen name="payment-success" options={{ title: 'Payment Success', tabBarButton: () => null }} />
+      {/*
+        Hidden screens — removed from the tab bar via `href: null`. The
+        previous approach (`tabBarButton: () => null`) rendered an empty
+        cell that still consumed flex space, pushing the 7 visible tabs
+        leftward. `href: null` actually drops them from the bar so the
+        visible tabs distribute evenly across the full width.
+      */}
+      <Tabs.Screen name="settings" options={{ title: 'Settings', href: null }} />
+      <Tabs.Screen name="mosh" options={{ title: 'Mosh Pit', href: null }} />
+      <Tabs.Screen name="privacy" options={{ title: 'Privacy Policy', href: null }} />
+      <Tabs.Screen name="payment-success" options={{ title: 'Payment Success', href: null }} />
     </Tabs>
   );
 }
