@@ -37,11 +37,12 @@ export const RankCrest: React.FC<Props> = ({ rank, size = 'sm', showLabel = fals
   if (!rank?.crest_url) return null;
   const dim = DIMENSIONS[size];
   return (
-    <View style={styles.wrap} data-testid={`rank-crest-${rank.id}`}>
+    <View style={styles.wrap} testID={`rank-crest-${rank.id}`}>
       <ExpoImage
         source={{ uri: rank.crest_url }}
         style={{ width: dim.crest, height: dim.crest }}
         contentFit="contain"
+        cachePolicy="memory-disk"
         transition={200}
       />
       {showLabel && (

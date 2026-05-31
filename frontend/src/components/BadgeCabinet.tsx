@@ -63,7 +63,7 @@ export const BadgeCabinet: React.FC<Props> = ({ userId, apiUrl }) => {
   if (badges.length === 0) return null;
 
   return (
-    <View style={styles.wrap} data-testid="badge-cabinet">
+    <View style={styles.wrap} testID="badge-cabinet">
       <View style={styles.header}>
         <Text style={styles.title}>BADGE CABINET</Text>
         <Text style={styles.counter}>
@@ -75,13 +75,15 @@ export const BadgeCabinet: React.FC<Props> = ({ userId, apiUrl }) => {
           <View
             key={b.id}
             style={[styles.tile, !b.earned && styles.tileLocked]}
-            data-testid={`badge-${b.id}`}
+            testID={`badge-${b.id}`}
           >
             {b.image_url ? (
               <ExpoImage
                 source={{ uri: b.image_url }}
                 style={[styles.image, !b.earned && styles.dimmed]}
                 contentFit="contain"
+                cachePolicy="memory-disk"
+                transition={150}
               />
             ) : (
               <View
@@ -143,9 +145,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     gap: 10,
   },
+  // Tile width is explicit instead of `width: '30%'` + `aspectRatio` —
+  // the percentage+aspectRatio combo has been known to render at 0×0
+  // on Android when the parent's row width hasn't been measured yet.
   tile: {
-    width: '30%',
-    aspectRatio: 0.85,
+    width: '31%',
+    minHeight: 110,
     backgroundColor: 'rgba(20,20,20,0.7)',
     borderRadius: 8,
     borderWidth: 1,
