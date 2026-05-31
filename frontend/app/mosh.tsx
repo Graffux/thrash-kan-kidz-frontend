@@ -279,7 +279,13 @@ export default function MoshPitScreen() {
           <TouchableOpacity onPress={() => router.back()} testID="mosh-back-btn">
             <Ionicons name="chevron-back" size={28} color="#9aff5a" />
           </TouchableOpacity>
-          <Text style={styles.pageTitle}>MOSH PIT</Text>
+          <Image
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            source={require('../src/assets/headers/moshpit.jpg')}
+            style={styles.headerLogo}
+            resizeMode="contain"
+            testID="moshpit-header-logo"
+          />
           <View style={{ width: 28 }} />
         </View>
 
@@ -545,6 +551,10 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   pageTitle: { color: '#39ff14', fontSize: 18, fontWeight: '900', letterSpacing: 3 },
+  // Raster Mosh Pit header rendered in place of the old text title.
+  // Width sized to fit between the back chevron and the right-side
+  // spacer, height matches the visual weight of the new app-bar.
+  headerLogo: { width: 200, height: 70 },
   scroll: { padding: 16, paddingBottom: 40 },
   composer: { marginBottom: 24 },
   composerInput: {

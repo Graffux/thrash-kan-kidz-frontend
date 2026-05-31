@@ -19,12 +19,12 @@ interface Props {
 // Source aspect is 1024x1024 in the optimized JPG, but the visible
 // wordmark inside the artwork is roughly 4:3 — width/height defaults
 // favor a wide banner look.
-export const DrippingLogo: React.FC<Props> = ({ width = 260, height = 110, style }) => {
+export const DrippingLogo: React.FC<Props> = ({ width = 280, height = 146, style }) => {
   return (
     <View style={[styles.wrap, { width, height }, style]} testID="dripping-logo">
       <Image
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        source={require('../assets/headers/tkk_logo.jpg')}
+        source={require('../assets/headers/tkk_home.jpg')}
         style={styles.img}
         resizeMode="contain"
       />

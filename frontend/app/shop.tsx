@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { FONTS } from '../src/theme';
 import { cardThumb, scratchCoverThumb } from '../src/utils/cardImage';
+import { boostState, boostDaysLeft } from '../src/utils/vipBoost';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -796,7 +797,68 @@ export default function ShopScreen() {
           </View>
         </View>
 
-        {/* Series Toggle */}
+        {/*
+          Daily-login coin-boost status card.
+          – `expiring` (≤7 days left): amber nudge to refresh by buying a pack.
+          – `inactive` (no boost / expired): green pitch explaining the perk.
+          – `active`   (>7 days left): subtle reassurance + countdown.
+          Tapping the prompt opens the Buy Coins modal so the user is one
+          tap away from refreshing the boost.
+        */}
+        {(() => {
+          const state = boostState(user.coin_boost_expires_at);
+          const days = boostDaysLeft(user.coin_boost_expires_at);
+          if (state === 'active') {
+            return (
+              <View style={styles.boostCardActive} testID="shop-boost-active">
+                <Ionicons name="star" size={14} color="#0a1a02" />
+                <Text style={styles.boostActiveText}>
+                  VIP Boost active · {days} days left · 25 coins/day on login
+                </Text>
+              </View>
+            );
+          }
+          if (state === 'expiring') {
+            return (
+              <TouchableOpacity
+                style={styles.boostCardExpiring}
+                onPress={() => setShowBuyCoins(true)}
+                testID="shop-boost-expiring"
+              >
+                <Ionicons name="alert-circle" size={18} color="#ffd24a" />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.boostExpiringTitle}>
+                    Boost expires in {days} {days === 1 ? 'day' : 'days'}
+                  </Text>
+                  <Text style={styles.boostExpiringSub}>
+                    Grab any coin pack to refresh another 30 days of 25/day login bonus.
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color="#ffd24a" />
+              </TouchableOpacity>
+            );
+          }
+          // inactive
+          return (
+            <TouchableOpacity
+              style={styles.boostCardInactive}
+              onPress={() => setShowBuyCoins(true)}
+              testID="shop-boost-inactive"
+            >
+              <Ionicons name="flash" size={18} color="#39ff14" />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.boostInactiveTitle}>
+                  Unlock the VIP Daily Boost
+                </Text>
+                <Text style={styles.boostInactiveSub}>
+                  Buy any coin pack → 25 coins/day on login for 30 days + VIP tag in Mosh Pit.
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#39ff14" />
+            </TouchableOpacity>
+          );
+        })()}
+        {/* (boost card injected above by the inline IIFE) */}
         {spinPool && spinPool.unlocked_series && spinPool.unlocked_series.length > 1 && (
           <View style={styles.seriesToggles} data-testid="series-toggle">
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.seriesToggleScroll}>
@@ -1209,6 +1271,77 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#39ff14',
   },
+
+  // ---------- VIP Daily Boost status cards (shop) ----------
+  // Three visual variants live under one mental model so the user
+  // always sees their current boost state at a glance.
+  boostCardActive: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    backgroundColor: '#ffd24a',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  boostActiveText: {
+    color: '#0a1a02',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  boostCardExpiring: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: 'rgba(40, 28, 4, 0.92)',
+    borderWidth: 1.5,
+    borderColor: '#ffd24a',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  boostExpiringTitle: {
+    color: '#ffd24a',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  boostExpiringSub: {
+    color: '#fff5d4',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  boostCardInactive: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: 'rgba(8, 22, 4, 0.92)',
+    borderWidth: 1.5,
+    borderColor: '#39ff14',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  boostInactiveTitle: {
+    color: '#39ff14',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  boostInactiveSub: {
+    color: '#d4ffcc',
+    fontSize: 11,
+    marginTop: 2,
+  },
+
   buyCoinsButton: {
     flexDirection: 'row',
     alignItems: 'center',

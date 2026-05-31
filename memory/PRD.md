@@ -169,6 +169,66 @@ FastAPI + MongoDB.
 - `/api/badges` lists `founding_thrasher` (18 total badges).
 - `/api/users/{Graffux}/badges` → `founding_thrasher.earned = True`.
 
+## Session 2026-05-30 (continued — Daily Boost UX)
+
+### Home countdown chip
+- VIP chip on home expanded from `VIP` → `VIP · 28d` (or whatever the
+  current `boostDaysLeft(user.coin_boost_expires_at)` returns).
+- Same chip auto-disappears the moment `coin_boost_expires_at` passes —
+  no extra plumbing, falls out of the date math.
+
+### Shop status card (new)
+- One inline state card lives between the shop header and the series
+  toggle. Three visual variants:
+  - `active`  (>7d left) → amber chip "VIP Boost active · Nd left · 25 coins/day"
+  - `expiring` (≤7d left) → amber bordered tappable card "Boost expires in N days — buy any pack to refresh" → opens BuyCoinsModal.
+  - `inactive` (no boost / expired) → green bordered tappable card "Unlock the VIP Daily Boost — buy any coin pack" → opens BuyCoinsModal.
+
+### Shared util
+- New `frontend/src/utils/vipBoost.ts` exports `boostDaysLeft`,
+  `isBoostActive`, `boostState`. Re-used by Home + Shop. No new API
+  surface, all derived from `user.coin_boost_expires_at`.
+
+### Frontend User type
+- `is_vip_supporter?` and `coin_boost_expires_at?` added to
+  `AppContext.User` so the rest of the app can read both directly.
+
+### versionCode stays 122
+- All boost UX ships in the same EAS build as the VIP/Series-8/header
+  batch — no extra build needed.
+
+## Session 2026-05-30 (continued — Leaderboard crash fix + header rasters → v123)
+
+### Critical fix: Leaderboard "Property 'Image' doesn't exist"
+- `app/leaderboard.tsx` used `<Image>` in the redesigned header but I
+  forgot to add it to the `react-native` import block in the previous
+  session. Crash reproduced from user screenshot. Added `Image` to the
+  import statement. **Trivially testable in v123 build.**
+
+### New raster headers (the user is giving up on custom fonts)
+- `assets/headers/tkk_home.jpg` (137 KB, 900×471) — the trash-can /
+  rusted-metal / slime-dripping "Thrash Kan Kidz" wordmark.
+- `assets/headers/moshpit.jpg` (165 KB, 900×647) — matching
+  "MOSHPIT" wordmark.
+- `DrippingLogo` now sources `tkk_home.jpg` (was `tkk_logo.jpg`).
+  Default dimensions bumped 260×110 → 280×146 to suit the new artwork's
+  aspect ratio (~1.91:1).
+- Mosh Pit screen top-bar replaces the text `<Text>MOSH PIT</Text>`
+  title with the raster image (200×70).
+- Both PNGs source were sanitized (eXIf/iCCP/iTXt chunks stripped)
+  before re-encoding to JPEG-on-black to dodge AAPT2 PNG-validation
+  failures we hit on previous builds.
+
+### versionCode 122 → 123
+- Forces a fresh build so the crash fix actually ships.
+
+### Open issue (FYI)
+- User reported "all other headers were gone" in v121 — i.e. shop,
+  trade, profile etc that still rely on the Critica / BraverGrave TTF
+  fonts. We did NOT touch those in this round (user only asked for
+  Home + Mosh Pit). If those screens still look broken in v123, the
+  remediation is to commission matching raster headers for each.
+
 ### Production database fixes (already live)
 - Graffux daily_login_streak set to **52** (was 51 from auto-tick).
 - Dripping daily_login_streak set to **41** (was 1; restored via admin endpoint;
