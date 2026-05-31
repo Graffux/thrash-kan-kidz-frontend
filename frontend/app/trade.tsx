@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GrungeBackground } from '../src/components/GrungeBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
+import { headerUri } from '../src/assets/headerCatalog';
 import { useApp } from '../src/context/AppContext';
 import { cardThumb } from '../src/utils/cardImage';
 import { RankCrest } from '../src/components/RankCrest';
@@ -338,7 +339,7 @@ export default function TradeScreen() {
     <GrungeBackground>
       <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <ExpoImage source={{ uri: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/a7zxlvom_enhanced-1776903865079.png' }} style={styles.headerImage} contentFit="contain" />
+        <ExpoImage source={{ uri: headerUri('tradeCenter') }} style={styles.headerImage} contentFit="contain" />
       </View>
 
       {/* Tab Switcher */}

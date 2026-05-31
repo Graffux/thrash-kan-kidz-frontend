@@ -245,10 +245,13 @@ export default function TabLayout() {
   // We leave the remote-URI as a fallback ONLY for emergency OTA fixes
   // (the URLs are still valid on the backend) but the primary path is
   // local bundled .ttf.
+  // Custom death-metal display fonts (BraverGrave/Critica) were removed
+  // in v124 — they kept silently failing on Android in production
+  // builds, so we fell back to system bold via `FONTS.death = undefined`.
+  // Only MetalMania-Regular remains as a custom face (used for small
+  // rank labels / welcome strip — proved reliable on every device).
   const [fontsLoaded, fontError] = useFonts({
     'MetalMania-Regular': require('../assets/fonts/MetalMania-Regular.ttf'),
-    'BraverGrave': require('../assets/fonts/BraverGrave.ttf'),
-    'Critica': require('../assets/fonts/Critica.ttf'),
   });
 
   // Don't block app render — render either way. SplatTitle will fall back to
