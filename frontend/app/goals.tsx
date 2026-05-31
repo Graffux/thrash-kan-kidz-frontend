@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
-import { headerUri } from '../src/assets/headerCatalog';
+import { headerSource } from '../src/assets/headerCatalog';
 import { useApp } from '../src/context/AppContext';
 
 import { GrungeBackground } from '../src/components/GrungeBackground';
@@ -76,7 +76,7 @@ export default function GoalsScreen() {
     <GrungeBackground>
       <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <ExpoImage source={{ uri: headerUri('goals') }} style={styles.headerImage} contentFit="contain" />
+        <ExpoImage source={headerSource('goals')} style={styles.headerImage} contentFit="contain" />
         <Text style={styles.subtitle}>
           {completedGoals.length} / {userGoals.length} Completed
         </Text>

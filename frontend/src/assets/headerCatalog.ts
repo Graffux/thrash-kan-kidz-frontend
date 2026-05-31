@@ -1,18 +1,20 @@
 /**
- * Single source of truth for the slime-drip raster headers used at the
- * top of each main screen. Centralised here so:
+ * Single source of truth for the slime-drip raster headers.
  *
- *   1. You can re-render any header (or all of them) and only touch
- *      ONE file in the codebase.
- *   2. The headers can never get swapped between screens again — every
- *      filename is bound to a screen key by name.
+ * Every header is BUNDLED LOCALLY via `require()` — no remote URLs. This
+ * is intentional: we hit repeated reports of remote-hosted header images
+ * failing to render on Android (likely an interaction between expo-image
+ * v3 + new architecture + flaky CDN behavior). Bundling guarantees the
+ * pixels are on-device the moment the app installs.
  *
- * URLs point at customer-assets.emergentagent.com so we can swap them
- * via a backend redeploy without an EAS build. If you ever want to
- * bundle one locally (instant load, no network), drop it under
- * `frontend/src/assets/headers/` and replace the entry with a
- * `require()` call — `ExpoImage`/`Image` accept either form.
+ * Each entry is a require() result (numeric module id), suitable for
+ * passing directly to `<Image source={...}>` or `<ExpoImage source={...}>`.
+ * NO string URI form — that's what was breaking.
+ *
+ * To change a header: re-export the PNG under `frontend/src/assets/headers/`
+ * with the same filename and rebuild. No code edits needed.
  */
+import type { ImageSourcePropType } from 'react-native';
 
 export type ScreenHeaderKey =
   | 'home'              // "Thrash Kan Kidz" wordmark on top of the home screen
@@ -24,24 +26,19 @@ export type ScreenHeaderKey =
   | 'goals'             // "GOALS" banner on the Goals screen
   | 'tradeCenter';      // "TRADE CENTER" banner on the Trade screen
 
-export const HEADER_URLS: Record<ScreenHeaderKey, string> = {
-  home:
-    'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/0lciuet8_enhanced-1776318342337.png',
-  yourStats:
-    'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xy3yb7n4_enhanced-1776904351419.png',
-  moshpit:
-    'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/pqq58yoz_enhanced-1780183718094.png',
-  leaderboard:
-    'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/oevsb75c_Screenshot_20260530_162245_ChatGPT.png',
-  cardPack:
-    'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/zljumrlp_enhanced-1776903996438.png',
-  myCollection:
-    'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/btr32loy_enhanced-1776904123985.png',
-  goals:
-    'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/u4jh2a58_enhanced-1776904246547.png',
-  tradeCenter:
-    'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/a7zxlvom_enhanced-1776903865079.png',
+/* eslint-disable @typescript-eslint/no-require-imports */
+export const HEADER_SOURCES: Record<ScreenHeaderKey, ImageSourcePropType> = {
+  home:         require('./headers/tkk_home.png'),
+  yourStats:    require('./headers/header_yourstats.png'),
+  moshpit:      require('./headers/moshpit.png'),
+  leaderboard:  require('./headers/leaderboard_logo.png'),
+  cardPack:     require('./headers/header_cardpack.png'),
+  myCollection: require('./headers/header_mycollection.png'),
+  goals:        require('./headers/header_goals.png'),
+  tradeCenter:  require('./headers/header_tradecenter.png'),
 };
+/* eslint-enable @typescript-eslint/no-require-imports */
 
-/** Convenience accessor — `headerUri('home')` instead of importing the dict everywhere. */
-export const headerUri = (key: ScreenHeaderKey): string => HEADER_URLS[key];
+/** Convenience accessor — `headerSource('cardPack')` */
+export const headerSource = (key: ScreenHeaderKey): ImageSourcePropType =>
+  HEADER_SOURCES[key];
