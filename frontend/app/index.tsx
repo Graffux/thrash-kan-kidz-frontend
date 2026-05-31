@@ -27,6 +27,7 @@ import { GrungeBackground } from '../src/components/GrungeBackground';
 import { FONTS } from '../src/theme';
 import { cardThumb } from '../src/utils/cardImage';
 import { boostDaysLeft, isBoostActive } from '../src/utils/vipBoost';
+import { headerUri } from '../src/assets/headerCatalog';
 import { RippableDailyPack } from '../src/components/RippableDailyPack';
 import { DrippingLogo } from '../src/components/DrippingLogo';
 import { MetalStatPanel } from '../src/components/MetalStatPanel';
@@ -328,7 +329,7 @@ export default function HomeScreen() {
 
         {/* "YOUR STATS" raster banner above the 4-up stat grid. */}
         <ExpoImage
-          source={{ uri: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xy3yb7n4_enhanced-1776904351419.png' }}
+          source={{ uri: headerUri('yourStats') }}
           style={styles.yourStatsHeader}
           contentFit="contain"
           testID="your-stats-header"

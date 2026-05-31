@@ -36,20 +36,16 @@ export const THEME = {
 
 export const FONTS = {
   /**
-   * Primary death-metal display font for the BIG headers/titles
-   * (section titles, big usernames, pack names). Jagged, dripping,
-   * legitimately death-metal — sourced from Braver Grave (.otf).
-   *
-   * MUST match the font's internal PostScript name (nameID 6).
-   * Android production builds silently fall back to the system font
-   * if the key doesn't match exactly.
+   * Death-metal display font slot. Was BraverGrave (.otf/.ttf) but
+   * Android dropped it inconsistently in production, so as of v124
+   * we ship `undefined` here and let everything fall back to system
+   * bold — which is exactly what users were already seeing on broken
+   * builds. Raster headers (see `src/assets/headerCatalog.ts`) cover
+   * the look-and-feel for every major screen title.
    */
-  death: 'BraverGrave',
-  /**
-   * Alternate horror-style display font (Critica). Use sparingly for
-   * variant titles or special accents where a more chiseled look is wanted.
-   */
-  critica: 'Critica',
+  death: undefined as string | undefined,
+  /** Removed alongside `death` — kept as a key for type-stability. */
+  critica: undefined as string | undefined,
   /**
    * Legacy "metal" font — still used for smaller accents (rank labels,
    * the small "Welcome" greeting) where Braver Grave would be too aggressive.
