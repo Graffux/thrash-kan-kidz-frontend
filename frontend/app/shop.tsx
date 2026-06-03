@@ -967,10 +967,14 @@ export default function ShopScreen() {
                       resizeMode="cover"
                     />
                   )}
-                  {/* Card front (after flip) */}
-                  {showFrontImage && spinResult && (
+                  {/* Card front (after flip) — use the first won_cards entry
+                      since `won_card` (singular) is only populated on the
+                      re-roll path. Without this fallback, opening a free
+                      pack (or any first-time pack) crashed with
+                      "Cannot read property 'front_image_url' of undefined". */}
+                  {showFrontImage && (spinResult?.won_card || spinResult?.won_cards?.[0]?.card) && (
                     <Image
-                      source={{ uri: spinResult.won_card.front_image_url }}
+                      source={{ uri: (spinResult?.won_card || spinResult?.won_cards?.[0]?.card)?.front_image_url }}
                       style={styles.revealedCardImage}
                       resizeMode="cover"
                     />

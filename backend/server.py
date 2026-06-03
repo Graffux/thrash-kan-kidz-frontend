@@ -2198,11 +2198,47 @@ async def check_series_completion(user_id: str, series_num: int):
         rare_reward_id is not None and rare_reward_id in unlocked_rares
     )
 
-    if owned_count >= required_count and not reward_already_granted:
+    series_complete = owned_count >= required_count
+
+    # --- Always-runs unlock bookkeeping --------------------------------
+    # The previous version of this function only ran the
+    # `unlocked_series.append(next_series)` write when the rare reward
+    # had NOT yet been granted. That meant if the user completed the
+    # series, picked up the reward in the same call, but the write that
+    # appended `next_series` to `unlocked_series` somehow lost (mongo
+    # hiccup, partial migration, code path that skipped this branch on a
+    # prior version), the bookkeeping was permanently broken — the next
+    # call would short-circuit on `reward_already_granted` and never
+    # backfill the unlock.
+    #
+    # Fix: any time the user is at completion threshold, ensure the next
+    # released series is in `unlocked_series`. Cheap, idempotent.
+    if series_complete:
+        unlocked_series_list = user.get("unlocked_series", [1])
+        next_series = series_num + 1
+        max_visible = current_max_series()
+        needs_unlock_write = False
+        needs_completed_write = False
+        if next_series not in unlocked_series_list and next_series <= max_visible:
+            unlocked_series_list.append(next_series)
+            needs_unlock_write = True
+        if series_num not in completed_series:
+            completed_series.append(series_num)
+            needs_completed_write = True
+        if needs_unlock_write or needs_completed_write:
+            await db.users.update_one(
+                {"id": user_id},
+                {"$set": {
+                    "completed_series": completed_series,
+                    "unlocked_series": unlocked_series_list,
+                }},
+            )
+
+    if series_complete and not reward_already_granted:
         # Series completed! Mark as complete (idempotent thanks to set behavior)
         if series_num not in completed_series:
             completed_series.append(series_num)
-        
+
         # Unlock next series — but only if it's been released. Scheduled
         # / coming-soon series stay locked even if the user finishes the
         # one before them; they auto-unlock at release time via the startup
