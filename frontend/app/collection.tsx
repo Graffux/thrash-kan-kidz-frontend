@@ -1856,12 +1856,12 @@ const styles = StyleSheet.create({
   },
   // Share-this-card button inside Card Detail modal
   modalFlipWrap: {
-    // Match the explicit image size so the absolutely-positioned faces
-    // have real dimensions to fill. Earlier this was `width: '100%'`
-    // inside a parent with no width, which collapsed to 0×0 and
-    // silently hid the front/back card images.
-    width: width * 0.7,
-    height: width * 1.05,
+    // RESTORED to v127 dimensions per user report — the v128 explicit
+    // `width * 0.7 / height * 1.05` change was meant to fix a layout
+    // collapse but broke working renders for users on v127. Reverting
+    // until we can repro the original 0×0 case with hard evidence.
+    width: '100%',
+    aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
