@@ -1030,8 +1030,9 @@ CARD_BACK_IMAGE_URLS = {
 RARE_CARD_ACHIEVEMENTS = {
     "card_kerry_the_king": {"required_cards": 16, "name": "Kerry The King"},  # Complete Series 1
     "card_strap_on_taylor": {"required_cards": 32, "name": "Strap-On Taylor"},  # Complete Series 2
-    "card_martin_generic_aint": {"required_cards": 48, "name": "Martin Generic Ain't"},  # Complete Series 3
-    "card_sean_kill_again": {"required_cards": 80, "name": "Sean Kill-Again"},  # Complete Series 5
+    "card_sean_kill_again": {"required_cards": 48, "name": "Sean Kill-Again"},  # Complete Series 3
+    "card_jeff_wanker": {"required_cards": 64, "name": "Jeff Wanker"},  # Complete Series 4
+    "card_martin_generic_aint": {"required_cards": 80, "name": "Martin Generic Ain't"},  # Complete Series 5
     "card_nicklebag_darrell": {"required_cards": 96, "name": "Nicklebag Darrell"},  # Complete Series 6
     "card_alien_dubin": {"required_cards": 112, "name": "Alien Dubin"}  # Complete Series 7
 }
@@ -3863,12 +3864,12 @@ INITIAL_CARDS = [
         "back_image_url": CARD_BACK_IMAGE_URLS["martin_generic_aint"],
         "coin_cost": 150,
         "available": False,
-        "achievement_required": 48,
-        "series_reward": 3,
+        "achievement_required": 80,
+        "series_reward": 5,
         "band": "Celtic Frosty"
     },
     # =====================
-    # EPIC CARD - Series 5 completion reward (moved from S3)
+    # EPIC CARD - Series 3 completion reward (swapped from S5 — see series_config.py)
     # =====================
     {
         "id": "card_sean_kill_again",
@@ -3879,8 +3880,8 @@ INITIAL_CARDS = [
         "back_image_url": CARD_BACK_IMAGE_URLS["sean_kill_again"],
         "coin_cost": 150,
         "available": False,
-        "achievement_required": 80,
-        "series_reward": 5,
+        "achievement_required": 48,
+        "series_reward": 3,
         "band": "Violents"
     },
     # =====================
