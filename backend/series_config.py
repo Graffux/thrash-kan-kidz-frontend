@@ -54,7 +54,7 @@ SERIES_CONFIG: Dict[int, dict] = {
     3: {
         "name": "Series 3",
         "cards_required": 16,
-        "rare_reward": "card_martin_generic_aint",
+        "rare_reward": "card_sean_kill_again",
         "description": "The Thrash Continues",
     },
     4: {
@@ -66,7 +66,7 @@ SERIES_CONFIG: Dict[int, dict] = {
     5: {
         "name": "Series 5",
         "cards_required": 16,
-        "rare_reward": "card_sean_kill_again",
+        "rare_reward": "card_martin_generic_aint",
         "description": "Thrash Metal Edition",
     },
     6: {
