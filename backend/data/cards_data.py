@@ -713,6 +713,12 @@ CARD_IMAGE_URLS = {
     "rubber_ruben_comic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/hmjih433_Screenshot_20260602_021257_ChatGPT.png",
     "rubber_ruben_graffiti": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/b7kpz7dv_Screenshot_20260602_021331_ChatGPT.png",
     "rubber_ruben_neon": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/7sluimey_Screenshot_20260602_021623_ChatGPT.png",
+    # Deflowerment / Ruben Grossas (Card B)
+    "ruben_grossas": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/3z7qwzj1_enhanced-1780099203422.jpg",
+    "ruben_grossas_holographic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/v6wd643f_Screenshot_20260602_023553_ChatGPT.png",
+    "ruben_grossas_comic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/kjp1ajm1_Screenshot_20260602_024111_ChatGPT.png",
+    "ruben_grossas_graffiti": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/pyjhp2l4_Screenshot_20260602_030615_ChatGPT.png",
+    "ruben_grossas_neon": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/6qgtfvnm_Screenshot_20260602_075459_ChatGPT.png",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -1039,6 +1045,7 @@ CARD_BACK_IMAGE_URLS = {
     "variant_back_neon": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/tnldwg74_enhanced-1780571972567.jpg",
     # ---- Series 8 — Slam Edition (base card backs) ----
     "rubber_ruben": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/uba3netc_enhanced-1780098829928.jpg",
+    "ruben_grossas": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xx3yuzzh_enhanced-1780102951101.jpg",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
     # Series 8 Rare Reward (epic) — Slam Edition
@@ -10153,6 +10160,85 @@ INITIAL_CARDS = [
         "card_type": "A",
         "is_variant": True,
         "base_card_id": "card_rubber_ruben",
+        "variant_name": "Neon"
+    },
+    # ---- Deflowerment / Ruben Grossas (Card B) — base card ----
+    {
+        "id": "card_ruben_grossas",
+        "name": "Ruben Grossas",
+        "description": "Ruben lives and breathes rot. His diet consists of expired energy drinks, moldy pizza, and regret. He fronts DEFLOWERMENT, the nastiest slam band TKK has ever known. FILTH FACTOR: 10 | STENCH LEVEL: 10 | GROSSITUDE: 10 | SLAM POWER: 9 | HYGIENE: -10 | SOCIAL SKILLS: -10. Top Album: Leftover Humanity. Signature Move: FOOD COMA SLAM -- sits on opponent, burps up rotten bile, and drops a full plate to finish them. \"I don't need a shower... I bathe in regret.\" Trash Facts: owns 347 half-eaten pizzas in his fridge, hasn't cleaned his fridge since 2018, farts can kill small plants, once got food poisoning from food poisoning, honorable member of the Roach Pit Brigade.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["ruben_grossas"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B"
+    },
+    # ---- Ruben Grossas variants (Series 8 / Slam Edition) ----
+    {
+        "id": "card_ruben_grossas_holographic",
+        "name": "Ruben Grossas (Holographic)",
+        "description": "Refracted in rancid rainbow light, Ruben Grossas glistens like a moldy diamond. The Holographic variant turns every burp into a prismatic shockwave. Filth in 7 wavelengths at once.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas_holographic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_holographic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_ruben_grossas",
+        "variant_name": "Holographic"
+    },
+    {
+        "id": "card_ruben_grossas_comic",
+        "name": "Ruben Grossas (Comic)",
+        "description": "Approved by the TKK Comics Authority. The Comic variant of Ruben Grossas slumps in halftone glory across the cover of TKK Slam Edition #1, $1.99 US. Moldy pepperoni, diaired energy, leftover ?? years old. Sold on every greasy newsstand near you.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas_comic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_comic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_ruben_grossas",
+        "variant_name": "Comic"
+    },
+    {
+        "id": "card_ruben_grossas_graffiti",
+        "name": "Ruben Grossas (Graffiti)",
+        "description": "Sprayed across the loading dock of every closed-down Pizza Hut. The Graffiti variant of Ruben Grossas drips down brick walls in moldy yellow and bruised purple. Tagged by the Roach Pit Brigade themselves.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas_graffiti"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_graffiti"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_ruben_grossas",
+        "variant_name": "Graffiti"
+    },
+    {
+        "id": "card_ruben_grossas_neon",
+        "name": "Ruben Grossas (Neon)",
+        "description": "Bathed in flickering neon pink and toxic green at 3am behind the dive bar. The Neon variant of Ruben Grossas glows louder than his stench. Diaired Energy can in one hand, glowing pizza slice in the other. The pit is ALIVE.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas_neon"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_neon"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_ruben_grossas",
         "variant_name": "Neon"
     },
 ]
