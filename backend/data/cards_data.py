@@ -704,6 +704,8 @@ CARD_IMAGE_URLS = {
     "skeet_sandoval_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rsjb0tpt_Screenshot_20260516_204040_ChatGPT.png",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/i4e0c7o8_enhanced-1778561784058.jpg",
+    # Series 8 Rare Reward (epic) — Slam Edition
+    "crisp_chris": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/khrorjzs_Screenshot_20260603_051424_ChatGPT.png",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -1024,6 +1026,8 @@ CARD_BACK_IMAGE_URLS = {
     "variant_back_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/9rtg9pzl_enhanced-1777973441663.jpg",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
+    # Series 8 Rare Reward (epic) — Slam Edition
+    "crisp_chris": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xom7s0gr_Screenshot_20260603_052107_ChatGPT.png",
 }
 
 # Rare card achievement requirements (Series completion rewards)
@@ -1034,7 +1038,8 @@ RARE_CARD_ACHIEVEMENTS = {
     "card_jeff_wanker": {"required_cards": 64, "name": "Jeff Wanker"},  # Complete Series 4
     "card_martin_generic_aint": {"required_cards": 80, "name": "Martin Generic Ain't"},  # Complete Series 5
     "card_nicklebag_darrell": {"required_cards": 96, "name": "Nicklebag Darrell"},  # Complete Series 6
-    "card_alien_dubin": {"required_cards": 112, "name": "Alien Dubin"}  # Complete Series 7
+    "card_alien_dubin": {"required_cards": 112, "name": "Alien Dubin"},  # Complete Series 7
+    "card_crisp_chris": {"required_cards": 128, "name": "Crisp Chris"}  # Complete Series 8
 }
 
 # =====================================================================
@@ -3921,6 +3926,23 @@ INITIAL_CARDS = [
         "series": 7,
         "series_reward": 7,
         "band": "Old Lazy Drivers"
+    },
+    # =====================
+    # EPIC CARD - Series 8 completion reward (Slam Edition)
+    # =====================
+    {
+        "id": "card_crisp_chris",
+        "name": "Crisp Chris",
+        "description": "AKA: The Burnt Offering. Crisp Chris was left in the pyre for hours. The flames didn't kill him, they perfected him. Now he lives on burning stages, melting faces and guitar strings. Smells like charcoal, oil and regret. Trash Facts: once deep-fried his pick, uses gasoline as cologne, slept in a campfire for 3 days, eats nothing but burnt ends, and built a grill out of his broken guitars.",
+        "rarity": "epic",
+        "front_image_url": CARD_IMAGE_URLS["crisp_chris"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["crisp_chris"],
+        "coin_cost": 150,
+        "available": False,
+        "achievement_required": 128,
+        "series": 8,
+        "series_reward": 8,
+        "band": "Infernal Bleeding"
     },
     # =====================
     # SERIES 3 VARIANTS (16 base cards × 4 variants = 64 cards)

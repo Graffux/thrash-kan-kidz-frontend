@@ -83,16 +83,15 @@ SERIES_CONFIG: Dict[int, dict] = {
         "rare_reward": "card_alien_dubin",
         "description": "Grind Edition",
     },
-    # Series 8 — coming soon. Variant scratch covers (Holographic, Comic,
-    # Graffiti, Neon) are wired up; base cards + rare reward will be
-    # filled in once the artwork ships. Leaving release_date unset keeps
-    # this in "coming_soon" status (hidden from /api/cards but the
-    # frontend's "Coming Soon" tile will still render via /api/series/list).
+    # Series 8 — Slam Edition. Reward is the epic "Crisp Chris" card,
+    # auto-granted on series completion (all 128 cards across S1–S8 collected).
+    # release_date scheduled for Saturday June 13, 2026 @ 00:00 CDT (= 05:00 UTC).
     8: {
         "name": "Series 8",
         "cards_required": 16,
-        "rare_reward": None,  # TODO: set once the S8 epic reward card is defined
-        "description": "Coming Soon",
+        "rare_reward": "card_crisp_chris",
+        "description": "Slam Edition",
+        "release_date": datetime(2026, 6, 13, 5, 0, 0, tzinfo=timezone.utc),
     },
 }
 
