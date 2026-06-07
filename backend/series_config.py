@@ -83,6 +83,16 @@ SERIES_CONFIG: Dict[int, dict] = {
         "rare_reward": "card_alien_dubin",
         "description": "Grind Edition",
     },
+    # Series 8 — Slam Edition. Reward is the epic "Crisp Chris" card,
+    # auto-granted on series completion (all 128 cards across S1–S8 collected).
+    # release_date scheduled for Saturday June 13, 2026 @ 00:00 CDT (= 05:00 UTC).
+    8: {
+        "name": "Series 8",
+        "cards_required": 16,
+        "rare_reward": "card_crisp_chris",
+        "description": "Slam Edition",
+        "release_date": datetime(2026, 6, 13, 5, 0, 0, tzinfo=timezone.utc),
+    },
 }
 
 # Highest series number declared in code. NOT the same as the highest

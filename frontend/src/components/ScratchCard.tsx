@@ -202,19 +202,6 @@ export const ScratchCard: React.FC<Props> = ({
             preserveAspectRatio="xMidYMid slice"
             mask="url(#scratchMask)"
           />
-          {/* Belt-and-suspenders: a translucent dark overlay clipped by the
-              SAME mask so even on devices where <SvgImage href> silently
-              no-ops, there's a visible "thing" being scratched off and the
-              user gets the dot-feedback they expect. */}
-          <Rect
-            x="0"
-            y="0"
-            width={width}
-            height={height}
-            fill="#2a1e16"
-            opacity={0.85}
-            mask="url(#scratchMask)"
-          />
         </Svg>
       </Animated.View>
     </View>
@@ -229,11 +216,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   coverFallback: {
-    // Toxic-grunge "scratch-off" surface. Solid color so it ALWAYS renders
-    // even if the SVG cover image fails. The masked overlays on top of
-    // this also use a translucent dark color so the composite reads as a
-    // textured rust/grunge plate even without the fancy art.
-    backgroundColor: '#3a2a1d',
+    // Scratch-off "foil" surface. Bright metallic gold so the variant
+    // cover reads as a real scratch-ticket — and so it's clearly visible
+    // even if the remote SVG <Image> href silently fails on a flaky
+    // network. The colored variant artwork loads on top of this when
+    // available. Previous version was a muted brown that looked like a
+    // blank screen on lower-end devices.
+    backgroundColor: '#d4a017',
   },
 });
 

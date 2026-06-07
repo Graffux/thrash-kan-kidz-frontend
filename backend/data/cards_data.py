@@ -704,6 +704,21 @@ CARD_IMAGE_URLS = {
     "skeet_sandoval_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rsjb0tpt_Screenshot_20260516_204040_ChatGPT.png",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/i4e0c7o8_enhanced-1778561784058.jpg",
+    # Series 8 Rare Reward (epic) — Slam Edition
+    "crisp_chris": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/khrorjzs_Screenshot_20260603_051424_ChatGPT.png",
+    # ---- Series 8 — Slam Edition (base + variant fronts) ----
+    # Deflowerment / Rubber Ruben (Frontman)
+    "rubber_ruben": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/fx6c62e6_enhanced-1780098706026.jpg",
+    "rubber_ruben_holographic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/866yqj72_Screenshot_20260602_014936_ChatGPT.png",
+    "rubber_ruben_comic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/hmjih433_Screenshot_20260602_021257_ChatGPT.png",
+    "rubber_ruben_graffiti": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/b7kpz7dv_Screenshot_20260602_021331_ChatGPT.png",
+    "rubber_ruben_neon": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/7sluimey_Screenshot_20260602_021623_ChatGPT.png",
+    # Deflowerment / Ruben Grossas (Card B)
+    "ruben_grossas": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/3z7qwzj1_enhanced-1780099203422.jpg",
+    "ruben_grossas_holographic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/v6wd643f_Screenshot_20260602_023553_ChatGPT.png",
+    "ruben_grossas_comic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/kjp1ajm1_Screenshot_20260602_024111_ChatGPT.png",
+    "ruben_grossas_graffiti": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/pyjhp2l4_Screenshot_20260602_030615_ChatGPT.png",
+    "ruben_grossas_neon": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/6qgtfvnm_Screenshot_20260602_075459_ChatGPT.png",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -1022,18 +1037,31 @@ CARD_BACK_IMAGE_URLS = {
     "variant_back_chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/4xtenwkt_enhanced-1777973266535.jpg",
     "variant_back_digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rwqpqj2r_enhanced-1777973091465.jpg",
     "variant_back_melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/9rtg9pzl_enhanced-1777973441663.jpg",
+    # Universal Series 8 (Slam Edition) variant backs — shared across ALL
+    # Series 8 variant cards (Holographic / Comic / Graffiti / Neon).
+    "variant_back_holographic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/y1asb6mt_enhanced-1780571734508.jpg",
+    "variant_back_comic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xdo0xjou_enhanced-1780571804270.jpg",
+    "variant_back_graffiti": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/sejyn6u7_enhanced-1780571872918.jpg",
+    "variant_back_neon": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/tnldwg74_enhanced-1780571972567.jpg",
+    # ---- Series 8 — Slam Edition (base card backs) ----
+    "rubber_ruben": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/uba3netc_enhanced-1780098829928.jpg",
+    "ruben_grossas": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xx3yuzzh_enhanced-1780102951101.jpg",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
+    # Series 8 Rare Reward (epic) — Slam Edition
+    "crisp_chris": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xom7s0gr_Screenshot_20260603_052107_ChatGPT.png",
 }
 
 # Rare card achievement requirements (Series completion rewards)
 RARE_CARD_ACHIEVEMENTS = {
     "card_kerry_the_king": {"required_cards": 16, "name": "Kerry The King"},  # Complete Series 1
     "card_strap_on_taylor": {"required_cards": 32, "name": "Strap-On Taylor"},  # Complete Series 2
-    "card_martin_generic_aint": {"required_cards": 48, "name": "Martin Generic Ain't"},  # Complete Series 3
-    "card_sean_kill_again": {"required_cards": 80, "name": "Sean Kill-Again"},  # Complete Series 5
+    "card_sean_kill_again": {"required_cards": 48, "name": "Sean Kill-Again"},  # Complete Series 3
+    "card_jeff_wanker": {"required_cards": 64, "name": "Jeff Wanker"},  # Complete Series 4
+    "card_martin_generic_aint": {"required_cards": 80, "name": "Martin Generic Ain't"},  # Complete Series 5
     "card_nicklebag_darrell": {"required_cards": 96, "name": "Nicklebag Darrell"},  # Complete Series 6
-    "card_alien_dubin": {"required_cards": 112, "name": "Alien Dubin"}  # Complete Series 7
+    "card_alien_dubin": {"required_cards": 112, "name": "Alien Dubin"},  # Complete Series 7
+    "card_crisp_chris": {"required_cards": 128, "name": "Crisp Chris"}  # Complete Series 8
 }
 
 # =====================================================================
@@ -1082,6 +1110,11 @@ VARIANT_SCRATCH_COVERS = {
     "chrome": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/bcbmpuzx_enhanced-1778623874780.jpg",
     "digital": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/heods8iy_enhanced-1778623983567.jpg",
     "melted": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/zz9ztaov_enhanced-1778624016085.jpg",
+    # Series 8 variants
+    "neon": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ox2j4xea_file_00000000f14c71fdb121b8f2d764701e.png",
+    "graffiti": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/8ma0g46d_file_00000000fa4471fdaac588e2b79edb4b.png",
+    "comic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/uht7n709_file_00000000ca2871fd926fe3683dcd2969.png",
+    "holographic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/sxk6r53h_file_000000003dd871fd94179510f3cebe70.png",
 }
 
 INITIAL_CARDS = [
@@ -3863,12 +3896,12 @@ INITIAL_CARDS = [
         "back_image_url": CARD_BACK_IMAGE_URLS["martin_generic_aint"],
         "coin_cost": 150,
         "available": False,
-        "achievement_required": 48,
-        "series_reward": 3,
+        "achievement_required": 80,
+        "series_reward": 5,
         "band": "Celtic Frosty"
     },
     # =====================
-    # EPIC CARD - Series 5 completion reward (moved from S3)
+    # EPIC CARD - Series 3 completion reward (swapped from S5 — see series_config.py)
     # =====================
     {
         "id": "card_sean_kill_again",
@@ -3879,8 +3912,8 @@ INITIAL_CARDS = [
         "back_image_url": CARD_BACK_IMAGE_URLS["sean_kill_again"],
         "coin_cost": 150,
         "available": False,
-        "achievement_required": 80,
-        "series_reward": 5,
+        "achievement_required": 48,
+        "series_reward": 3,
         "band": "Violents"
     },
     # =====================
@@ -3915,6 +3948,23 @@ INITIAL_CARDS = [
         "series": 7,
         "series_reward": 7,
         "band": "Old Lazy Drivers"
+    },
+    # =====================
+    # EPIC CARD - Series 8 completion reward (Slam Edition)
+    # =====================
+    {
+        "id": "card_crisp_chris",
+        "name": "Crisp Chris",
+        "description": "AKA: The Burnt Offering. Crisp Chris was left in the pyre for hours. The flames didn't kill him, they perfected him. Now he lives on burning stages, melting faces and guitar strings. Smells like charcoal, oil and regret. Trash Facts: once deep-fried his pick, uses gasoline as cologne, slept in a campfire for 3 days, eats nothing but burnt ends, and built a grill out of his broken guitars.",
+        "rarity": "epic",
+        "front_image_url": CARD_IMAGE_URLS["crisp_chris"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["crisp_chris"],
+        "coin_cost": 150,
+        "available": False,
+        "achievement_required": 128,
+        "series": 8,
+        "series_reward": 8,
+        "band": "Infernal Bleeding"
     },
     # =====================
     # SERIES 3 VARIANTS (16 base cards × 4 variants = 64 cards)
@@ -10029,5 +10079,166 @@ INITIAL_CARDS = [
         "is_variant": True,
         "base_card_id": "card_skeet_sandoval",
         "variant_name": "Melted"
+    },
+    # =====================
+    # SERIES 8 — Slam Edition
+    # =====================
+    # ---- Deflowerment / Rubber Ruben (Frontman) — base card ----
+    {
+        "id": "card_rubber_ruben",
+        "name": "Rubber Ruben",
+        "description": "The Flexible Frontman of Deflowerment. Squishy, stretchy, and ready to slam! Rubber Ruben can take a beating and bounce right back. Nothing sticks to him except brutal riffs and bad attitudes. SLAM: 10 | SQUISH: 10 | FLEX: 10 | DURABILITY: 9 | ATTITUDE: 10 | RIFFS: 10 | GROSS FACTOR: 9. Special Move: RUBBERIZED SLAM -- stretches his body to the limit and delivers a devastating slam that bounces back with double impact!",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["rubber_ruben"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["rubber_ruben"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "A"
+    },
+    # ---- Rubber Ruben variants (Series 8 / Slam Edition) ----
+    {
+        "id": "card_rubber_ruben_holographic",
+        "name": "Rubber Ruben (Holographic)",
+        "description": "Iridescent rubber-flesh refracting every stage light into a rainbow of filth. The Holographic variant of Rubber Ruben bounces in 7 dimensions at once. Each slam echoes through a different prism of pain.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["rubber_ruben_holographic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_holographic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_rubber_ruben",
+        "variant_name": "Holographic"
+    },
+    {
+        "id": "card_rubber_ruben_comic",
+        "name": "Rubber Ruben (Comic)",
+        "description": "KA-POW! SPLAT! BAM! The Comic variant of Rubber Ruben slams in halftone dots and bold black outlines. Every riff is a panel. Every breakdown a splash page. Slam approved -- print edition only.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["rubber_ruben_comic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_comic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_rubber_ruben",
+        "variant_name": "Comic"
+    },
+    {
+        "id": "card_rubber_ruben_graffiti",
+        "name": "Rubber Ruben (Graffiti)",
+        "description": "Spray-painted across every dive bar bathroom from Detroit to Tampa. The Graffiti variant of Rubber Ruben tags the pit before he tears it apart. Drips of neon. Cans of fury. Slam till the wall comes down.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["rubber_ruben_graffiti"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_graffiti"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_rubber_ruben",
+        "variant_name": "Graffiti"
+    },
+    {
+        "id": "card_rubber_ruben_neon",
+        "name": "Rubber Ruben (Neon)",
+        "description": "Glowing electric purple under a flickering club sign. The Neon variant of Rubber Ruben buzzes louder than the amps. Voltage: maxed. Rubber: still 100% pure. Slam until the breaker trips.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["rubber_ruben_neon"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_neon"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_rubber_ruben",
+        "variant_name": "Neon"
+    },
+    # ---- Deflowerment / Ruben Grossas (Card B) — base card ----
+    {
+        "id": "card_ruben_grossas",
+        "name": "Ruben Grossas",
+        "description": "Ruben lives and breathes rot. His diet consists of expired energy drinks, moldy pizza, and regret. He fronts DEFLOWERMENT, the nastiest slam band TKK has ever known. FILTH FACTOR: 10 | STENCH LEVEL: 10 | GROSSITUDE: 10 | SLAM POWER: 9 | HYGIENE: -10 | SOCIAL SKILLS: -10. Top Album: Leftover Humanity. Signature Move: FOOD COMA SLAM -- sits on opponent, burps up rotten bile, and drops a full plate to finish them. \"I don't need a shower... I bathe in regret.\" Trash Facts: owns 347 half-eaten pizzas in his fridge, hasn't cleaned his fridge since 2018, farts can kill small plants, once got food poisoning from food poisoning, honorable member of the Roach Pit Brigade.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["ruben_grossas"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B"
+    },
+    # ---- Ruben Grossas variants (Series 8 / Slam Edition) ----
+    {
+        "id": "card_ruben_grossas_holographic",
+        "name": "Ruben Grossas (Holographic)",
+        "description": "Refracted in rancid rainbow light, Ruben Grossas glistens like a moldy diamond. The Holographic variant turns every burp into a prismatic shockwave. Filth in 7 wavelengths at once.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas_holographic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_holographic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_ruben_grossas",
+        "variant_name": "Holographic"
+    },
+    {
+        "id": "card_ruben_grossas_comic",
+        "name": "Ruben Grossas (Comic)",
+        "description": "Approved by the TKK Comics Authority. The Comic variant of Ruben Grossas slumps in halftone glory across the cover of TKK Slam Edition #1, $1.99 US. Moldy pepperoni, diaired energy, leftover ?? years old. Sold on every greasy newsstand near you.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas_comic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_comic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_ruben_grossas",
+        "variant_name": "Comic"
+    },
+    {
+        "id": "card_ruben_grossas_graffiti",
+        "name": "Ruben Grossas (Graffiti)",
+        "description": "Sprayed across the loading dock of every closed-down Pizza Hut. The Graffiti variant of Ruben Grossas drips down brick walls in moldy yellow and bruised purple. Tagged by the Roach Pit Brigade themselves.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas_graffiti"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_graffiti"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_ruben_grossas",
+        "variant_name": "Graffiti"
+    },
+    {
+        "id": "card_ruben_grossas_neon",
+        "name": "Ruben Grossas (Neon)",
+        "description": "Bathed in flickering neon pink and toxic green at 3am behind the dive bar. The Neon variant of Ruben Grossas glows louder than his stench. Diaired Energy can in one hand, glowing pizza slice in the other. The pit is ALIVE.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["ruben_grossas_neon"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_neon"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Deflowerment",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_ruben_grossas",
+        "variant_name": "Neon"
     },
 ]

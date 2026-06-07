@@ -8,8 +8,9 @@ FastAPI + MongoDB.
 ## Status
 - **Live on Google Play Production**.
 - Current live build on devices: **v1.20.0 / versionCode 111**.
-- Next build prepared in repo: **v1.20.0 / versionCode 114**.
-- **567 cards seeded**, Series 1–7 fully released.
+- Next build prepared in repo: **v1.20.0 / versionCode 130**.
+- **568 cards seeded** (Crisp Chris added), Series 1–7 fully released.
+- Series 8 (Slam Edition) scheduled — variants Holographic/Comic/Graffiti/Neon wired, epic reward `card_crisp_chris` (Infernal Bleeding, achievement_required=128) auto-grants on S1–S8 completion. Release: **Saturday June 13, 2026 @ 00:00 CDT (05:00 UTC)**.
 - Backend hosted on Render (`https://thrash-kan-kidz-api.onrender.com`).
 - MongoDB Atlas (`thrash_kan_kidz` DB).
 - Custom domain `thrashkankidz.com` via Cloudflare Pages.
