@@ -725,6 +725,12 @@ CARD_IMAGE_URLS = {
     "matted_away_comic":        "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/njiaf5ac_Screenshot_20260602_075801_ChatGPT.png",
     "matted_away_graffiti":     "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rnavm9ql_Screenshot_20260602_080114_ChatGPT.png",
     "matted_away_neon":         "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/33kis2hk_Screenshot_20260603_042906_ChatGPT.png",
+    # Abominable Snowman / Maddy No Way (Card B)
+    "maddy_no_way":              "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/4jnxx5lp_Screenshot_20260601_114430_ChatGPT.png",
+    "maddy_no_way_holographic":  "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/87miiwqx_Screenshot_20260603_044330_ChatGPT.png",
+    "maddy_no_way_comic":        "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/0i4efl8l_Screenshot_20260603_044812_ChatGPT.png",
+    "maddy_no_way_graffiti":     "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/2et16daw_Screenshot_20260603_045404_ChatGPT.png",
+    "maddy_no_way_neon":         "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/bdnp1wa3_file_000000002e4071f8ac90bf44135f0d9f.png",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -1053,6 +1059,7 @@ CARD_BACK_IMAGE_URLS = {
     "rubber_ruben": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/uba3netc_enhanced-1780098829928.jpg",
     "ruben_grossas": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xx3yuzzh_enhanced-1780102951101.jpg",
     "matted_away":   "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/l7stm4i9_Matted_Away_Back_under_5MB.jpg",
+    "maddy_no_way":  "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vasxm41h_enhanced-1780336063741.jpg",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
     # Series 8 Rare Reward (epic) — Slam Edition
@@ -10328,6 +10335,85 @@ INITIAL_CARDS = [
         "card_type": "A",
         "is_variant": True,
         "base_card_id": "card_matted_away",
+        "variant_name": "Neon"
+    },
+    # ---- Abominable Snowman / Maddy No Way (Card B) ----
+    {
+        "id": "card_maddy_no_way",
+        "name": "Maddy No Way",
+        "description": "Not here for your drama. Not here for your excuses. Just here to slam, like it or not. NOPE. NOT TODAY. Built different. Breaks rules. Brings the pit. Collect the chaos. Member of ABOMINABLE SNOWMAN -- a frozen tangle of rage and refusal. Rule the pit. Collect. Slam. Repeat. TKK or Get Slammed.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["maddy_no_way"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["maddy_no_way"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "B"
+    },
+    # ---- Maddy No Way variants (Series 8 / Slam Edition) ----
+    {
+        "id": "card_maddy_no_way_holographic",
+        "name": "Maddy No Way (Holographic)",
+        "description": "Refracted through every spotlight ever turned down. The Holographic variant of Maddy No Way shimmers in seven colors of NOPE. Crossed arms. Crossed dimensions. Same answer.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["maddy_no_way_holographic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_holographic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_maddy_no_way",
+        "variant_name": "Holographic"
+    },
+    {
+        "id": "card_maddy_no_way_comic",
+        "name": "Maddy No Way (Comic)",
+        "description": "Slammin' 23 May, 10c. NO POSERS! NO FAKERS! NO WAY! 100% ANTI BULLSHIT! The Comic variant of Maddy No Way leaps off the cover in halftone defiance. Crossed arms guaranteed in every panel.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["maddy_no_way_comic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_comic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_maddy_no_way",
+        "variant_name": "Comic"
+    },
+    {
+        "id": "card_maddy_no_way_graffiti",
+        "name": "Maddy No Way (Graffiti)",
+        "description": "Tagged on every dive bar wall from Tampa to Reykjavik. The Graffiti variant of Maddy No Way drips down brick in toxic purple and acid green. Spray-painted by hands that refuse to put down the can.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["maddy_no_way_graffiti"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_graffiti"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_maddy_no_way",
+        "variant_name": "Graffiti"
+    },
+    {
+        "id": "card_maddy_no_way_neon",
+        "name": "Maddy No Way (Neon)",
+        "description": "Glowing under a flickering NO VACANCY sign in radioactive pink and electric red. The Neon variant of Maddy No Way buzzes louder than the rejection. Voltage maxed. Mood: still NOPE.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["maddy_no_way_neon"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_neon"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "B",
+        "is_variant": True,
+        "base_card_id": "card_maddy_no_way",
         "variant_name": "Neon"
     },
 ]
