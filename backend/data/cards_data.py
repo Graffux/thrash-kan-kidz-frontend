@@ -719,6 +719,12 @@ CARD_IMAGE_URLS = {
     "ruben_grossas_comic": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/kjp1ajm1_Screenshot_20260602_024111_ChatGPT.png",
     "ruben_grossas_graffiti": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/pyjhp2l4_Screenshot_20260602_030615_ChatGPT.png",
     "ruben_grossas_neon": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/6qgtfvnm_Screenshot_20260602_075459_ChatGPT.png",
+    # Abominable Snowman / Matted Away (Card A)
+    "matted_away":              "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/qfl1fbqh_Matted_Away_under_5MB.jpg",
+    "matted_away_holographic":  "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/29c5i6hr_Screenshot_20260602_023714_ChatGPT.png",
+    "matted_away_comic":        "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/njiaf5ac_Screenshot_20260602_075801_ChatGPT.png",
+    "matted_away_graffiti":     "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rnavm9ql_Screenshot_20260602_080114_ChatGPT.png",
+    "matted_away_neon":         "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/33kis2hk_Screenshot_20260603_042906_ChatGPT.png",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -1046,6 +1052,7 @@ CARD_BACK_IMAGE_URLS = {
     # ---- Series 8 — Slam Edition (base card backs) ----
     "rubber_ruben": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/uba3netc_enhanced-1780098829928.jpg",
     "ruben_grossas": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xx3yuzzh_enhanced-1780102951101.jpg",
+    "matted_away":   "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/l7stm4i9_Matted_Away_Back_under_5MB.jpg",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
     # Series 8 Rare Reward (epic) — Slam Edition
@@ -10239,6 +10246,88 @@ INITIAL_CARDS = [
         "card_type": "B",
         "is_variant": True,
         "base_card_id": "card_ruben_grossas",
+        "variant_name": "Neon"
+    },
+    # =====================
+    # SERIES 8 - Band 2: Abominable Snowman
+    # =====================
+    # ---- Abominable Snowman / Matted Away (Card A) ----
+    {
+        "id": "card_matted_away",
+        "name": "Matted Away",
+        "description": "The Matted Away. Legend has it he hasn't washed his hair since the Ice Age. Lives in filth. Breathes mold. Slams hard. MATTEDNESS: 10 | DIRT LEVEL: 10 | STENCH: 10 | HAIR MASS: 10 | SLAM POWER: 10. \"So matted, not even a brush would dare.\" Fronts the legendary slam outfit ABOMINABLE SNOWMAN -- a frozen tangle of dreads, decay, and devastating riffs.",
+        "rarity": "common",
+        "front_image_url": CARD_IMAGE_URLS["matted_away"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["matted_away"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "A"
+    },
+    # ---- Matted Away variants (Series 8 / Slam Edition) ----
+    {
+        "id": "card_matted_away_holographic",
+        "name": "Matted Away (Holographic)",
+        "description": "Iridescent dreadlocks refracting every stage light into a prism of filth. The Holographic variant of Matted Away shimmers in every color -- but the stench stays exactly the same.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["matted_away_holographic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_holographic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_matted_away",
+        "variant_name": "Holographic"
+    },
+    {
+        "id": "card_matted_away_comic",
+        "name": "Matted Away (Comic)",
+        "description": "LONG HAIR! DON'T CARE! VOLUME MAXED! BUILT FOR THE PIT! LOUDER THAN EVER! The Comic variant of Matted Away leaps from the cover of TKK Comics Group #1 in glorious halftone fury. All thrash, all the time.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["matted_away_comic"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_comic"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_matted_away",
+        "variant_name": "Comic"
+    },
+    {
+        "id": "card_matted_away_graffiti",
+        "name": "Matted Away (Graffiti)",
+        "description": "Tagged across every abandoned warehouse from the Yukon to Tampa. The Graffiti variant of Matted Away drips down brick walls in moldy ochre and toxic green -- a wall mural the city tried to scrub three times.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["matted_away_graffiti"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_graffiti"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_matted_away",
+        "variant_name": "Graffiti"
+    },
+    {
+        "id": "card_matted_away_neon",
+        "name": "Matted Away (Neon)",
+        "description": "Glowing under 3am dive-bar signs in radioactive orange and electric pink. The Neon variant of Matted Away hums louder than the amps. Hair: still matted. Voltage: maxed.",
+        "rarity": "variant",
+        "front_image_url": CARD_IMAGE_URLS["matted_away_neon"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["variant_back_neon"],
+        "coin_cost": 50,
+        "available": True,
+        "series": 8,
+        "band": "Abominable Snowman",
+        "card_type": "A",
+        "is_variant": True,
+        "base_card_id": "card_matted_away",
         "variant_name": "Neon"
     },
 ]
