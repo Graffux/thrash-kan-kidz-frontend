@@ -167,9 +167,10 @@ async def get_feed(limit: int = 20, viewer_id: str | None = None):
     cursor = db.mosh_posts.find({}, {"_id": 0}).sort("created_at", -1).limit(limit)
     posts = await cursor.to_list(limit)
     vip_set = await _vip_set_for_user_ids([p["user_id"] for p in posts])
-    # Pin the Series 8 announcement to the top of the feed. Always there
-    # until the copy is updated server-side.
-    return [SERIES8_ANNOUNCEMENT] + [
+    # Series 8 launch banner removed Jun 11 2026 — Series 8 is now fully
+    # loaded so the "Coming soon" copy is obsolete. Bring it back (or swap
+    # for a "LIVE NOW" variant) by re-prepending SERIES8_ANNOUNCEMENT here.
+    return [
         _serialize(p, viewer_id=viewer_id, is_vip=p["user_id"] in vip_set) for p in posts
     ]
 
