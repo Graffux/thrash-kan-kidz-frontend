@@ -312,20 +312,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Series 8 Slam Edition announcement banner — always visible
-            on Home until the next series launches. Tappable so we can
-            wire it to a teaser/details screen later without an EAS
-            build. */}
-        <View style={styles.seriesBanner} testID="series8-banner">
-          <View style={styles.seriesBannerInner}>
-            <Ionicons name="flame" size={18} color="#ffd24a" />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.seriesBannerTitle}>SERIES 8 — SLAM EDITION</Text>
-              <Text style={styles.seriesBannerSub}>Coming soon. Stay tuned, banger.</Text>
-            </View>
-            <Ionicons name="flame" size={18} color="#ffd24a" />
-          </View>
-        </View>
+        {/* Series 8 launch banner removed Jun 11 2026 — ships free with next EAS build. */}
 
         {/* "YOUR STATS" raster banner above the 4-up stat grid. */}
         <ExpoImage

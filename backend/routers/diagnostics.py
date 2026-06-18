@@ -202,3 +202,176 @@ async def set_series_release_date(
         "status": series_status(series_num),
         "released": is_series_released(series_num),
     }
+
+
+# ---------------------------------------------------------------------------
+# MOSH PIT CLEANUP — one-click keyword pruning of outdated announcements.
+# Open in any browser (or your phone) and click through:
+#   {BACKEND_URL}/api/admin/mosh/cleanup/view?user=Graffux
+#
+# Two-step flow on purpose:
+#   1. ?keyword=...        → preview matches (no deletion)
+#   2. ?keyword=...&confirm=1 → actually deletes posts + their nested comments
+# ---------------------------------------------------------------------------
+@router.get("/admin/mosh/cleanup")
+async def mosh_cleanup_json(
+    user: str = "",
+    keyword: str = "",
+    confirm: int = 0,
+):
+    """JSON variant for scripting / curl. See /admin/mosh/cleanup/view for UI."""
+    if user not in ADMIN_USERNAMES:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    keyword = (keyword or "").strip()
+    if not keyword:
+        raise HTTPException(status_code=400, detail="keyword required")
+
+    # Case-insensitive substring match on `content`.
+    query = {"content": {"$regex": keyword, "$options": "i"}}
+    matches = await db.mosh_posts.find(
+        query, {"_id": 0, "id": 1, "username": 1, "content": 1, "created_at": 1}
+    ).sort("created_at", -1).to_list(500)
+
+    if not confirm:
+        return {
+            "dry_run": True,
+            "keyword": keyword,
+            "match_count": len(matches),
+            "matches": matches,
+            "hint": "Re-call with &confirm=1 to actually delete.",
+        }
+
+    # Confirmed delete — also drop nested comments to keep collections clean.
+    match_ids = [m["id"] for m in matches]
+    posts_res = await db.mosh_posts.delete_many({"id": {"$in": match_ids}})
+    comments_res = await db.mosh_comments.delete_many({"post_id": {"$in": match_ids}})
+    return {
+        "dry_run": False,
+        "keyword": keyword,
+        "deleted_posts": posts_res.deleted_count,
+        "deleted_comments": comments_res.deleted_count,
+        "removed_ids": match_ids,
+    }
+
+
+@router.get("/admin/mosh/cleanup/view", response_class=HTMLResponse)
+async def mosh_cleanup_view(user: str = "", keyword: str = "", confirm: int = 0):
+    """
+    Mobile-friendly HTML page. Open in your browser:
+        {BACKEND_URL}/api/admin/mosh/cleanup/view?user=Graffux
+    Then type a keyword → preview → click DELETE to confirm.
+    """
+    if user not in ADMIN_USERNAMES:
+        return HTMLResponse(
+            "<h1>403 Forbidden</h1><p>Pass ?user=&lt;admin username&gt;</p>",
+            status_code=403,
+        )
+
+    keyword = (keyword or "").strip()
+    deleted_summary = ""
+    matches: list[dict] = []
+    confirmed = bool(confirm) and bool(keyword)
+
+    if confirmed:
+        query = {"content": {"$regex": keyword, "$options": "i"}}
+        targets = await db.mosh_posts.find(query, {"_id": 0, "id": 1}).to_list(500)
+        target_ids = [t["id"] for t in targets]
+        posts_res = await db.mosh_posts.delete_many({"id": {"$in": target_ids}})
+        comments_res = await db.mosh_comments.delete_many(
+            {"post_id": {"$in": target_ids}}
+        )
+        deleted_summary = (
+            f"<div style='background:#1e3a1e;border:1px solid #3a7a3a;"
+            f"padding:12px;border-radius:8px;margin:12px 0;color:#9fe39f;'>"
+            f"✅ Deleted <b>{posts_res.deleted_count}</b> post(s) and "
+            f"<b>{comments_res.deleted_count}</b> nested comment(s) "
+            f"matching <code>{_esc(keyword)}</code>."
+            f"</div>"
+        )
+        # After delete, run a fresh search to show "no remaining matches"
+        matches = await db.mosh_posts.find(
+            {"content": {"$regex": keyword, "$options": "i"}},
+            {"_id": 0, "id": 1, "username": 1, "content": 1, "created_at": 1},
+        ).sort("created_at", -1).to_list(50)
+    elif keyword:
+        matches = await db.mosh_posts.find(
+            {"content": {"$regex": keyword, "$options": "i"}},
+            {"_id": 0, "id": 1, "username": 1, "content": 1, "created_at": 1},
+        ).sort("created_at", -1).to_list(50)
+
+    # Render the matches table
+    rows_html = ""
+    for m in matches:
+        ts = m.get("created_at", "")
+        if not isinstance(ts, str):
+            ts = ts.isoformat() if ts else ""
+        rows_html += (
+            f"<tr>"
+            f"<td style='padding:8px;border-bottom:1px solid #333;'>"
+            f"<code style='color:#888;font-size:11px;'>{_esc(m.get('id',''))[:8]}…</code>"
+            f"</td>"
+            f"<td style='padding:8px;border-bottom:1px solid #333;color:#ffd24a;'>"
+            f"{_esc(m.get('username',''))}"
+            f"</td>"
+            f"<td style='padding:8px;border-bottom:1px solid #333;'>"
+            f"{_esc(m.get('content','')[:180])}"
+            f"</td>"
+            f"</tr>"
+        )
+    table_html = (
+        f"<table style='width:100%;border-collapse:collapse;background:#161616;"
+        f"color:#eee;font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;'>"
+        f"<thead><tr style='background:#222;'>"
+        f"<th style='padding:8px;text-align:left;'>ID</th>"
+        f"<th style='padding:8px;text-align:left;'>User</th>"
+        f"<th style='padding:8px;text-align:left;'>Content</th>"
+        f"</tr></thead><tbody>{rows_html or '<tr><td colspan=3 style=padding:20px;color:#666;>No posts matched.</td></tr>'}</tbody></table>"
+    ) if keyword else ""
+
+    delete_btn = ""
+    if matches and keyword and not confirmed:
+        delete_btn = (
+            f"<form method='get' style='margin-top:16px;'>"
+            f"<input type='hidden' name='user' value='{_esc(user)}'>"
+            f"<input type='hidden' name='keyword' value='{_esc(keyword)}'>"
+            f"<input type='hidden' name='confirm' value='1'>"
+            f"<button type='submit' style='background:#a02828;color:#fff;"
+            f"padding:12px 24px;border:none;border-radius:6px;font-size:16px;"
+            f"font-weight:bold;cursor:pointer;' "
+            f"onclick=\"return confirm('Permanently delete {len(matches)} post(s) matching &quot;{_esc(keyword)}&quot;?');\">"
+            f"🗑️  DELETE {len(matches)} POST(S)"
+            f"</button>"
+            f"</form>"
+        )
+
+    page = f"""
+    <!doctype html>
+    <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Mosh Pit Cleanup</title></head>
+    <body style="background:#0d0d0d;color:#eee;font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;max-width:900px;margin:0 auto;">
+    <h1 style="color:#ffd24a;border-bottom:2px solid #444;padding-bottom:8px;">🤘 Mosh Pit Cleanup</h1>
+    <p style="color:#aaa;">Search posts by keyword (case-insensitive). Preview, then confirm to delete.</p>
+
+    <form method="get" style="background:#1a1a1a;padding:16px;border-radius:8px;border:1px solid #333;">
+      <input type="hidden" name="user" value="{_esc(user)}">
+      <label style="display:block;margin-bottom:8px;color:#bbb;font-size:14px;">Keyword:</label>
+      <input type="text" name="keyword" value="{_esc(keyword)}" placeholder="e.g. coming soon" autofocus
+        style="width:100%;padding:10px;background:#222;color:#fff;border:1px solid #444;border-radius:6px;font-size:16px;box-sizing:border-box;">
+      <button type="submit" style="margin-top:12px;background:#3a7a3a;color:#fff;padding:10px 20px;border:none;border-radius:6px;font-size:15px;cursor:pointer;">
+        🔍 Preview Matches
+      </button>
+    </form>
+
+    {deleted_summary}
+
+    {f'<h2 style="color:#ffd24a;margin-top:24px;">Matches for &ldquo;{_esc(keyword)}&rdquo; ({len(matches)})</h2>' if keyword else ''}
+    {table_html}
+    {delete_btn}
+
+    <p style="color:#555;font-size:11px;margin-top:32px;border-top:1px solid #222;padding-top:12px;">
+    Logged in as <code style="color:#ffd24a;">{_esc(user)}</code>.
+    Also available as JSON: <code>/api/admin/mosh/cleanup?user={_esc(user)}&keyword=…&confirm=1</code>
+    </p>
+    </body></html>
+    """
+    return HTMLResponse(page)
