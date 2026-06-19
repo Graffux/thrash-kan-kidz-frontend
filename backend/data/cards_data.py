@@ -731,6 +731,8 @@ CARD_IMAGE_URLS = {
     "maddy_no_way_comic":        "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/0i4efl8l_Screenshot_20260603_044812_ChatGPT.png",
     "maddy_no_way_graffiti":     "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/2et16daw_Screenshot_20260603_045404_ChatGPT.png",
     "maddy_no_way_neon":         "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/bdnp1wa3_file_000000002e4071f8ac90bf44135f0d9f.png",
+    # ---- DAILY REWARD CARDS (rare, available: False, only granted via daily challenges) ----
+    "i_gore_cavahorror": "TODO_URL_i_gore_cavahorror_front",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -1060,6 +1062,8 @@ CARD_BACK_IMAGE_URLS = {
     "ruben_grossas": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/xx3yuzzh_enhanced-1780102951101.jpg",
     "matted_away":   "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/l7stm4i9_Matted_Away_Back_under_5MB.jpg",
     "maddy_no_way":  "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vasxm41h_enhanced-1780336063741.jpg",
+    # ---- DAILY REWARD CARDS (back) ----
+    "i_gore_cavahorror":  "TODO_URL_i_gore_cavahorror_back",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
     # Series 8 Rare Reward (epic) — Slam Edition
@@ -10415,5 +10419,21 @@ INITIAL_CARDS = [
         "is_variant": True,
         "base_card_id": "card_maddy_no_way",
         "variant_name": "Neon"
+    },
+    # =====================
+    # DAILY REWARD CARDS - Earned only via Daily Challenges
+    # =====================
+    {
+        "id": "card_i_gore_cavahorror",
+        "name": "I-Gore Cavahorror",
+        "description": "I-Gore lives for creepy movies, midnight mayhem and anything that goes bump in the night. He's not afraid of horror... he IS horror. FAVORITE MOVIES: The Thing, Friday the 13th, Evil Dead, Hellraiser. BAND: SEPULCABRA -- \"We don't play music... we summon the dead.\" THRASH STATS: GROSS-FACTOR / THRASHABILITY / HORROR POWER / WEIRD-O-METER / SCARE QUOTIENT. KNOWN FOR: binge watching horror flicks until sunrise, collecting skulls/bones/cursed VHS tapes, headbanging at the cemetery, Nuclear Noodz -- his drink of the damned! THRASH WARNING: May cause nightmares, spontaneous mosh pits, and an uncontrollable urge to scream BRAAAAINSSS!",
+        "rarity": "rare",
+        "front_image_url": CARD_IMAGE_URLS["i_gore_cavahorror"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["i_gore_cavahorror"],
+        "coin_cost": 200,
+        "available": False,
+        "series": 8,
+        "band": "Sepulcabra",
+        "is_daily_reward": True
     },
 ]
