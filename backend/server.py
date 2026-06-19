@@ -4026,6 +4026,7 @@ from routers import mosh as mosh_routes  # noqa: E402
 from routers import leaderboard as leaderboard_routes  # noqa: E402
 from routers import app_version as app_version_routes  # noqa: E402
 from routers import diagnostics as diagnostics_routes  # noqa: E402
+from routers import daily_challenges as daily_challenges_routes  # noqa: E402
 api_router.include_router(cards_routes.router)
 api_router.include_router(static_routes.router)
 api_router.include_router(feedback_routes.router)
@@ -4034,6 +4035,7 @@ api_router.include_router(mosh_routes.router)
 api_router.include_router(leaderboard_routes.router)
 api_router.include_router(app_version_routes.router)
 api_router.include_router(diagnostics_routes.router)
+api_router.include_router(daily_challenges_routes.router)
 
 # Include the router in the main app
 app.include_router(api_router)
