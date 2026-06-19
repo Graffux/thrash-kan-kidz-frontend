@@ -49,6 +49,7 @@ class Card(BaseModel):
     is_variant: bool = False
     base_card_id: Optional[str] = None
     variant_name: Optional[str] = None
+    is_daily_reward: bool = False  # True for daily-challenge-only cards (I-Gore, Chris Pervalicious, etc.)
     scratch_cover_url: Optional[str] = None  # Variant-themed scratch overlay shown on pack-open
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
