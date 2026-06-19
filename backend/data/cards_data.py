@@ -734,6 +734,7 @@ CARD_IMAGE_URLS = {
     # ---- DAILY REWARD CARDS (rare, available: False, only granted via daily challenges) ----
     "i_gore_cavahorror": "TODO_URL_i_gore_cavahorror_front",
     "chris_pervalicious": "TODO_URL_chris_pervalicious_front",
+    "jeff_handyman": "TODO_URL_jeff_handyman_front",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -1066,6 +1067,7 @@ CARD_BACK_IMAGE_URLS = {
     # ---- DAILY REWARD CARDS (back) ----
     "i_gore_cavahorror":  "TODO_URL_i_gore_cavahorror_back",
     "chris_pervalicious": "TODO_URL_chris_pervalicious_back",
+    "jeff_handyman": "TODO_URL_jeff_handyman_back",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
     # Series 8 Rare Reward (epic) — Slam Edition
@@ -10449,6 +10451,19 @@ INITIAL_CARDS = [
         "available": False,
         "series": 8,
         "band": "Infernal Bleeding",
+        "is_daily_reward": True
+    },
+    {
+        "id": "card_jeff_handyman",
+        "name": "Jeff Handyman",
+        "description": "Jeff Handyman fronts SLAY HER -- a thrash outfit that builds gear AND slaughters stages. When he's not nailing solos, he's literally nailing things. Half guitarist, half general contractor, all chaos. SIGNATURE MOVE: Power Drill Pick Slide. BAND: SLAY HER -- \"We don't tune our guitars... we MEASURE them.\"",
+        "rarity": "rare",
+        "front_image_url": CARD_IMAGE_URLS["jeff_handyman"],
+        "back_image_url": CARD_BACK_IMAGE_URLS["jeff_handyman"],
+        "coin_cost": 200,
+        "available": False,
+        "series": 8,
+        "band": "Slay Her",
         "is_daily_reward": True
     },
 ]

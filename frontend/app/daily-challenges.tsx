@@ -2,9 +2,10 @@
 //   GET  /api/users/{uid}/daily-challenges
 //   POST /api/users/{uid}/daily-challenges/select   { challenge_id }
 //   POST /api/users/{uid}/daily-challenges/claim
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, Alert,
+  Modal, Animated, Easing, Dimensions,
 } from "react-native";
 import { router, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -35,6 +36,25 @@ export default function DailyChallengesScreen() {
   const { user, refreshData } = useApp();
   const [data, setData] = useState<Payload | null>(null);
   const [busy, setBusy] = useState(false);
+  // Big-reveal modal state
+  const [reveal, setReveal] = useState<null | { name: string; coins: number; packs: number; tickets: number; cardId: string | null }>(null);
+  const scale = useRef(new Animated.Value(0)).current;
+  const rotate = useRef(new Animated.Value(0)).current;
+  const flash = useRef(new Animated.Value(0)).current;
+  const burst = useRef(new Animated.Value(0)).current;
+
+  const playReveal = useCallback(() => {
+    scale.setValue(0); rotate.setValue(0); flash.setValue(0); burst.setValue(0);
+    Animated.sequence([
+      Animated.timing(flash, { toValue: 1, duration: 180, useNativeDriver: true }),
+      Animated.parallel([
+        Animated.timing(flash, { toValue: 0, duration: 320, useNativeDriver: true }),
+        Animated.spring(scale, { toValue: 1, friction: 5, tension: 90, useNativeDriver: true }),
+        Animated.timing(rotate, { toValue: 1, duration: 900, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(burst, { toValue: 1, duration: 900, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+      ]),
+    ]).start();
+  }, [scale, rotate, flash, burst]);
 
   const load = useCallback(async () => {
     if (!user?.id) return;
@@ -73,12 +93,21 @@ export default function DailyChallengesScreen() {
         Alert.alert("Can't claim yet", j.detail || "Finish the challenge first");
       } else {
         const g = j.granted || {};
-        const lines = [];
-        if (g.coins) lines.push(`+${g.coins} coins`);
-        if (g.free_packs) lines.push(`+${g.free_packs} free pack${g.free_packs > 1 ? "s" : ""}`);
-        if (g.wheel_tickets) lines.push(`+${g.wheel_tickets} wheel ticket${g.wheel_tickets > 1 ? "s" : ""}`);
-        if (g.bonus_card_id) lines.push(`+1 RARE CARD: I-Gore Cavahorror`);
-        Alert.alert("Reward claimed! \\m/", lines.join("\n"));
+        const cardName = g.bonus_card_id === "card_i_gore_cavahorror"
+          ? "I-Gore Cavahorror"
+          : g.bonus_card_id === "card_chris_pervalicious"
+          ? "Chris Pervalicious"
+          : g.bonus_card_id === "card_jeff_handyman"
+          ? "Jeff Handyman"
+          : g.bonus_card_id ? "RARE CARD" : "";
+        setReveal({
+          name: cardName,
+          coins: g.coins || 0,
+          packs: g.free_packs || 0,
+          tickets: g.wheel_tickets || 0,
+          cardId: g.bonus_card_id || null,
+        });
+        setTimeout(playReveal, 50);
         await refreshData?.();
         await load();
       }
@@ -175,6 +204,57 @@ export default function DailyChallengesScreen() {
 
         <Text style={styles.resetNote}>Resets at UTC midnight ({data.reset_at_utc.split("T")[1]?.slice(0, 5)} UTC).</Text>
       </ScrollView>
+
+      {/* BIG EXPLOSIVE REWARD REVEAL */}
+      <Modal visible={!!reveal} transparent animationType="fade" onRequestClose={() => setReveal(null)}>
+        <View style={styles.revealBg}>
+          <Animated.View style={[styles.flashLayer, { opacity: flash }]} pointerEvents="none" />
+          {/* Radiating burst rays */}
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <Animated.View
+              key={i}
+              pointerEvents="none"
+              style={[
+                styles.burstRay,
+                {
+                  transform: [
+                    { rotate: `${i * 45}deg` },
+                    { scaleY: burst.interpolate({ inputRange: [0, 1], outputRange: [0, 1.4] }) },
+                  ],
+                  opacity: burst.interpolate({ inputRange: [0, 0.6, 1], outputRange: [0, 0.95, 0.5] }),
+                },
+              ]}
+            />
+          ))}
+          <Animated.View
+            style={[
+              styles.revealCard,
+              {
+                transform: [
+                  { scale },
+                  { rotate: rotate.interpolate({ inputRange: [0, 1], outputRange: ["-15deg", "0deg"] }) },
+                ],
+              },
+            ]}
+          >
+            <Text style={styles.revealEyebrow}>🤘 REWARD CLAIMED 🤘</Text>
+            {reveal?.cardId && (
+              <>
+                <Text style={styles.revealRare}>★ RARE CARD ★</Text>
+                <Text style={styles.revealCardName}>{reveal.name}</Text>
+              </>
+            )}
+            <View style={styles.revealRewardList}>
+              {(reveal?.coins ?? 0) > 0 && <Text style={styles.revealReward}>+ {reveal!.coins} COINS</Text>}
+              {(reveal?.packs ?? 0) > 0 && <Text style={styles.revealReward}>+ {reveal!.packs} FREE PACK{reveal!.packs > 1 ? "S" : ""}</Text>}
+              {(reveal?.tickets ?? 0) > 0 && <Text style={styles.revealReward}>+ {reveal!.tickets} WHEEL SPIN{reveal!.tickets > 1 ? "S" : ""}</Text>}
+            </View>
+            <Pressable testID="reveal-dismiss-btn" onPress={() => setReveal(null)} style={styles.revealDismiss}>
+              <Text style={styles.revealDismissText}>SLAM ON \\m/</Text>
+            </Pressable>
+          </Animated.View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -215,4 +295,30 @@ const styles = StyleSheet.create({
   claimBtnDisabled: { backgroundColor: "#2a2a2a" },
   claimBtnText: { color: "#fff", fontSize: 15, fontWeight: "900", letterSpacing: 0.5 },
   resetNote: { color: "#555", fontSize: 11, textAlign: "center", marginTop: 20 },
+
+  // BIG EXPLOSIVE REVEAL MODAL
+  revealBg: {
+    flex: 1, backgroundColor: "rgba(0,0,0,0.92)",
+    justifyContent: "center", alignItems: "center", overflow: "hidden",
+  },
+  flashLayer: {
+    ...StyleSheet.absoluteFillObject, backgroundColor: "#fff5d4",
+  },
+  burstRay: {
+    position: "absolute", width: 6, height: Dimensions.get("window").height * 1.2,
+    backgroundColor: "#ffd24a",
+  },
+  revealCard: {
+    backgroundColor: "#1a0a2a",
+    borderColor: "#ffd24a", borderWidth: 3, borderRadius: 16,
+    paddingHorizontal: 28, paddingVertical: 32, alignItems: "center",
+    maxWidth: 340, width: "85%",
+  },
+  revealEyebrow: { color: "#ffd24a", fontSize: 14, fontWeight: "900", letterSpacing: 2, marginBottom: 14 },
+  revealRare: { color: "#e5b4ff", fontSize: 18, fontWeight: "900", letterSpacing: 3, marginBottom: 6 },
+  revealCardName: { color: "#fff", fontSize: 28, fontWeight: "900", textAlign: "center", marginBottom: 20, letterSpacing: 1 },
+  revealRewardList: { gap: 6, marginBottom: 22 },
+  revealReward: { color: "#9fe39f", fontSize: 16, fontWeight: "800", textAlign: "center" },
+  revealDismiss: { backgroundColor: "#ffd24a", paddingHorizontal: 36, paddingVertical: 12, borderRadius: 8 },
+  revealDismissText: { color: "#0d0d0d", fontSize: 16, fontWeight: "900", letterSpacing: 1.5 },
 });

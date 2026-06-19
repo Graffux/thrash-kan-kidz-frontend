@@ -29,12 +29,14 @@ from data.daily_challenges import (
 
 router = APIRouter()
 
-# Date-keyed daily reward card schedule. Today gets I-Gore; tomorrow Chris
-# Pervalicious. Add more entries as new cards land. If today's date isn't in
-# this map, falls back to whatever bonus_card_id is set on the catalog.
-DAILY_REWARD_BY_DATE: dict[str, str] = {
-    "2026-06-19": "card_i_gore_cavahorror",
-    "2026-06-20": "card_chris_pervalicious",
+# ISO-week-keyed reward card schedule. One card per ISO week (Monday-Sunday in UTC).
+# Format: "YYYY-Www". Calculate via datetime.isocalendar().
+# As you generate new cards, append more (week_key, card_id) entries here.
+WEEKLY_REWARD_BY_ISO_WEEK: dict[str, str] = {
+    "2026-W25": "card_i_gore_cavahorror",       # week of Jun 15-21
+    "2026-W26": "card_chris_pervalicious",      # week of Jun 22-28
+    "2026-W27": "card_jeff_handyman",           # week of Jun 29-Jul 5
+    # Add more weekly cards as you generate them
 }
 
 mongo_url = os.environ["MONGO_URL"]
@@ -263,10 +265,11 @@ async def claim_daily_challenge(user_id: str):
     if update_doc:
         await db.users.update_one({"id": user_id}, {"$set": update_doc})
 
-    # Bonus card (date-keyed rotation takes precedence; "*" sentinel falls
-    # back to a random variant if no scheduled card for today)
+    # Bonus card (ISO-week rotation takes precedence; falls back to catalog or random variant)
     bcid = rewards.get("bonus_card_id")
-    scheduled = DAILY_REWARD_BY_DATE.get(date_iso)
+    iso_year, iso_week, _ = datetime.now(timezone.utc).isocalendar()
+    week_key = f"{iso_year}-W{iso_week:02d}"
+    scheduled = WEEKLY_REWARD_BY_ISO_WEEK.get(week_key)
     if scheduled:
         bcid = scheduled
     elif bcid == "*":
