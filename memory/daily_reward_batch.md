@@ -1,6 +1,8 @@
 # Daily Reward Cards — Batch Upload Queue (Jun 2026)
 
-User uploaded 9 new daily-reward cards that share a **universal back** (back image upload pending — will land in a follow-up message).
+User uploaded 9 new daily-reward cards that share a **universal back** ("DAILY CHALLENGE CLASSICS" — spiked TKK skull crest on purple/green slime).
+
+✅ **Universal back image uploaded.** It will be one of the 10 newest assets in `get_assets_tool` along with the 9 character fronts.
 
 All cards: `rarity: "rare"`, `is_daily_reward: True`, `available: False`, `series: 8`, no `card_type` field, no variants. Each gets its own `front_image_url`; all 9 reuse the same `back_image_url` once user uploads the universal back.
 
