@@ -151,7 +151,7 @@ BADGES = [
         "tint": "#39ff14",  # neon green to match the badge art
         "condition_type": COND_SERIES_BASE_COMPLETE,
         "condition_params": {"series_num": 8},
-        "image_url": "TODO_URL_series_8_master_badge",
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/ys2a0zds_file_0000000024a871fda2c8f23705204a9c.png",
     },
     {
         "id": "series_9_master",
@@ -161,7 +161,7 @@ BADGES = [
         "tint": "#ffd700",  # gold to match the badge art
         "condition_type": COND_SERIES_BASE_COMPLETE,
         "condition_params": {"series_num": 9},
-        "image_url": "TODO_URL_series_9_master_badge",
+        "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/p6upndw7_file_00000000388471fd96baba97e39cf724.png",
     },
 
     # --- Easy wins (proactive additions) ---
