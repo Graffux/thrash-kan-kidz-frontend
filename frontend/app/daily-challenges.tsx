@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { router, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useApp } from "../src/context/AppContext";
 
 const API = process.env.EXPO_PUBLIC_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
@@ -45,6 +46,13 @@ export default function DailyChallengesScreen() {
 
   const playReveal = useCallback(() => {
     scale.setValue(0); rotate.setValue(0); flash.setValue(0); burst.setValue(0);
+    // Tactile "BOOM" — heavy impact on the flash, plus a success notification
+    // a moment later when the card lands. Wrapped in try/catch since haptics
+    // can be unavailable on some hardware/emulators.
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); } catch {}
+    setTimeout(() => {
+      try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
+    }, 380);
     Animated.sequence([
       Animated.timing(flash, { toValue: 1, duration: 180, useNativeDriver: true }),
       Animated.parallel([
