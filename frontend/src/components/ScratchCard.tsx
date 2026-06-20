@@ -49,7 +49,9 @@ export const ScratchCard: React.FC<Props> = ({
   // because the SVG re-renders only on state change.
   const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
   const [revealed, setRevealed] = useState(false);
-  const coverOpacity = useRef(new Animated.Value(1)).current;
+  // Slightly transparent so players can tease the art beneath as they scratch.
+  // 0.82 = visible cover with a faint ghost of the card underneath.
+  const coverOpacity = useRef(new Animated.Value(0.82)).current;
 
   // Grid-based coverage tracking. We snap each dot to a cell and count
   // unique touched cells. Cell size ~= half the brush radius keeps overlap
@@ -147,7 +149,7 @@ export const ScratchCard: React.FC<Props> = ({
     setDots([]);
     setRevealed(false);
     touchedCells.current = new Set();
-    coverOpacity.setValue(1);
+    coverOpacity.setValue(0.82);
   }, [imageUri, coverOpacity]);
 
   return (
@@ -171,13 +173,6 @@ export const ScratchCard: React.FC<Props> = ({
         pointerEvents={revealed ? 'none' : 'auto'}
         style={[StyleSheet.absoluteFill, { opacity: coverOpacity }]}
       >
-        {/* Visible fallback layer — always shown until enough is scratched. */}
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            styles.coverFallback,
-          ]}
-        />
         <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
           <Defs>
             <Mask id="scratchMask" x="0" y="0" width={width} height={height}>
@@ -191,8 +186,19 @@ export const ScratchCard: React.FC<Props> = ({
               </G>
             </Mask>
           </Defs>
-          {/* The fancy cover image. May fail to render on slow devices, in
-              which case the solid coverFallback above carries the load. */}
+          {/* Fallback foil color — also masked so scratch holes show the card
+              art underneath, not a solid gold layer. If the SvgImage href
+              below fails to load (slow network / flaky devices), this Rect
+              still gives the user something to scratch. */}
+          <Rect
+            x="0"
+            y="0"
+            width={width}
+            height={height}
+            fill="#d4a017"
+            mask="url(#scratchMask)"
+          />
+          {/* The fancy cover image, painted on top of the fallback Rect. */}
           <SvgImage
             href={coverUri}
             x="0"
@@ -214,15 +220,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#0a0a0a',
     borderRadius: 8,
-  },
-  coverFallback: {
-    // Scratch-off "foil" surface. Bright metallic gold so the variant
-    // cover reads as a real scratch-ticket — and so it's clearly visible
-    // even if the remote SVG <Image> href silently fails on a flaky
-    // network. The colored variant artwork loads on top of this when
-    // available. Previous version was a muted brown that looked like a
-    // blank screen on lower-end devices.
-    backgroundColor: '#d4a017',
   },
 });
 
