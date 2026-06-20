@@ -405,7 +405,8 @@ export default function HomeScreen() {
         <ThrashMissionsPreview />
 
         <View style={styles.miniGamesContainer}>
-          <SplatTitle>MINI-GAMES</SplatTitle>          <TouchableOpacity
+          <SplatTitle>MINI-GAMES</SplatTitle>
+          <TouchableOpacity
             style={styles.miniGameButton}
             onPress={() => {
               buttonTapSound.play();
