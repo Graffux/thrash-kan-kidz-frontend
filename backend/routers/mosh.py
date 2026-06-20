@@ -106,6 +106,7 @@ def _serialize(post: dict, viewer_id: str | None = None, is_vip: bool = False) -
         "viewer_reacted": viewer_id in reactors if viewer_id else False,
         "comment_count": int(post.get("comment_count", 0)),
         "is_vip_supporter": bool(is_vip),
+        "is_pinned": bool(post.get("is_pinned", False)),
     }
 
 
@@ -164,12 +165,17 @@ async def create_post(request: Request):
 @router.get("/mosh/feed")
 async def get_feed(limit: int = 20, viewer_id: str | None = None):
     limit = max(1, min(limit, 100))
-    cursor = db.mosh_posts.find({}, {"_id": 0}).sort("created_at", -1).limit(limit)
+    # Pinned admin posts (is_pinned=True) float to the top forever; everything
+    # else sorts by recency. Mongo treats missing field as null < True, so
+    # legacy posts without the field stay in the unpinned bucket automatically.
+    cursor = (
+        db.mosh_posts.find({}, {"_id": 0})
+        .sort([("is_pinned", -1), ("created_at", -1)])
+        .limit(limit)
+    )
     posts = await cursor.to_list(limit)
     vip_set = await _vip_set_for_user_ids([p["user_id"] for p in posts])
-    # Pin the Series 8 announcement to the top of the feed. Always there
-    # until the copy is updated server-side.
-    return [SERIES8_ANNOUNCEMENT] + [
+    return [
         _serialize(p, viewer_id=viewer_id, is_vip=p["user_id"] in vip_set) for p in posts
     ]
 

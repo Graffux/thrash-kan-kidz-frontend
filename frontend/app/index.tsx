@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   TextInput,
   ScrollView,
   ActivityIndicator,
@@ -312,20 +313,21 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Series 8 Slam Edition announcement banner — always visible
-            on Home until the next series launches. Tappable so we can
-            wire it to a teaser/details screen later without an EAS
-            build. */}
-        <View style={styles.seriesBanner} testID="series8-banner">
-          <View style={styles.seriesBannerInner}>
-            <Ionicons name="flame" size={18} color="#ffd24a" />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.seriesBannerTitle}>SERIES 8 — SLAM EDITION</Text>
-              <Text style={styles.seriesBannerSub}>Coming soon. Stay tuned, banger.</Text>
-            </View>
-            <Ionicons name="flame" size={18} color="#ffd24a" />
+        {/* Series 8 launch banner removed Jun 11 2026 — ships free with next EAS build. */}
+
+        {/* Daily Challenges entry tile. Backend lives at /api/users/{uid}/daily-challenges. */}
+        <Pressable
+          testID="daily-challenges-tile"
+          onPress={() => router.push("/daily-challenges")}
+          style={styles.dailyTile}
+        >
+          <Ionicons name="flame" size={22} color="#ffd24a" />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.dailyTileTitle}>DAILY CHALLENGES</Text>
+            <Text style={styles.dailyTileSub}>Pick your slam. Earn the daily rare.</Text>
           </View>
-        </View>
+          <Ionicons name="chevron-forward" size={20} color="#ffd24a" />
+        </Pressable>
 
         {/* "YOUR STATS" raster banner above the 4-up stat grid. */}
         <ExpoImage
@@ -403,7 +405,8 @@ export default function HomeScreen() {
         <ThrashMissionsPreview />
 
         <View style={styles.miniGamesContainer}>
-          <SplatTitle>MINI-GAMES</SplatTitle>          <TouchableOpacity
+          <SplatTitle>MINI-GAMES</SplatTitle>
+          <TouchableOpacity
             style={styles.miniGameButton}
             onPress={() => {
               buttonTapSound.play();
@@ -711,6 +714,31 @@ const styles = StyleSheet.create({
     color: '#fff5d4',
     fontSize: 11,
     marginTop: 1,
+  },
+
+  // Daily Challenges entry tile (replaces the legacy Series 8 launch banner slot)
+  dailyTile: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: 'rgba(40, 28, 4, 0.92)',
+    borderWidth: 1.5,
+    borderColor: '#ffd24a',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 14,
+  },
+  dailyTileTitle: {
+    color: '#ffd24a',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 1.4,
+  },
+  dailyTileSub: {
+    color: '#fff5d4',
+    fontSize: 11,
+    marginTop: 2,
   },
 
   // VIP supporter chip rendered on home next to the user's name when

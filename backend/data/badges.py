@@ -143,6 +143,26 @@ BADGES = [
         "condition_params": {"series_num": 7},
         "image_url": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/b8qfgszs_enhanced-1779078359336.png",
     },
+    {
+        "id": "series_8_master",
+        "name": "Series 8 Master",
+        "description": "Collect every base card from Series 8",
+        "icon": "ribbon",
+        "tint": "#39ff14",  # neon green to match the badge art
+        "condition_type": COND_SERIES_BASE_COMPLETE,
+        "condition_params": {"series_num": 8},
+        "image_url": "TODO_URL_series_8_master_badge",
+    },
+    {
+        "id": "series_9_master",
+        "name": "Series 9 Master",
+        "description": "Collect every base card from Series 9",
+        "icon": "ribbon",
+        "tint": "#ffd700",  # gold to match the badge art
+        "condition_type": COND_SERIES_BASE_COMPLETE,
+        "condition_params": {"series_num": 9},
+        "image_url": "TODO_URL_series_9_master_badge",
+    },
 
     # --- Easy wins (proactive additions) ---
     {

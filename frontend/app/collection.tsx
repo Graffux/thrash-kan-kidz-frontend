@@ -273,6 +273,11 @@ const SimpleCardOwned = React.memo(({
           <Text style={styles.variantBadgeText}>VAR</Text>
         </View>
       )}
+      {(card as any).is_daily_reward && (
+        <View style={styles.dailyRewardBadge} testID={`daily-badge-${card.id}`}>
+          <Text style={styles.dailyRewardBadgeText}>🌙</Text>
+        </View>
+      )}
       <View style={styles.cardNameBadge}>
         <Text style={styles.cardNameText} numberOfLines={1}>
           {card.name}
@@ -1451,6 +1456,23 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 8,
     fontWeight: 'bold',
+  },
+  // Daily Reward badge — small moon icon overlay on cards earned via Daily Challenges.
+  // Sits top-right (variant badge is top-left, quantity badge is bottom-right).
+  dailyRewardBadge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(58, 26, 74, 0.95)',
+    borderWidth: 1,
+    borderColor: '#e5b4ff',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  dailyRewardBadgeText: {
+    fontSize: 11,
+    lineHeight: 12,
   },
   cardNameBadge: {
     position: 'absolute',
