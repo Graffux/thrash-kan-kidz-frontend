@@ -720,17 +720,17 @@ CARD_IMAGE_URLS = {
     "ruben_grossas_graffiti": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/pyjhp2l4_Screenshot_20260602_030615_ChatGPT.png",
     "ruben_grossas_neon": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/6qgtfvnm_Screenshot_20260602_075459_ChatGPT.png",
     # Abominable Snowman / Matted Away (Card A)
-    "matted_away": ".../matted_away/matted_away.png.jpg",
-    "matted_away_holographic": ".../matted_away/matted_away_holographic.png.png",
-    "matted_away_comic": ".../matted_away/matted_away_comic.png.png",
-    "matted_away_graffiti": ".../matted_away/matted_away_graffiti.png.png",
-    "matted_away_neon": ".../matted_away/matted_away_neon.png.png",
+    "matted_away": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/matted_away/matted_away.png.jpg",
+    "matted_away_holographic": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/matted_away/matted_away_holographic.png.png",
+    "matted_away_comic": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/matted_away/matted_away_comic.png.png",
+    "matted_away_graffiti": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/matted_away/matted_away_graffiti.png.png",
+    "matted_away_neon": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/matted_away/matted_away_neon.png.png",
     # Abominable Snowman / Maddy No Way (Card B)
-    "maddy_no_way": ".../maddy_no_way/maddy_no_way.png.png",
-    "maddy_no_way_holographic": ".../maddy_no_way/maddy_no_way_holographic.png.png",
-    "maddy_no_way_comic": ".../maddy_no_way/maddy_no_way_comic.png.png",
-    "maddy_no_way_graffiti": ".../maddy_no_way/maddy_no_way_graffiti.png.png",
-    "maddy_no_way_neon": ".../maddy_no_way/maddy_no_way_neon.png.png",
+    "maddy_no_way": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/maddy_no_way/maddy_no_way.png.png",
+    "maddy_no_way_holographic": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/maddy_no_way/maddy_no_way_holographic.png.png",
+    "maddy_no_way_comic": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/maddy_no_way/maddy_no_way_comic.png.png",
+    "maddy_no_way_graffiti": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/maddy_no_way/maddy_no_way_graffiti.png.png",
+    "maddy_no_way_neon": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/maddy_no_way/maddy_no_way_neon.png.png",
     # Prophetic / James Sparks (Card A)
     "james_sparks": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/james_sparks/james_sparks.jpg.jpg",
     "james_sparks_holographic": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/james_sparks/james_sparks_holographic.png.png",
@@ -801,7 +801,7 @@ CARD_IMAGE_URLS = {
     "damontel": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/damontel_williams/damontel.png.jpg",
     "damontel_holographic": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/damontel_williams/damontel_holographic.png.jpg",
     "damontel_comic": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/damontel_williams/damontel_comic.png.jpg",
-    "damontel_graffiti": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/damontel_williams/damontel_graffiti.jpg.jpg",
+    "damontel_graffiti": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/damontel_williams/damontel_graffiti.png.jpg",
     "damontel_neon": "https://raw.githubusercontent.com/Graffux/thrash-kan-kidz-frontend/main/frontend/assets/cards/series8/damontel_williams/damontel_neon.png.jpg",
 }
 

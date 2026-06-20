@@ -10,7 +10,10 @@ import { router, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useApp } from "../src/context/AppContext";
 
-const API = process.env.EXPO_PUBLIC_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+const API =
+  process.env.EXPO_PUBLIC_BACKEND_URL ||
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://192.168.1.191:8000";
 
 type Reward = { coins: number; free_packs: number; wheel_tickets: number; bonus_card_id: string | null };
 type Offering = {
