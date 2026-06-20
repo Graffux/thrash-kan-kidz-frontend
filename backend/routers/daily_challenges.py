@@ -36,6 +36,15 @@ WEEKLY_REWARD_BY_ISO_WEEK: dict[str, str] = {
     "2026-W25": "card_i_gore_cavahorror",       # week of Jun 15-21
     "2026-W26": "card_chris_pervalicious",      # week of Jun 22-28
     "2026-W27": "card_jeff_handyman",           # week of Jun 29-Jul 5
+    "2026-W28": "card_paul_bawl_off",           # week of Jul 6-12
+    "2026-W29": "card_chum_araya",              # week of Jul 13-19
+    "2026-W30": "card_musty_dave",              # week of Jul 20-26
+    "2026-W31": "card_daves_mustang",           # week of Jul 27-Aug 2
+    "2026-W32": "card_ronchy",                  # week of Aug 3-9
+    "2026-W33": "card_tank_mullen",             # week of Aug 10-16
+    "2026-W34": "card_heave_tucker",            # week of Aug 17-23
+    "2026-W35": "card_george_porkgrinder",      # week of Aug 24-30
+    "2026-W36": "card_chunk_schuldiner",        # week of Aug 31-Sep 6
     # Add more weekly cards as you generate them
 }
 

@@ -735,6 +735,16 @@ CARD_IMAGE_URLS = {
     "i_gore_cavahorror": "TODO_URL_i_gore_cavahorror_front",
     "chris_pervalicious": "TODO_URL_chris_pervalicious_front",
     "jeff_handyman": "TODO_URL_jeff_handyman_front",
+    # 9 batch daily-reward fronts (universal back shared via daily_reward_universal_back)
+    "paul_bawl_off":      "TODO_URL_paul_bawl_off_front",
+    "chum_araya":         "TODO_URL_chum_araya_front",
+    "musty_dave":         "TODO_URL_musty_dave_front",
+    "daves_mustang":      "TODO_URL_daves_mustang_front",
+    "ronchy":             "TODO_URL_ronchy_front",
+    "tank_mullen":        "TODO_URL_tank_mullen_front",
+    "heave_tucker":       "TODO_URL_heave_tucker_front",
+    "george_porkgrinder": "TODO_URL_george_porkgrinder_front",
+    "chunk_schuldiner":   "TODO_URL_chunk_schuldiner_front",
 }
 
 CARD_BACK_IMAGE_URLS = {
@@ -1068,6 +1078,8 @@ CARD_BACK_IMAGE_URLS = {
     "i_gore_cavahorror":  "TODO_URL_i_gore_cavahorror_back",
     "chris_pervalicious": "TODO_URL_chris_pervalicious_back",
     "jeff_handyman": "TODO_URL_jeff_handyman_back",
+    # Universal back for all 9 batch daily-reward cards (DAILY CHALLENGE CLASSICS branding)
+    "daily_reward_universal_back": "TODO_URL_daily_reward_universal_back",
     # Series 7 Rare Reward (epic)
     "alien_dubin": "https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/vu8xlmum_enhanced-1778561623250.jpg",
     # Series 8 Rare Reward (epic) — Slam Edition
@@ -10466,4 +10478,30 @@ INITIAL_CARDS = [
         "band": "Slay Her",
         "is_daily_reward": True
     },
+] + [
+    # 9 batch daily-reward cards sharing the universal "DAILY CHALLENGE CLASSICS" back
+    {
+        "id": f"card_{slug}",
+        "name": name,
+        "description": f"{name} — Daily Challenge Classic. Earned via weekly Daily Challenge rotation.",
+        "rarity": "rare",
+        "front_image_url": CARD_IMAGE_URLS[slug],
+        "back_image_url": CARD_BACK_IMAGE_URLS["daily_reward_universal_back"],
+        "coin_cost": 200,
+        "available": False,
+        "series": 8,
+        "band": band,
+        "is_daily_reward": True,
+    }
+    for slug, name, band in [
+        ("paul_bawl_off",      "Paul Bawl Off",      "Pantera Parody"),
+        ("chum_araya",         "Chum Araya",         "Slay Her"),
+        ("musty_dave",         "Musty Dave",         "Megadeth Parody"),
+        ("daves_mustang",      "Dave's Mustang",     "Megadeth Parody"),
+        ("ronchy",             "Ronchy",             "Death Metal Edition"),
+        ("tank_mullen",        "Tank Mullen",        "Death Metal Edition"),
+        ("heave_tucker",       "Heave Tucker",       "Death Metal Edition"),
+        ("george_porkgrinder", "George Porkgrinder", "Death Metal Edition"),
+        ("chunk_schuldiner",   "Chunk Schuldiner",   "Death Metal Edition"),
+    ]
 ]

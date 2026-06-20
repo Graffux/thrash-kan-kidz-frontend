@@ -1314,12 +1314,15 @@ async def _evaluate_badge(badge: dict, user: dict) -> bool:
 
     if ct == COND_SERIES_BASE_COMPLETE:
         series_num = p.get("series_num")
-        # Series 7 stores band cards with rarity "rare"/"epic" plus the reward
-        # — we only count base band cards (not variants, not the rare reward).
+        # Count only TRUE base cards: exclude variants, exclude epic series
+        # rewards (Alien Dubin / Crisp Chris), and exclude daily-reward cards
+        # (I-Gore, Chris Pervalicious, Jeff Handyman, etc.) which share the
+        # same `series: N` field but are earnable only via Daily Challenges.
         base_card_ids = await db.cards.distinct("id", {
             "series": series_num,
             "is_variant": {"$ne": True},
             "series_reward": None,
+            "is_daily_reward": {"$ne": True},
         })
         if not base_card_ids:
             return False
