@@ -24,10 +24,10 @@ CHALLENGE_POOL = [
         "target": 3,
         "icon": "package",
         "rewards": {
-            "coins": 300,
+            "coins": 100,
             "free_packs": 1,
             "wheel_tickets": 0,
-            "bonus_card_id": None,
+            "bonus_card_id": "card_paul_bawl_off",
         },
     },
     {
@@ -38,7 +38,7 @@ CHALLENGE_POOL = [
         "target": 5,
         "icon": "package",
         "rewards": {
-            "coins": 500,
+            "coins": 100,
             "free_packs": 2,
             "wheel_tickets": 1,
             "bonus_card_id": None,
@@ -52,53 +52,53 @@ CHALLENGE_POOL = [
         "target": 8,
         "icon": "package",
         "rewards": {
-            "coins": 800,
+            "coins": 150,
             "free_packs": 3,
             "wheel_tickets": 1,
-            "bonus_card_id": "card_crisp_chris",  # daily reward card
+            "bonus_card_id": "card_paul_bawl_off",  # daily reward card
         },
     },
     # ---------- VARIANT-COLLECT CHALLENGES ----------
     {
-        "id": "collect_3_variants",
+        "id": "collect_1_variants",
         "type": "collect_variants",
         "name": "Variant Hunter",
-        "description": "Collect 3 variant cards (any flavor) today.",
-        "target": 3,
+        "description": "Collect 1 variant cards (any flavor) today.",
+        "target": 1,
         "icon": "sparkles",
         "rewards": {
-            "coins": 400,
+            "coins": 100,
             "free_packs": 1,
             "wheel_tickets": 0,
             "bonus_card_id": None,
         },
     },
     {
-        "id": "collect_5_variants",
+        "id": "collect_3_variants",
         "type": "collect_variants",
         "name": "Shiny Squad",
-        "description": "Collect 5 variant cards today. Pull rate test.",
-        "target": 5,
+        "description": "Collect 3 variant cards today. Pull rate test.",
+        "target": 3,
         "icon": "sparkles",
         "rewards": {
-            "coins": 600,
+            "coins": 150,
             "free_packs": 1,
             "wheel_tickets": 1,
-            "bonus_card_id": "card_crisp_chris",  # guaranteed daily reward on claim
+            "bonus_card_id": None,  # guaranteed daily reward on claim
         },
     },
     {
-        "id": "collect_7_variants",
+        "id": "collect_5_variants",
         "type": "collect_variants",
         "name": "Glittered Out",
-        "description": "Collect 7 variant cards today. For the truly cursed.",
-        "target": 7,
+        "description": "Collect 5 variant cards today. For the truly cursed.",
+        "target": 5,
         "icon": "sparkles",
         "rewards": {
-            "coins": 900,
+            "coins": 200,
             "free_packs": 2,
             "wheel_tickets": 1,
-            "bonus_card_id": "card_crisp_chris",
+            "bonus_card_id": "card_paul_bawl_off",
         },
     },
     # ---------- TRADE CHALLENGES ----------
@@ -110,7 +110,7 @@ CHALLENGE_POOL = [
         "target": 1,
         "icon": "users",
         "rewards": {
-            "coins": 300,
+            "coins": 150,
             "free_packs": 1,
             "wheel_tickets": 0,
             "bonus_card_id": None,
@@ -124,7 +124,7 @@ CHALLENGE_POOL = [
         "target": 2,
         "icon": "users",
         "rewards": {
-            "coins": 500,
+            "coins": 200,
             "free_packs": 1,
             "wheel_tickets": 1,
             "bonus_card_id": None,
@@ -138,10 +138,10 @@ CHALLENGE_POOL = [
         "target": 3,
         "icon": "users",
         "rewards": {
-            "coins": 750,
+            "coins": 250,
             "free_packs": 2,
             "wheel_tickets": 1,
-            "bonus_card_id": "card_crisp_chris",
+            "bonus_card_id": "card_paul_bawl_off",
         },
     },
 ]
