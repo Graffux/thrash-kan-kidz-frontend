@@ -55,7 +55,7 @@ CHALLENGE_POOL = [
             "coins": 800,
             "free_packs": 3,
             "wheel_tickets": 1,
-            "bonus_card_id": "card_i_gore_cavahorror",  # daily reward card
+            "bonus_card_id": "card_crisp_chris",  # daily reward card
         },
     },
     # ---------- VARIANT-COLLECT CHALLENGES ----------
@@ -84,7 +84,7 @@ CHALLENGE_POOL = [
             "coins": 600,
             "free_packs": 1,
             "wheel_tickets": 1,
-            "bonus_card_id": "card_i_gore_cavahorror",  # guaranteed daily reward on claim
+            "bonus_card_id": "card_crisp_chris",  # guaranteed daily reward on claim
         },
     },
     {
@@ -98,7 +98,7 @@ CHALLENGE_POOL = [
             "coins": 900,
             "free_packs": 2,
             "wheel_tickets": 1,
-            "bonus_card_id": "card_i_gore_cavahorror",
+            "bonus_card_id": "card_crisp_chris",
         },
     },
     # ---------- TRADE CHALLENGES ----------
@@ -141,7 +141,7 @@ CHALLENGE_POOL = [
             "coins": 750,
             "free_packs": 2,
             "wheel_tickets": 1,
-            "bonus_card_id": "card_i_gore_cavahorror",
+            "bonus_card_id": "card_crisp_chris",
         },
     },
 ]

@@ -550,9 +550,16 @@ export default function ShopScreen() {
     <GrungeBackground>
       <SafeAreaView style={styles.container}>
 
-      {/* Buy Coins Modal */}
-      <BuyCoinsModal visible={showBuyCoins} onClose={() => setShowBuyCoins(false)} />
-      <RonchTrashTalk line={ronchLine} onDismiss={() => setRonchLine(null)} />
+      
+<BuyCoinsModal
+  visible={showBuyCoins}
+  onClose={() => setShowBuyCoins(false)}
+/>e(null)} />{/* Buy Coins Modal */}
+
+<RonchTrashTalk
+  line={ronchLine}
+  onDismiss={() => setRonchLine(null)}
+/>
 
       {/* Result Modal */}
       <Modal visible={showResult} transparent animationType="fade" onRequestClose={closeResult}>
@@ -860,7 +867,7 @@ export default function ShopScreen() {
             </TouchableOpacity>
           );
         })()}
-        {/* (boost card injected above by the inline IIFE) */}
+        
         {spinPool && spinPool.unlocked_series && spinPool.unlocked_series.length > 1 && (
           <View style={styles.seriesToggles} data-testid="series-toggle">
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.seriesToggleScroll}>

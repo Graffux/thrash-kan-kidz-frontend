@@ -33,9 +33,9 @@ router = APIRouter()
 # Pervalicious. Add more entries as new cards land. If today's date isn't in
 # this map, falls back to whatever bonus_card_id is set on the catalog.
 DAILY_REWARD_BY_DATE: dict[str, str] = {
-    "2026-06-19": "card_i_gore_cavahorror",
-    "2026-06-20": "card_chris_pervalicious",
+    "2026-06-22": "card_paul_bawl_off",
 }
+
 
 mongo_url = os.environ["MONGO_URL"]
 db_name = os.environ["DB_NAME"]
@@ -266,11 +266,16 @@ async def claim_daily_challenge(user_id: str):
     # Bonus card (date-keyed rotation takes precedence; "*" sentinel falls
     # back to a random variant if no scheduled card for today)
     bcid = rewards.get("bonus_card_id")
-    scheduled = DAILY_REWARD_BY_DATE.get(date_iso)
+    scheduled = None
+    for start_date in sorted(DAILY_REWARD_BY_DATE.keys(), reverse=True):
+     if date_iso >= start_date:
+        scheduled = DAILY_REWARD_BY_DATE[start_date]
+        break
+
     if scheduled:
-        bcid = scheduled
+     bcid = scheduled
     elif bcid == "*":
-        bcid = await _pick_bonus_card_id()
+     bcid = await _pick_bonus_card_id()
     if bcid:
         import uuid
         await db.user_cards.insert_one({
@@ -281,6 +286,8 @@ async def claim_daily_challenge(user_id: str):
             "acquired_at": datetime.now(timezone.utc),
         })
         granted["bonus_card_id"] = bcid
+        bonus_card = await db.cards.find_one({"id": bcid}, {"_id": 0})
+        granted["bonus_card"] = bonus_card
 
     claimed_iso = datetime.now(timezone.utc).isoformat()
     await db.user_daily_challenges.update_one(

@@ -77,7 +77,10 @@ export default function DailyChallengesScreen() {
         if (g.coins) lines.push(`+${g.coins} coins`);
         if (g.free_packs) lines.push(`+${g.free_packs} free pack${g.free_packs > 1 ? "s" : ""}`);
         if (g.wheel_tickets) lines.push(`+${g.wheel_tickets} wheel ticket${g.wheel_tickets > 1 ? "s" : ""}`);
-        if (g.bonus_card_id) lines.push(`+1 RARE CARD: I-Gore Cavahorror`);
+        if (g.bonus_card_id) {
+  const cardName = g.bonus_card?.name || g.bonus_card_id;
+  lines.push(`+1 RARE CARD: ${cardName}`);
+}
         Alert.alert("Reward claimed! \\m/", lines.join("\n"));
         await refreshData?.();
         await load();
