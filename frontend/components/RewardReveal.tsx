@@ -87,98 +87,180 @@ export default function RewardReveal({
   const cfg = THEME[theme] || THEME.generic;
 
   const fade = useRef(new Animated.Value(0)).current;
-  const cardY = useRef(new Animated.Value(90)).current;
-  const cardScale = useRef(new Animated.Value(0.72)).current;
-  const textY = useRef(new Animated.Value(20)).current;
+  const cardY = useRef(new Animated.Value(140)).current;
+  const cardScale = useRef(new Animated.Value(0.55)).current;
+  const textY = useRef(new Animated.Value(28)).current;
   const glow = useRef(new Animated.Value(0)).current;
   const flash = useRef(new Animated.Value(0)).current;
+  const stageLights = useRef(new Animated.Value(0)).current;
+  const shake = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!visible) return;
 
     fade.setValue(0);
-    cardY.setValue(90);
-    cardScale.setValue(0.72);
-    textY.setValue(20);
+    cardY.setValue(140);
+    cardScale.setValue(0.55);
+    textY.setValue(28);
     glow.setValue(0);
     flash.setValue(0);
+    stageLights.setValue(0);
+    shake.setValue(0);
 
     Animated.sequence([
       Animated.timing(fade, {
         toValue: 1,
-        duration: 220,
+        duration: 180,
         useNativeDriver: true,
       }),
-      Animated.sequence([
-  Animated.timing(flash, {
-    toValue: 1,
-    duration: 60,
-    useNativeDriver: true,
-  }),
-  Animated.timing(flash, {
-    toValue: 0,
-    duration: 180,
-    useNativeDriver: true,
-  }),
-]),
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(flash, {
+            toValue: 1,
+            duration: 55,
+            useNativeDriver: true,
+          }),
+          Animated.timing(flash, {
+            toValue: 0,
+            duration: 210,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.timing(shake, {
+            toValue: 1,
+            duration: 45,
+            useNativeDriver: true,
+          }),
+          Animated.timing(shake, {
+            toValue: -1,
+            duration: 45,
+            useNativeDriver: true,
+          }),
+          Animated.timing(shake, {
+            toValue: 0,
+            duration: 60,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]),
       Animated.parallel([
         Animated.spring(cardY, {
           toValue: 0,
-          friction: 6,
-          tension: 70,
+          friction: 5,
+          tension: 92,
           useNativeDriver: true,
         }),
         Animated.spring(cardScale, {
           toValue: 1,
-          friction: 5,
-          tension: 80,
+          friction: 4,
+          tension: 92,
           useNativeDriver: true,
         }),
         Animated.timing(textY, {
           toValue: 0,
-          duration: 320,
+          duration: 300,
           useNativeDriver: true,
         }),
       ]),
     ]).start();
 
-    Animated.loop(
+    const glowLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(glow, {
           toValue: 1,
-          duration: 850,
+          duration: 760,
           useNativeDriver: true,
         }),
         Animated.timing(glow, {
           toValue: 0,
-          duration: 850,
+          duration: 760,
           useNativeDriver: true,
         }),
       ])
-    ).start();
-  }, [visible, fade, cardY, cardScale, textY, glow]);
+    );
+
+    const lightLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(stageLights, {
+          toValue: 1,
+          duration: 520,
+          useNativeDriver: true,
+        }),
+        Animated.timing(stageLights, {
+          toValue: 0,
+          duration: 520,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    glowLoop.start();
+    lightLoop.start();
+
+    return () => {
+      glowLoop.stop();
+      lightLoop.stop();
+    };
+  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake]);
 
   const glowOpacity = glow.interpolate({
     inputRange: [0, 1],
     outputRange: [0.35, 0.95],
   });
 
+  const lightOpacity = stageLights.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.12, 0.55],
+  });
+
+  const shakeX = shake.interpolate({
+    inputRange: [-1, 0, 1],
+    outputRange: [-8, 0, 8],
+  });
+
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
-      <Animated.View style={[styles.overlay, { backgroundColor: cfg.bg, opacity: fade }]}>
-                <Animated.View
+      <Animated.View
+        style={[
+          styles.overlay,
+          {
+            backgroundColor: cfg.bg,
+            opacity: fade,
+            transform: [{ translateX: shakeX }],
+          },
+        ]}
+      >
+        <Animated.View
           pointerEvents="none"
           style={[
             StyleSheet.absoluteFillObject,
             {
-              backgroundColor: "#ffffff",
+              backgroundColor: '#ffffff',
               opacity: flash,
             },
           ]}
         />
+
+        <View style={styles.stageRig} pointerEvents="none">
+          <Animated.View
+            style={[
+              styles.stageLightLeft,
+              { backgroundColor: cfg.accent, opacity: lightOpacity },
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.stageLightRight,
+              { backgroundColor: cfg.accent, opacity: lightOpacity },
+            ]}
+          />
+          <View style={styles.floorGlow} />
+        </View>
+
         <View style={styles.burstLayer} pointerEvents="none">
-          <Text style={[styles.burst, { color: cfg.accent }]}>? ? ? ? ?</Text>
-          <Text style={[styles.burstSmall, { color: cfg.accent }]}>?  ??  ?</Text>
+          <Text style={[styles.burst, { color: cfg.accent }]}>? ? ?</Text>
+          <Text style={[styles.burstSmall, { color: cfg.accent }]}>?  TKK  ?</Text>
         </View>
 
         <Animated.View style={[styles.headerBlock, { transform: [{ translateY: textY }] }]}>
@@ -240,6 +322,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 18,
+  },
+  stageRig: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+  },
+  stageLightLeft: {
+    position: 'absolute',
+    top: -80,
+    left: -80,
+    width: 190,
+    height: 520,
+    borderRadius: 95,
+    transform: [{ rotate: '-22deg' }],
+  },
+  stageLightRight: {
+    position: 'absolute',
+    top: -80,
+    right: -80,
+    width: 190,
+    height: 520,
+    borderRadius: 95,
+    transform: [{ rotate: '22deg' }],
+  },
+  floorGlow: {
+    position: 'absolute',
+    bottom: 72,
+    width: CARD_W + 95,
+    height: 42,
+    borderRadius: 999,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
   burstLayer: {
     ...StyleSheet.absoluteFillObject,
@@ -352,3 +465,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 });
+
+
+
+
+
