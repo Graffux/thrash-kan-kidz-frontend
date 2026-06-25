@@ -780,7 +780,7 @@ export default function CollectionScreen() {
       });
     // Reward cards for this series (series_reward matches, rarity is rare/epic)
     const rewards = allCards
-      .filter(c => c.series_reward === series && (c.rarity === 'rare' || c.rarity === 'epic'));
+      .filter(c => (c as any).series_reward === series && (c.rarity === 'rare' || c.rarity === 'epic'));
     return [...base, ...rewards, ...variants];
   };
 

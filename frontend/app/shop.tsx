@@ -554,7 +554,7 @@ export default function ShopScreen() {
 <BuyCoinsModal
   visible={showBuyCoins}
   onClose={() => setShowBuyCoins(false)}
-/>e(null)} />{/* Buy Coins Modal */}
+/>{/* Buy Coins Modal */}
 
 <RonchTrashTalk
   line={ronchLine}
