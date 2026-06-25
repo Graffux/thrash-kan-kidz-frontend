@@ -96,6 +96,7 @@ export default function RewardReveal({
   const shake = useRef(new Animated.Value(0)).current;
   const smoke = useRef(new Animated.Value(0)).current;
   const logoSlam = useRef(new Animated.Value(0)).current;
+  const sparks = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!visible) return;
@@ -110,6 +111,7 @@ export default function RewardReveal({
     shake.setValue(0);
     smoke.setValue(0);
     logoSlam.setValue(0);
+    sparks.setValue(0);
 
     Animated.sequence([
       Animated.timing(fade, {
@@ -172,6 +174,11 @@ export default function RewardReveal({
           tension: 110,
           useNativeDriver: true,
         }),
+        Animated.timing(sparks, {
+          toValue: 1,
+          duration: 720,
+          useNativeDriver: true,
+        }),
       ]),
     ]).start();
 
@@ -222,7 +229,7 @@ export default function RewardReveal({
       lightLoop.stop();
       smokeLoop.stop();
     };
-  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake, smoke, logoSlam]);
+  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake, smoke, logoSlam, sparks]);
 
   const glowOpacity = glow.interpolate({
     inputRange: [0, 1],
@@ -267,6 +274,26 @@ export default function RewardReveal({
   const logoSlamOpacity = logoSlam.interpolate({
     inputRange: [0, 0.2, 1],
     outputRange: [0, 1, 1],
+  });
+
+  const sparkOpacity = sparks.interpolate({
+    inputRange: [0, 0.18, 1],
+    outputRange: [0, 1, 0],
+  });
+
+  const sparkScale = sparks.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.35, 1.2],
+  });
+
+  const sparkFlyLeft = sparks.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -95],
+  });
+
+  const sparkFlyRight = sparks.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 95],
   });
 
   return (
@@ -339,6 +366,33 @@ export default function RewardReveal({
           <Text style={[styles.logoSlamText, { color: cfg.accent }]}>TKK</Text>
           <Text style={styles.logoSlamSub}>REWARD DROP</Text>
         </Animated.View>
+
+        <View style={styles.sparkLayer} pointerEvents="none">
+          <Animated.Text
+            style={[
+              styles.spark,
+              {
+                color: cfg.accent,
+                opacity: sparkOpacity,
+                transform: [{ translateX: sparkFlyLeft }, { scale: sparkScale }],
+              },
+            ]}
+          >
+            ?
+          </Animated.Text>
+          <Animated.Text
+            style={[
+              styles.sparkAlt,
+              {
+                color: cfg.accent,
+                opacity: sparkOpacity,
+                transform: [{ translateX: sparkFlyRight }, { scale: sparkScale }],
+              },
+            ]}
+          >
+            ?
+          </Animated.Text>
+        </View>
 
         <View style={styles.burstLayer} pointerEvents="none">
           <Text style={[styles.burst, { color: cfg.accent }]}>? ? ?</Text>
@@ -480,6 +534,33 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
   },
+  sparkLayer: {
+    position: 'absolute',
+    top: CARD_H * 0.34,
+    width: CARD_W + 160,
+    height: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 4,
+  },
+  spark: {
+    position: 'absolute',
+    left: 70,
+    fontSize: 34,
+    fontWeight: '900',
+    textShadowColor: '#fff',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  },
+  sparkAlt: {
+    position: 'absolute',
+    right: 70,
+    fontSize: 34,
+    fontWeight: '900',
+    textShadowColor: '#fff',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  },
   burstLayer: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
@@ -591,6 +672,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 });
+
+
+
+
+
 
 
 
