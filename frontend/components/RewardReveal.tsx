@@ -95,6 +95,7 @@ export default function RewardReveal({
   const stageLights = useRef(new Animated.Value(0)).current;
   const shake = useRef(new Animated.Value(0)).current;
   const smoke = useRef(new Animated.Value(0)).current;
+  const logoSlam = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!visible) return;
@@ -108,6 +109,7 @@ export default function RewardReveal({
     stageLights.setValue(0);
     shake.setValue(0);
     smoke.setValue(0);
+    logoSlam.setValue(0);
 
     Animated.sequence([
       Animated.timing(fade, {
@@ -164,6 +166,12 @@ export default function RewardReveal({
           duration: 300,
           useNativeDriver: true,
         }),
+        Animated.spring(logoSlam, {
+          toValue: 1,
+          friction: 4,
+          tension: 110,
+          useNativeDriver: true,
+        }),
       ]),
     ]).start();
 
@@ -214,7 +222,7 @@ export default function RewardReveal({
       lightLoop.stop();
       smokeLoop.stop();
     };
-  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake, smoke]);
+  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake, smoke, logoSlam]);
 
   const glowOpacity = glow.interpolate({
     inputRange: [0, 1],
@@ -244,6 +252,21 @@ export default function RewardReveal({
   const smokeOpacity = smoke.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: [0.08, 0.22, 0.08],
+  });
+
+  const logoSlamY = logoSlam.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-70, 0],
+  });
+
+  const logoSlamScale = logoSlam.interpolate({
+    inputRange: [0, 0.72, 1],
+    outputRange: [1.8, 0.86, 1],
+  });
+
+  const logoSlamOpacity = logoSlam.interpolate({
+    inputRange: [0, 0.2, 1],
+    outputRange: [0, 1, 1],
   });
 
   return (
@@ -303,9 +326,23 @@ export default function RewardReveal({
           <View style={styles.floorGlow} />
         </View>
 
+        <Animated.View
+          style={[
+            styles.logoSlam,
+            {
+              opacity: logoSlamOpacity,
+              transform: [{ translateY: logoSlamY }, { scale: logoSlamScale }],
+            },
+          ]}
+          pointerEvents="none"
+        >
+          <Text style={[styles.logoSlamText, { color: cfg.accent }]}>TKK</Text>
+          <Text style={styles.logoSlamSub}>REWARD DROP</Text>
+        </Animated.View>
+
         <View style={styles.burstLayer} pointerEvents="none">
           <Text style={[styles.burst, { color: cfg.accent }]}>? ? ?</Text>
-          <Text style={[styles.burstSmall, { color: cfg.accent }]}>?  TKK  ?</Text>
+          <Text style={[styles.burstSmall, { color: cfg.accent }]}>?  ?  ?</Text>
         </View>
 
         <Animated.View style={[styles.headerBlock, { transform: [{ translateY: textY }] }]}>
@@ -419,6 +456,30 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
+  logoSlam: {
+    position: 'absolute',
+    top: 42,
+    alignItems: 'center',
+    zIndex: 3,
+  },
+  logoSlamText: {
+    fontSize: 42,
+    fontWeight: '900',
+    letterSpacing: 3,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 10,
+  },
+  logoSlamSub: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 2,
+    marginTop: -4,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
   burstLayer: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
@@ -530,6 +591,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 });
+
+
+
+
+
 
 
 
