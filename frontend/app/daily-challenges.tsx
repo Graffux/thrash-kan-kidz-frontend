@@ -2,6 +2,7 @@
 //   GET  /api/users/{uid}/daily-challenges
 //   POST /api/users/{uid}/daily-challenges/select   { challenge_id }
 //   POST /api/users/{uid}/daily-challenges/claim
+import RewardReveal from "../components/RewardReveal";
 import React, { useEffect, useState, useCallback } from "react";
 import {
   View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, Alert,
@@ -32,9 +33,12 @@ const ICON_FOR_TYPE: Record<string, any> = {
 };
 
 export default function DailyChallengesScreen() {
+  const [rewardRevealVisible, setRewardRevealVisible] = useState(false);
+  const [rewardRevealCard, setRewardRevealCard] = useState<any>(null);
   const { user, refreshData } = useApp();
   const [data, setData] = useState<Payload | null>(null);
   const [busy, setBusy] = useState(false);
+  const [rewardRevealSummary, setRewardRevealSummary] = useState("");
 
   const load = useCallback(async () => {
     if (!user?.id) return;
@@ -81,7 +85,13 @@ export default function DailyChallengesScreen() {
   const cardName = g.bonus_card?.name || g.bonus_card_id;
   lines.push(`+1 RARE CARD: ${cardName}`);
 }
-        Alert.alert("Reward claimed! \\m/", lines.join("\n"));
+        if (g.bonus_card) {
+          setRewardRevealCard(g.bonus_card);
+          setRewardRevealSummary(lines.join("\n"));
+          setRewardRevealVisible(true);
+        } else {
+          Alert.alert("Reward claimed! \\m/", lines.join("\n"));
+        }
         await refreshData?.();
         await load();
       }
@@ -178,6 +188,21 @@ export default function DailyChallengesScreen() {
 
         <Text style={styles.resetNote}>Resets at UTC midnight ({data.reset_at_utc.split("T")[1]?.slice(0, 5)} UTC).</Text>
       </ScrollView>
+
+            <RewardReveal
+        visible={rewardRevealVisible}
+        title="DAILY REWARD UNLOCKED!"
+        subtitle={rewardRevealSummary || "Daily Challenge Prize"}
+        card={rewardRevealCard}
+        theme="daily"
+        onClose={() => {
+          setRewardRevealVisible(false);
+          setRewardRevealCard(null);
+          setRewardRevealSummary("");
+        }}
+      />
+ 
+          
     </View>
   );
 }
@@ -217,5 +242,13 @@ const styles = StyleSheet.create({
   },
   claimBtnDisabled: { backgroundColor: "#2a2a2a" },
   claimBtnText: { color: "#fff", fontSize: 15, fontWeight: "900", letterSpacing: 0.5 },
+  rewardOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.88)", alignItems: "center", justifyContent: "center", padding: 20 },
+  rewardModal: { width: "100%", maxWidth: 360, backgroundColor: "#16051f", borderColor: "#ffd24a", borderWidth: 3, borderRadius: 18, padding: 18, alignItems: "center" },
+  rewardModalTitle: { color: "#ffd24a", fontSize: 26, fontWeight: "900", textAlign: "center", letterSpacing: 1 },
+  rewardModalSub: { color: "#e5b4ff", fontSize: 13, fontWeight: "800", marginTop: 4, marginBottom: 12 },
+  rewardModalCard: { width: 260, height: 370, marginVertical: 10 },
+  rewardModalName: { color: "#fff", fontSize: 18, fontWeight: "900", textAlign: "center", marginBottom: 14 },
+  rewardModalBtn: { backgroundColor: "#ffd24a", paddingHorizontal: 22, paddingVertical: 12, borderRadius: 10 },
+  rewardModalBtnText: { color: "#0d0d0d", fontSize: 15, fontWeight: "900" },
   resetNote: { color: "#555", fontSize: 11, textAlign: "center", marginTop: 20 },
 });
