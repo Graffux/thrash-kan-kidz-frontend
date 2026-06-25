@@ -94,6 +94,7 @@ export default function RewardReveal({
   const flash = useRef(new Animated.Value(0)).current;
   const stageLights = useRef(new Animated.Value(0)).current;
   const shake = useRef(new Animated.Value(0)).current;
+  const smoke = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!visible) return;
@@ -106,6 +107,7 @@ export default function RewardReveal({
     flash.setValue(0);
     stageLights.setValue(0);
     shake.setValue(0);
+    smoke.setValue(0);
 
     Animated.sequence([
       Animated.timing(fade, {
@@ -195,14 +197,24 @@ export default function RewardReveal({
       ])
     );
 
+    const smokeLoop = Animated.loop(
+      Animated.timing(smoke, {
+        toValue: 1,
+        duration: 2600,
+        useNativeDriver: true,
+      })
+    );
+
     glowLoop.start();
     lightLoop.start();
+    smokeLoop.start();
 
     return () => {
       glowLoop.stop();
       lightLoop.stop();
+      smokeLoop.stop();
     };
-  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake]);
+  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake, smoke]);
 
   const glowOpacity = glow.interpolate({
     inputRange: [0, 1],
@@ -217,6 +229,21 @@ export default function RewardReveal({
   const shakeX = shake.interpolate({
     inputRange: [-1, 0, 1],
     outputRange: [-8, 0, 8],
+  });
+
+  const smokeLeftX = smoke.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-55, 35],
+  });
+
+  const smokeRightX = smoke.interpolate({
+    inputRange: [0, 1],
+    outputRange: [55, -35],
+  });
+
+  const smokeOpacity = smoke.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0.08, 0.22, 0.08],
   });
 
   return (
@@ -243,6 +270,24 @@ export default function RewardReveal({
         />
 
         <View style={styles.stageRig} pointerEvents="none">
+          <Animated.View
+            style={[
+              styles.smokeLeft,
+              {
+                opacity: smokeOpacity,
+                transform: [{ translateX: smokeLeftX }],
+              },
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.smokeRight,
+              {
+                opacity: smokeOpacity,
+                transform: [{ translateX: smokeRightX }],
+              },
+            ]}
+          />
           <Animated.View
             style={[
               styles.stageLightLeft,
@@ -326,6 +371,26 @@ const styles = StyleSheet.create({
   stageRig: {
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
+  },
+  smokeLeft: {
+    position: 'absolute',
+    left: -45,
+    bottom: 120,
+    width: CARD_W + 80,
+    height: 145,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.38)',
+    transform: [{ rotate: '-8deg' }],
+  },
+  smokeRight: {
+    position: 'absolute',
+    right: -45,
+    bottom: 160,
+    width: CARD_W + 70,
+    height: 125,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.32)',
+    transform: [{ rotate: '8deg' }],
   },
   stageLightLeft: {
     position: 'absolute',
@@ -465,6 +530,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 });
+
+
+
+
+
 
 
 
