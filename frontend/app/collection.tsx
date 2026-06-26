@@ -831,7 +831,7 @@ export default function CollectionScreen() {
         c.reward_type ||
         c.special_type ||
         c.card_category === 'reward' ||
-        (!c.series && !c.series_reward && (c.rarity === 'rare' || c.rarity === 'epic'));
+        c.series_reward || c.rarity === 'rare' || c.rarity === 'epic';
 
       return isSpecialReward && arr.findIndex(other => other.id === card.id) === index;
     })
@@ -1955,6 +1955,8 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
 });
+
+
 
 
 
