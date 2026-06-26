@@ -822,6 +822,21 @@ export default function CollectionScreen() {
     };
   };
 
+  const specialRewardCards = userCards
+    .map(uc => uc.card)
+    .filter((card, index, arr) => {
+      const c: any = card;
+      const isSpecialReward =
+        c.is_daily_reward ||
+        c.reward_type ||
+        c.special_type ||
+        c.card_category === 'reward' ||
+        (!c.series && !c.series_reward && (c.rarity === 'rare' || c.rarity === 'epic'));
+
+      return isSpecialReward && arr.findIndex(other => other.id === card.id) === index;
+    })
+    .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
   const totalOwned = userCards.length;
 
   const cardFlipPlay = cardFlipSound.play;
@@ -906,6 +921,23 @@ export default function CollectionScreen() {
       )}
 
       <ScrollView style={styles.flashListContainer} showsVerticalScrollIndicator={false} contentContainerStyle={styles.flashListContent}>
+        {specialRewardCards.length > 0 && (
+          <View style={styles.seriesSection} data-testid="special-reward-cards-section">
+            <View style={styles.seriesSectionHeader}>
+              <View style={styles.seriesHeaderLeft}>
+                <Text style={styles.seriesHeaderTitle}>Special / Reward Cards</Text>
+                <Text style={styles.seriesHeaderStats}>
+                  {specialRewardCards.length} collected
+                </Text>
+              </View>
+              <Ionicons name="star" size={22} color="#FFD700" />
+            </View>
+            <View style={styles.seriesCardGrid}>
+              {specialRewardCards.map(card => renderCard(card))}
+            </View>
+          </View>
+        )}
+
         {seriesNumbers.map(series => {
           const cards = getSeriesCards(series);
           const stats = getSeriesStats(series);
@@ -1923,3 +1955,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
 });
+
+
+
