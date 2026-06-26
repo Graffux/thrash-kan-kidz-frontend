@@ -13,14 +13,14 @@
  * remounts and the animation re-fires.
  */
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet, ViewStyle } from 'react-native';
+import { Text, StyleSheet, TextStyle } from 'react-native';
 import { MotiText } from 'moti';
 
 interface Props {
   amount: number;
   tone?: 'gold' | 'medal';     // 'gold' for coins, 'medal' for goals
   durationMs?: number;
-  style?: ViewStyle;
+  style?: TextStyle;
 }
 
 const TONE_COLOR: Record<NonNullable<Props['tone']>, string> = {
@@ -88,3 +88,4 @@ const styles = StyleSheet.create({
 });
 
 export default CoinGainPop;
+

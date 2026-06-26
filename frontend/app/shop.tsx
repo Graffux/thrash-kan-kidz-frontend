@@ -51,6 +51,8 @@ interface SpinPoolData {
   total_count: number;
   rare_reward: any;
   spin_cost: number;
+  unlocked_series?: number[];
+  completed_series?: number[];
 }
 
 export default function ShopScreen() {
@@ -472,9 +474,6 @@ export default function ShopScreen() {
           // First-Variant celebration check for card #1
           if (spinResult?.won_cards?.[0]?.card) {
             setTimeout(() => maybeCelebrateForCard(spinResult.won_cards![0].card), 600);
-          } else if (result?.won_cards?.[0]?.card) {
-            // spinResult state may not be updated yet within the same tick — fall back to fresh result
-            setTimeout(() => maybeCelebrateForCard(result.won_cards[0].card), 600);
           }
           if (spinResult?.won_cards?.every((c: any) => c.is_duplicate)) {
             setTimeout(() => dupeSound.play(), 500);
@@ -674,7 +673,8 @@ export default function ShopScreen() {
                     <TouchableOpacity
                       style={styles.sharePullBtn}
                       onPress={() => {
-                        const c = spinResult.won_cards[revealIndex].card;
+                        const c = spinResult?.won_cards?.[revealIndex]?.card;
+                        if (!c) return;
                         closeResult();
                         // Use query-string URL form — more reliable across
                         // expo-router versions than the object form.
@@ -1882,3 +1882,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
+
