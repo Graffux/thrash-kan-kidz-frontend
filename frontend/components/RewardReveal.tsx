@@ -125,12 +125,12 @@ export default function RewardReveal({
         Animated.sequence([
           Animated.timing(flash, {
             toValue: 1,
-            duration: 55,
+            duration: 90,
             useNativeDriver: true,
           }),
           Animated.timing(flash, {
             toValue: 0,
-            duration: 210,
+            duration: 280,
             useNativeDriver: true,
           }),
         ]),
@@ -155,14 +155,14 @@ export default function RewardReveal({
       Animated.parallel([
         Animated.spring(cardY, {
           toValue: 0,
-          friction: 5,
-          tension: 92,
+          friction: 3,
+          tension: 145,
           useNativeDriver: true,
         }),
         Animated.spring(cardScale, {
           toValue: 1,
           friction: 4,
-          tension: 92,
+          tension: 145,
           useNativeDriver: true,
         }),
         Animated.timing(textY, {
@@ -257,7 +257,7 @@ export default function RewardReveal({
 
   const shakeX = shake.interpolate({
     inputRange: [-1, 0, 1],
-    outputRange: [-8, 0, 8],
+    outputRange: [-16, 0, 16],
   });
 
   const smokeLeftX = smoke.interpolate({
@@ -312,12 +312,12 @@ export default function RewardReveal({
 
   const idleFloatY = idleFloat.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -8],
+    outputRange: [0, -14],
   });
 
   const idleTilt = idleFloat.interpolate({
     inputRange: [0, 1],
-    outputRange: ['-1.5deg', '1.5deg'],
+    outputRange: ['-3deg', '3deg'],
   });
 
   return (
@@ -679,6 +679,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 });
+
+
+
+
 
 
 
