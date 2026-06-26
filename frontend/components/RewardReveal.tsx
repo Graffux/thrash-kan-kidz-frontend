@@ -33,7 +33,7 @@ type RewardRevealProps = {
 };
 
 const { width } = Dimensions.get('window');
-const CARD_W = Math.min(270, width * 0.72);
+const CARD_W = Math.min(292, width * 0.78);
 const CARD_H = CARD_W * 1.42;
 
 const THEME = {
@@ -97,6 +97,7 @@ export default function RewardReveal({
   const smoke = useRef(new Animated.Value(0)).current;
   const logoSlam = useRef(new Animated.Value(0)).current;
   const sparks = useRef(new Animated.Value(0)).current;
+  const idleFloat = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!visible) return;
@@ -112,6 +113,7 @@ export default function RewardReveal({
     smoke.setValue(0);
     logoSlam.setValue(0);
     sparks.setValue(0);
+    idleFloat.setValue(0);
 
     Animated.sequence([
       Animated.timing(fade, {
@@ -168,12 +170,7 @@ export default function RewardReveal({
           duration: 300,
           useNativeDriver: true,
         }),
-        Animated.spring(logoSlam, {
-          toValue: 1,
-          friction: 4,
-          tension: 110,
-          useNativeDriver: true,
-        }),
+
         Animated.timing(sparks, {
           toValue: 1,
           duration: 720,
@@ -224,12 +221,29 @@ export default function RewardReveal({
     lightLoop.start();
     smokeLoop.start();
 
+    const floatLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(idleFloat, {
+          toValue: 1,
+          duration: 1450,
+          useNativeDriver: true,
+        }),
+        Animated.timing(idleFloat, {
+          toValue: 0,
+          duration: 1450,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    floatLoop.start();
+
     return () => {
       glowLoop.stop();
       lightLoop.stop();
       smokeLoop.stop();
+      floatLoop.stop();
     };
-  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake, smoke, logoSlam, sparks]);
+  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake, smoke, sparks, idleFloat]);
 
   const glowOpacity = glow.interpolate({
     inputRange: [0, 1],
@@ -296,6 +310,16 @@ export default function RewardReveal({
     outputRange: [0, 95],
   });
 
+  const idleFloatY = idleFloat.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -8],
+  });
+
+  const idleTilt = idleFloat.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['-1.5deg', '1.5deg'],
+  });
+
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
       <Animated.View
@@ -353,19 +377,6 @@ export default function RewardReveal({
           <View style={styles.floorGlow} />
         </View>
 
-        <Animated.View
-          style={[
-            styles.logoSlam,
-            {
-              opacity: logoSlamOpacity,
-              transform: [{ translateY: logoSlamY }, { scale: logoSlamScale }],
-            },
-          ]}
-          pointerEvents="none"
-        >
-          <Text style={[styles.logoSlamText, { color: cfg.accent }]}>TKK</Text>
-          <Text style={styles.logoSlamSub}>REWARD DROP</Text>
-        </Animated.View>
 
         <View style={styles.sparkLayer} pointerEvents="none">
           <Animated.Text
@@ -394,10 +405,6 @@ export default function RewardReveal({
           </Animated.Text>
         </View>
 
-        <View style={styles.burstLayer} pointerEvents="none">
-          <Text style={[styles.burst, { color: cfg.accent }]}>? ? ?</Text>
-          <Text style={[styles.burstSmall, { color: cfg.accent }]}>?  ?  ?</Text>
-        </View>
 
         <Animated.View style={[styles.headerBlock, { transform: [{ translateY: textY }] }]}>
           <Text style={[styles.eyebrow, { color: cfg.accent }]}>{subtitle || cfg.eyebrow}</Text>
@@ -408,7 +415,7 @@ export default function RewardReveal({
           style={[
             styles.cardStage,
             {
-              transform: [{ translateY: cardY }, { scale: cardScale }],
+              transform: [{ translateY: Animated.add(cardY, idleFloatY) }, { scale: cardScale }, { rotate: idleTilt }],
             },
           ]}
         >
@@ -582,7 +589,7 @@ const styles = StyleSheet.create({
   },
   headerBlock: {
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: 8,
   },
   eyebrow: {
     fontSize: 16,
@@ -605,12 +612,12 @@ const styles = StyleSheet.create({
     height: CARD_H + 28,
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 8,
+    marginVertical: 2,
   },
   glow: {
     position: 'absolute',
-    width: CARD_W + 34,
-    height: CARD_H + 34,
+    width: CARD_W + 58,
+    height: CARD_H + 58,
     borderRadius: 22,
   },
   cardImage: {
@@ -636,8 +643,8 @@ const styles = StyleSheet.create({
   },
   infoBlock: {
     alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 16,
+    marginTop: 4,
+    marginBottom: 10,
   },
   cardName: {
     color: '#fff',
@@ -656,7 +663,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 4,
   },
   button: {
     paddingHorizontal: 28,
@@ -672,6 +679,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 });
+
+
+
+
 
 
 
