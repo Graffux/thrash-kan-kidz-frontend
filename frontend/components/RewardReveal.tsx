@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import {
   Animated,
   Dimensions,
+  Easing,
   Image,
   Modal,
   Pressable,
@@ -98,6 +99,12 @@ export default function RewardReveal({
   const logoSlam = useRef(new Animated.Value(0)).current;
   const sparks = useRef(new Animated.Value(0)).current;
   const idleFloat = useRef(new Animated.Value(0)).current;
+  const buttonPop = useRef(new Animated.Value(0)).current;
+  const headerPop = useRef(new Animated.Value(0)).current;
+  const raySpin = useRef(new Animated.Value(0)).current;
+  const shimmer = useRef(new Animated.Value(0)).current;
+  const particleBurst = useRef(new Animated.Value(0)).current;
+  const nameReveal = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!visible) return;
@@ -114,6 +121,12 @@ export default function RewardReveal({
     logoSlam.setValue(0);
     sparks.setValue(0);
     idleFloat.setValue(0);
+    buttonPop.setValue(0);
+    headerPop.setValue(0);
+    raySpin.setValue(0);
+    shimmer.setValue(0);
+    particleBurst.setValue(0);
+    nameReveal.setValue(0);
 
     Animated.sequence([
       Animated.timing(fade, {
@@ -165,17 +178,62 @@ export default function RewardReveal({
           tension: 145,
           useNativeDriver: true,
         }),
-        Animated.timing(textY, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
+        Animated.sequence([
+          Animated.delay(360),
+          Animated.parallel([
+            Animated.timing(textY, {
+              toValue: 0,
+              duration: 260,
+              useNativeDriver: true,
+            }),
+            Animated.spring(headerPop, {
+              toValue: 1,
+              friction: 5,
+              tension: 95,
+              useNativeDriver: true,
+            }),
+          ]),
+        ]),
 
         Animated.timing(sparks, {
           toValue: 1,
           duration: 720,
           useNativeDriver: true,
         }),
+        Animated.sequence([
+          Animated.delay(260),
+          Animated.timing(particleBurst, {
+            toValue: 1,
+            duration: 650,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.delay(420),
+          Animated.timing(shimmer, {
+            toValue: 1,
+            duration: 820,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.delay(620),
+          Animated.spring(nameReveal, {
+            toValue: 1,
+            friction: 5,
+            tension: 95,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.delay(520),
+          Animated.spring(buttonPop, {
+            toValue: 1,
+            friction: 4,
+            tension: 120,
+            useNativeDriver: true,
+          }),
+        ]),
       ]),
     ]).start();
 
@@ -237,13 +295,23 @@ export default function RewardReveal({
     );
     floatLoop.start();
 
+    const rayLoop = Animated.loop(
+      Animated.timing(raySpin, {
+        toValue: 1,
+        duration: 5200,
+        useNativeDriver: true,
+      })
+    );
+    rayLoop.start();
+
     return () => {
       glowLoop.stop();
       lightLoop.stop();
       smokeLoop.stop();
       floatLoop.stop();
+      rayLoop.stop();
     };
-  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake, smoke, sparks, idleFloat]);
+  }, [visible, fade, cardY, cardScale, textY, glow, flash, stageLights, shake, smoke, sparks, idleFloat, buttonPop, headerPop, raySpin, shimmer, particleBurst, nameReveal]);
 
   const glowOpacity = glow.interpolate({
     inputRange: [0, 1],
@@ -406,7 +474,7 @@ export default function RewardReveal({
         </View>
 
 
-        <Animated.View style={[styles.headerBlock, { transform: [{ translateY: textY }] }]}>
+        <Animated.View style={[styles.headerBlock, { opacity: headerPop, transform: [{ translateY: textY }, { scale: headerPop.interpolate({ inputRange: [0, 1], outputRange: [0.86, 1] }) }] }]}>
           <Text style={[styles.eyebrow, { color: cfg.accent }]}>{subtitle || cfg.eyebrow}</Text>
           <Text style={styles.title}>{title || cfg.title}</Text>
         </Animated.View>
@@ -419,6 +487,24 @@ export default function RewardReveal({
             },
           ]}
         >
+          <Animated.View
+            style={[
+              styles.rayBurst,
+              {
+                borderColor: cfg.accent,
+                opacity: glowOpacity,
+                transform: [
+                  {
+                    rotate: raySpin.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg'],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          />
+
           <Animated.View
             style={[
               styles.glow,
@@ -451,9 +537,11 @@ export default function RewardReveal({
           </Text>
         </View>
 
+        <Animated.View style={{ opacity: buttonPop, transform: [{ scale: buttonPop.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }) }] }}>
         <Pressable style={[styles.button, { backgroundColor: cfg.accent }]} onPress={onClose}>
           <Text style={styles.buttonText}>{buttonText}</Text>
         </Pressable>
+      </Animated.View>
       </Animated.View>
     </Modal>
   );
@@ -614,6 +702,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 2,
   },
+  rayBurst: {
+    position: 'absolute',
+    width: CARD_W * 1.62,
+    height: CARD_W * 1.62,
+    borderRadius: CARD_W,
+    borderWidth: 18,
+    borderStyle: 'dashed',
+    opacity: 0.5,
+  },
   glow: {
     position: 'absolute',
     width: CARD_W + 58,
@@ -679,6 +776,14 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 });
+
+
+
+
+
+
+
+
 
 
 
