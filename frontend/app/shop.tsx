@@ -568,137 +568,67 @@ export default function ShopScreen() {
                 currently-revealed card. Epic / rare pulls get a wide-eyed
                 Ronch, dupes get an angry Ronch, anything else is happy. */}
             <MascotStamp
-              mood={
-                spinResult?.won_cards?.[revealIndex]?.is_duplicate
-                  ? 'duplicate'
-                  : ['rare', 'epic'].includes(spinResult?.won_cards?.[revealIndex]?.card?.rarity || '')
-                  ? 'rare_reveal'
-                  : 'variant_pull'
-              }
+              mood={spinResult?.won_cards?.some((p) => p.is_duplicate) ? 'duplicate' : 'variant_pull'}
               position="tr"
               size={64}
             />
-            <Text style={styles.resultTitle}>
-              {spinResult?.won_cards && revealIndex < spinResult.won_cards.length - 1
-                ? `Card ${revealIndex + 1} of ${spinResult.won_cards.length}`
-                : 'Pack Opened!'}
-            </Text>
+            <Text style={styles.resultTitle}>Pack Opened!</Text>
 
-            {spinResult?.won_cards && spinResult.won_cards[revealIndex] && (
+            {spinResult?.won_cards && (
               <View style={styles.packCardsRow}>
-                <View style={styles.packCardItem}>
+                {spinResult.won_cards.map((pull, idx) => (
                   <View
+                    key={`pack-fan-${idx}-${pull.card.id}`}
                     style={[
-                      styles.packCardImageWrap,
-                      spinResult.won_cards[revealIndex].is_duplicate && styles.packCardDupe,
+                      styles.packCardItem,
+                      idx === 0 && styles.packCardLeft,
+                      idx === 1 && styles.packCardCenter,
+                      idx === 2 && styles.packCardRight,
                     ]}
                   >
-                    <PackRevealWrapper
-                      animationKey={`pack-${revealIndex}-${spinResult.won_cards[revealIndex].card.id}`}
-                      rarity={(spinResult.won_cards[revealIndex].card.rarity as 'common' | 'rare' | 'epic') || 'common'}
-                      width={140}
-                      height={200}
+                    <View
+                      style={[
+                        styles.packCardImageWrap,
+                        pull.is_duplicate && styles.packCardDupe,
+                      ]}
                     >
-                      {spinResult.won_cards[revealIndex].card.is_variant &&
-                      spinResult.won_cards[revealIndex].card.scratch_cover_url ? (
-                        <ScratchCard
-                          key={`scratch-${revealIndex}-${spinResult.won_cards[revealIndex].card.id}`}
-                          width={140}
-                          height={200}
-                          imageUri={cardThumb(spinResult.won_cards[revealIndex].card, 540)}
-                          coverUri={
-                            // Use the backend resizer so we serve an 80 KB
-                            // JPEG to react-native-svg instead of the 4-5 MB
-                            // original (SVG <Image> silently fails on large
-                            // remote JPEGs). Falls back to the raw URL if the
-                            // card somehow has no id.
-                            scratchCoverThumb(spinResult.won_cards[revealIndex].card, 540) ||
-                            spinResult.won_cards[revealIndex].card.scratch_cover_url
-                          }
-                          onComplete={() => setScratched(true)}
-                        />
-                      ) : (
+                      <PackRevealWrapper
+                        animationKey={`pack-fan-${idx}-${pull.card.id}`}
+                        rarity="common"
+                        width={92}
+                        height={132}
+                      >
                         <ExpoImage
-                          key={`reveal-${revealIndex}`}
-                          source={{ uri: spinResult.won_cards[revealIndex].card.front_image_url }}
+                          source={{ uri: pull.card.front_image_url }}
                           style={styles.packCardImage}
                           contentFit="contain"
                           cachePolicy="memory-disk"
                           transition={150}
                         />
-                      )}
-                    </PackRevealWrapper>
+                      </PackRevealWrapper>
+                    </View>
+
+                    <Text style={styles.packCardName} numberOfLines={2}>
+                      {pull.card.name}
+                    </Text>
+
+                    {pull.is_duplicate && (
+                      <Text style={styles.packCardDupeLabel}>DUPE</Text>
+                    )}
                   </View>
-                  <Text style={styles.packCardName} numberOfLines={2}>
-                    {spinResult.won_cards[revealIndex].card.name}
-                  </Text>
-                  {spinResult.won_cards[revealIndex].is_duplicate && (
-                    <Text style={styles.packCardDupeLabel}>DUPE</Text>
-                  )}
-                  {!scratched && (
-                    <Text style={styles.scratchHint}>Scratch to reveal!</Text>
-                  )}
-                </View>
+                ))}
               </View>
             )}
 
-            {spinResult?.won_cards && revealIndex < spinResult.won_cards.length - 1 ? (
-              scratched && (
-                <MetalButton
-                  label="NEXT"
-                  onPress={() => {
-                    try { cardFlipSound.play(); } catch (_e) { /* ignore */ }
-                    const nextIdx = revealIndex + 1;
-                    setRevealIndex(nextIdx);
-                    const nextCard = spinResult?.won_cards?.[nextIdx]?.card;
-                    if (nextCard) setTimeout(() => maybeCelebrateForCard(nextCard), 500);
-                  }}
-                  tone="hellfire"
-                  size="md"
-                  testID="next-card-btn"
-                />
-              )
-            ) : (
-              scratched && (
-                <View style={styles.finalActionsRow}>
-                  <MetalButton
-                    label={spinResult?.series_completion?.series_completed ? 'CONTINUE...' : 'AWESOME!'}
-                    onPress={closeResult}
-                    tone={spinResult?.series_completion?.series_completed ? 'gold' : 'hellfire'}
-                    size="md"
-                    testID="close-result-btn"
-                  />
-                  {/* Share-this-pull → Mosh Pit composer with the card pre-attached. */}
-                  {spinResult?.won_cards?.[revealIndex]?.card && (
-                    <TouchableOpacity
-                      style={styles.sharePullBtn}
-                      onPress={() => {
-                        const c = spinResult?.won_cards?.[revealIndex]?.card;
-                        if (!c) return;
-                        closeResult();
-                        // Use query-string URL form — more reliable across
-                        // expo-router versions than the object form.
-                        const name = encodeURIComponent(c.name);
-                        // Pass the BACKEND THUMBNAIL URL (~80KB JPEG) instead
-                        // of the original 3-5 MB CDN image. base64-encoding
-                        // the original puts us well over the backend's 1 MB
-                        // post-image limit, which is why "Save to Mosh" was
-                        // failing for users with the error "Image too large".
-                        const img = encodeURIComponent(cardThumb(c, 540));
-                        router.push(
-                          `/mosh?sharePullName=${name}&sharePullImage=${img}` as any
-                        );
-                      }}
-                      testID="share-pull-btn"
-                    >
-                      <Ionicons name="share-social" size={16} color="#39ff14" />
-                      <Text style={styles.sharePullText}>SHARE TO MOSH PIT</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )
-            )}
-
+            <View style={styles.finalActionsRow}>
+              <MetalButton
+                label={spinResult?.series_completion?.series_completed ? 'CONTINUE...' : 'COLLECT ALL'}
+                onPress={closeResult}
+                tone={spinResult?.series_completion?.series_completed ? 'gold' : 'hellfire'}
+                size="md"
+                testID="close-result-btn"
+              />
+            </View>
             {/* Reroll Button - only show on final card */}
             {medals >= 1 &&
               spinResult?.won_cards &&
@@ -1736,14 +1666,28 @@ const styles = StyleSheet.create({
   packCardsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 8,
-    marginBottom: 16,
-    paddingHorizontal: 8,
+    alignItems: 'flex-end',
+    gap: 0,
+    marginTop: 8,
+    marginBottom: 18,
+    paddingHorizontal: 0,
+    minHeight: 190,
   },
   packCardItem: {
-    flex: 1,
     alignItems: 'center',
-    maxWidth: 110,
+    width: 108,
+  },
+  packCardLeft: {
+    transform: [{ rotate: '-10deg' }, { translateX: 16 }, { translateY: 12 }],
+    zIndex: 1,
+  },
+  packCardCenter: {
+    transform: [{ translateY: -8 }, { scale: 1.08 }],
+    zIndex: 3,
+  },
+  packCardRight: {
+    transform: [{ rotate: '10deg' }, { translateX: -16 }, { translateY: 12 }],
+    zIndex: 1,
   },
   packCardImageWrap: {
     borderRadius: 8,
@@ -1761,8 +1705,8 @@ const styles = StyleSheet.create({
     borderColor: '#888',
   },
   packCardImage: {
-    width: 140,
-    height: 200,
+    width: 92,
+    height: 132,
   },
   scratchHint: {
     color: '#FFD700',
@@ -1882,6 +1826,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
 
 
 
