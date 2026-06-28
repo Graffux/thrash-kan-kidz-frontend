@@ -149,6 +149,7 @@ export default function ShopScreen() {
   const cardScaleAnim = useRef(new Animated.Value(0.5)).current;
   const cardFlipAnim = useRef(new Animated.Value(0)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
+  const packFlashAnim = useRef(new Animated.Value(0)).current;
   const collectAnim = useRef(new Animated.Value(0)).current;
 
   const BACKGROUND_IMAGE = 'https://customer-assets.emergentagent.com/job_earn-cards/artifacts/zgy2com2_enhanced-1771247671181.jpg';
@@ -383,6 +384,12 @@ export default function ShopScreen() {
           // ignore
         }
 
+        packFlashAnim.setValue(1);
+        Animated.timing(packFlashAnim, {
+          toValue: 0,
+          duration: 90,
+          useNativeDriver: true,
+        }).start();
         // Phase 2: Pack bursts open and launches the fan reveal
         Animated.parallel([
           Animated.sequence([
@@ -1703,6 +1710,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
+  packFlashOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#ffffff',
+    zIndex: 999,
+  },
   resultContainer: {
     backgroundColor: '#1a1a2e',
     borderRadius: 20,
@@ -1900,6 +1912,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
+
 
 
 
