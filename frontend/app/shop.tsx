@@ -383,33 +383,40 @@ export default function ShopScreen() {
           // ignore
         }
 
-        // Phase 2: Pack opens and card slides out (face down)
+        // Phase 2: Pack bursts open and launches the fan reveal
         Animated.parallel([
-          // Pack scales up slightly then fades out
           Animated.sequence([
             Animated.timing(packScaleAnim, {
-              toValue: 1.2,
-              duration: 200,
+              toValue: 1.32,
+              duration: 140,
+              easing: Easing.out(Easing.cubic),
               useNativeDriver: true,
             }),
-            Animated.timing(packOpacityAnim, {
-              toValue: 0,
-              duration: 300,
-              useNativeDriver: true,
-            }),
+            Animated.parallel([
+              Animated.timing(packScaleAnim, {
+                toValue: 0.72,
+                duration: 90,
+                easing: Easing.in(Easing.quad),
+                useNativeDriver: true,
+              }),
+              Animated.timing(packOpacityAnim, {
+                toValue: 0,
+                duration: 90,
+                easing: Easing.in(Easing.quad),
+                useNativeDriver: true,
+              }),
+            ]),
           ]),
-          // Card slides up from pack
           Animated.timing(cardSlideAnim, {
             toValue: 1,
-            duration: 600,
-            easing: Easing.out(Easing.back(1.5)),
+            duration: 430,
+            easing: Easing.out(Easing.back(2.2)),
             useNativeDriver: true,
           }),
-          // Card scales up
           Animated.timing(cardScaleAnim, {
             toValue: 1,
-            duration: 600,
-            easing: Easing.out(Easing.back(1.5)),
+            duration: 430,
+            easing: Easing.out(Easing.back(2.2)),
             useNativeDriver: true,
           }),
         ]).start(() => {
@@ -1893,6 +1900,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
 
 
 
