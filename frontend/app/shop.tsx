@@ -1739,14 +1739,21 @@ const styles = StyleSheet.create({
     width: 108,
   },
   packCardLeft: {
-    transform: [{ rotate: '-10deg' }],
+    transform: [
+      { translateX: 24 },
+      { rotate: '-12deg' },
+    ],
     zIndex: 1,
   },
   packCardCenter: {
+    transform: [{ translateY: -8 }],
     zIndex: 3,
   },
   packCardRight: {
-    transform: [{ rotate: '10deg' }],
+    transform: [
+      { translateX: -24 },
+      { rotate: '12deg' },
+    ],
     zIndex: 1,
   },
   packCardImageWrap: {
@@ -1886,6 +1893,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
 
 
 
