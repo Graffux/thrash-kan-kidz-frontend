@@ -539,7 +539,7 @@ export default function ShopScreen() {
 
   const leftCardX = cardSlideAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -95],
+    outputRange: [0, -42],
   });
 
   const centerCardY = cardSlideAnim.interpolate({
@@ -549,7 +549,7 @@ export default function ShopScreen() {
 
   const rightCardX = cardSlideAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 95],
+    outputRange: [0, 42],
   });
   const cardFlipRotate = cardFlipAnim.interpolate({
     inputRange: [0, 0.5, 1],
@@ -1759,7 +1759,7 @@ const styles = StyleSheet.create({
   },
   packCardLeft: {
     transform: [
-      { translateX: 24 },
+      { translateX: 10 },
       { rotate: '-12deg' },
     ],
     zIndex: 1,
@@ -1770,7 +1770,7 @@ const styles = StyleSheet.create({
   },
   packCardRight: {
     transform: [
-      { translateX: -24 },
+      { translateX: -10 },
       { rotate: '12deg' },
     ],
     zIndex: 1,
@@ -1912,6 +1912,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
 
 
 
