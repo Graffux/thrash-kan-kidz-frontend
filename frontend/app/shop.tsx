@@ -149,6 +149,7 @@ export default function ShopScreen() {
   const cardScaleAnim = useRef(new Animated.Value(0.5)).current;
   const cardFlipAnim = useRef(new Animated.Value(0)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
+  const collectAnim = useRef(new Animated.Value(0)).current;
 
   const BACKGROUND_IMAGE = 'https://customer-assets.emergentagent.com/job_earn-cards/artifacts/zgy2com2_enhanced-1771247671181.jpg';
   const CARD_BACK_IMAGE = 'https://customer-assets.emergentagent.com/job_d9b7563a-44d0-4dcc-ab9c-25c405b50d3f/artifacts/jlg546ha_file_00000000369c71f580be8b548f7c5be7.png';
@@ -521,6 +522,21 @@ export default function ShopScreen() {
     outputRange: [100, 0],
   });
 
+
+  const leftCardX = cardSlideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -95],
+  });
+
+  const centerCardY = cardSlideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [80, 0],
+  });
+
+  const rightCardX = cardSlideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 95],
+  });
   const cardFlipRotate = cardFlipAnim.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: ['0deg', '90deg', '180deg'],
@@ -531,6 +547,21 @@ export default function ShopScreen() {
     outputRange: [0.5, 1],
   });
 
+
+  const collectScale = collectAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0.2],
+  });
+
+  const collectY = collectAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 420],
+  });
+
+  const collectOpacity = collectAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0],
+  });
   if (!user) {
     return (
       <GrungeBackground>
@@ -575,7 +606,18 @@ export default function ShopScreen() {
             <Text style={styles.resultTitle}>Pack Opened!</Text>
 
             {spinResult?.won_cards && (
-              <View style={styles.packCardsRow}>
+              <Animated.View
+  style={[
+    styles.packCardsRow,
+    {
+      transform: [
+        { translateY: collectY },
+        { scale: collectScale },
+      ],
+      opacity: collectOpacity,
+    },
+  ]}
+>
                 {spinResult.won_cards.map((pull, idx) => (
                   <View
                     key={`pack-fan-${idx}-${pull.card.id}`}
@@ -584,6 +626,15 @@ export default function ShopScreen() {
                       idx === 0 && styles.packCardLeft,
                       idx === 1 && styles.packCardCenter,
                       idx === 2 && styles.packCardRight,
+                      {
+                        transform: [
+                          ...(idx === 0 ? [{ translateX: leftCardX }] : []),
+                          ...(idx === 1 ? [{ translateY: centerCardY }] : []),
+                          ...(idx === 2 ? [{ translateX: rightCardX }] : []),
+                          { scale: cardScaleAnim },
+                        ],
+                        opacity: cardSlideAnim,
+                      },
                     ]}
                   >
                     <View
@@ -617,13 +668,23 @@ export default function ShopScreen() {
                     )}
                   </View>
                 ))}
-              </View>
+              </Animated.View>
             )}
 
             <View style={styles.finalActionsRow}>
               <MetalButton
                 label={spinResult?.series_completion?.series_completed ? 'CONTINUE...' : 'COLLECT ALL'}
-                onPress={closeResult}
+                onPress={() => {
+                  Animated.timing(collectAnim, {
+                    toValue: 1,
+                    duration: 450,
+                    easing: Easing.in(Easing.cubic),
+                    useNativeDriver: true,
+                  }).start(() => {
+                    collectAnim.setValue(0);
+                    closeResult();
+                  });
+                }}
                 tone={spinResult?.series_completion?.series_completed ? 'gold' : 'hellfire'}
                 size="md"
                 testID="close-result-btn"
@@ -1826,6 +1887,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
+
+
+
+
+
+
+
 
 
 
