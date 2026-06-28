@@ -619,7 +619,7 @@ export default function ShopScreen() {
   ]}
 >
                 {spinResult.won_cards.map((pull, idx) => (
-                  <View
+                  <Animated.View
                     key={`pack-fan-${idx}-${pull.card.id}`}
                     style={[
                       styles.packCardItem,
@@ -666,7 +666,7 @@ export default function ShopScreen() {
                     {pull.is_duplicate && (
                       <Text style={styles.packCardDupeLabel}>DUPE</Text>
                     )}
-                  </View>
+                  </Animated.View>
                 ))}
               </Animated.View>
             )}
@@ -1739,15 +1739,14 @@ const styles = StyleSheet.create({
     width: 108,
   },
   packCardLeft: {
-    transform: [{ rotate: '-10deg' }, { translateX: 16 }, { translateY: 12 }],
+    transform: [{ rotate: '-10deg' }],
     zIndex: 1,
   },
   packCardCenter: {
-    transform: [{ translateY: -8 }, { scale: 1.08 }],
     zIndex: 3,
   },
   packCardRight: {
-    transform: [{ rotate: '10deg' }, { translateX: -16 }, { translateY: 12 }],
+    transform: [{ rotate: '10deg' }],
     zIndex: 1,
   },
   packCardImageWrap: {
@@ -1887,6 +1886,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
+
 
 
 
