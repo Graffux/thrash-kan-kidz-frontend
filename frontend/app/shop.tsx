@@ -65,7 +65,7 @@ export default function ShopScreen() {
   const [spinPool, setSpinPool] = useState<SpinPoolData | null>(null);
   const [spinConfig, setSpinConfig] = useState({ spin_cost: 75 });
   const [selectedSeries, setSelectedSeries] = useState<number | null>(null);
-  const [packState, setPackState] = useState<'idle' | 'shaking' | 'opening' | 'revealed'>('idle');
+  const [packState, setPackState] = useState<'idle' | 'shake' | 'burst' | 'fan' | 'result'>('idle');
   const [ronchLine, setRonchLine] = useState<string | null>(null);
 
   // Daily wheel & medals (medals/free_packs displayed here are read from
@@ -258,7 +258,7 @@ export default function ShopScreen() {
     setSpinning(true);
     setSpinResult(null);
     resetAnimations();
-    setPackState('shaking');
+    setPackState('shake');
     drumRollSound.play();
 
     // Snapshot the variant_names this user already owned BEFORE this pack was opened.
@@ -322,7 +322,7 @@ export default function ShopScreen() {
 
       if (result.success) {
         setSpinResult(result);
-        setPackState('opening');
+        setPackState('burst');
         // If we just spent a free pack, the server returns the new balance;
         // mirror it locally so the badge updates immediately even before the
         // post-modal refreshData() resync. If the server didn't echo it
@@ -358,84 +358,68 @@ export default function ShopScreen() {
 
         packFlashAnim.setValue(1);
         shakeAnim.setValue(0);
+
         Animated.timing(packFlashAnim, {
           toValue: 0,
-          duration: 90,
+          duration: 120,
           useNativeDriver: true,
         }).start();
-        // Phase 2: Pack bursts open and launches the fan reveal
-        Animated.parallel([
-          Animated.sequence([
+
+        Animated.sequence([
+          Animated.timing(packScaleAnim, {
+            toValue: 1.28,
+            duration: 160,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
+          Animated.parallel([
             Animated.timing(packScaleAnim, {
-              toValue: 1.32,
+              toValue: 0.72,
               duration: 140,
+              easing: Easing.in(Easing.quad),
+              useNativeDriver: true,
+            }),
+            Animated.timing(packOpacityAnim, {
+              toValue: 0,
+              duration: 140,
+              easing: Easing.in(Easing.quad),
+              useNativeDriver: true,
+            }),
+          ]),
+        ]).start(() => {
+          setPackState('fan');
+
+          Animated.parallel([
+            Animated.timing(cardSlideAnim, {
+              toValue: 1,
+              duration: 360,
               easing: Easing.out(Easing.cubic),
               useNativeDriver: true,
             }),
-            Animated.parallel([
-              Animated.timing(packScaleAnim, {
-                toValue: 0.72,
-                duration: 90,
-                easing: Easing.in(Easing.quad),
-                useNativeDriver: true,
-              }),
-              Animated.timing(packOpacityAnim, {
-                toValue: 0,
-                duration: 90,
-                easing: Easing.in(Easing.quad),
-                useNativeDriver: true,
-              }),
-            ]),
-          ]),
-          Animated.sequence([
-  Animated.timing(cardSlideAnim, {
-    toValue: 1.08,
-    duration: 360,
-    easing: Easing.out(Easing.cubic),
-    useNativeDriver: true,
-  }),
-  Animated.timing(cardSlideAnim, {
-    toValue: 1,
-    duration: 120,
-    easing: Easing.out(Easing.bounce),
-    useNativeDriver: true,
-  }),
-]),
-          Animated.timing(cardScaleAnim, {
-            toValue: 1,
-            duration: 430,
-            easing: Easing.out(Easing.back(2.2)),
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          setPackState('revealed');
-          setSpinning(false);
-          
-          setShowResult(true);
-          try { cardFlipSound.play(); } catch (_e) { /* ignore */ }
-          if (result?.won_cards?.[0]?.card) {
-            setTimeout(() => maybeCelebrateForCard(result.won_cards[0].card), 600);
-          }
-          if (result?.won_cards?.every((c: any) => c.is_duplicate)) {
-            setTimeout(() => dupeSound.play(), 500);
-          }
-          refreshData();
-          fetchSpinData();
-          // Start glow animation for the reveal prompt
-          Animated.loop(
-            Animated.sequence([
-              Animated.timing(glowAnim, {
-                toValue: 1,
-                duration: 1000,
-                useNativeDriver: true,
-              }),
-              Animated.timing(glowAnim, {
-                toValue: 0,
-                duration: 1000,
-                useNativeDriver: true,
-              }),
-            ])
-          ).start();
+            Animated.timing(cardScaleAnim, {
+              toValue: 1,
+              duration: 360,
+              easing: Easing.out(Easing.back(1.8)),
+              useNativeDriver: true,
+            }),
+          ]).start(() => {
+            setPackState('result');
+            setSpinning(false);
+            setShowResult(true);
+
+            try { cardFlipSound.play(); } catch (_e) { /* ignore */ }
+
+            if (result?.won_cards?.[0]?.card) {
+              setTimeout(() => maybeCelebrateForCard(result.won_cards[0].card), 600);
+            }
+
+            if (result?.won_cards?.every((c: any) => c.is_duplicate)) {
+              setTimeout(() => dupeSound.play(), 500);
+            }
+
+            refreshData();
+            fetchSpinData();
+          });
         });
       } else {
         setSpinning(false);
@@ -879,7 +863,7 @@ export default function ShopScreen() {
         <View style={styles.packSection}>
           <View style={styles.packContainer}>
             {/* Card Pack Box - Now using the cover image */}
-            {packState !== 'revealed' && (
+            {packState !== 'fan' && (
               <Animated.View style={[
                 styles.cardPack,
                 {
@@ -1787,6 +1771,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
+
+
 
 
 
