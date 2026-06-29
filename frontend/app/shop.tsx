@@ -462,24 +462,24 @@ export default function ShopScreen() {
   });
 
   const cardSlideTranslate = cardSlideAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [100, 0],
+    inputRange: [0, 0.35, 1],
+    outputRange: [130, 35, 0],
   });
 
 
   const leftCardX = cardSlideAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -42],
+    inputRange: [0, 0.45, 1],
+    outputRange: [0, 0, -42],
   });
 
   const centerCardY = cardSlideAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [80, 0],
+    inputRange: [0, 0.35, 1],
+    outputRange: [130, 25, 0],
   });
 
   const rightCardX = cardSlideAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 42],
+    inputRange: [0, 0.45, 1],
+    outputRange: [0, 0, 42],
   });
   const glowOpacity = glowAnim.interpolate({
     inputRange: [0, 1],
@@ -1768,6 +1768,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
 
 
 
