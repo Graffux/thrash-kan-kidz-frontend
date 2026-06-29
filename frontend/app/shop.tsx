@@ -27,7 +27,6 @@ import PackRevealWrapper from '../src/components/PackRevealWrapper';
 import MetalButton from '../src/components/MetalButton';
 import MascotStamp from '../src/components/MascotStamp';
 import RonchTrashTalk, { maybeShowRonchTrashTalk } from '../src/components/RonchTrashTalk';
-import PackBurst from '../components/pack/PackBurst';
 import { useSoundPlayer } from '../src/utils/sounds';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -412,6 +411,7 @@ export default function ShopScreen() {
         ]).start(() => {
           setPackState('revealed');
           setSpinning(false);
+          setShowResult(true);
           
           // Start glow animation for the reveal prompt
           Animated.loop(
@@ -542,11 +542,7 @@ export default function ShopScreen() {
 />
 
       {/* Result Modal */}
-      <PackBurst
-  visible={packState === 'burst'}
-  packImage={packCoverImage}
-  burstAnim={cardSlideAnim}
-/> <Modal visible={showResult} transparent animationType="fade" onRequestClose={closeResult}>
+<Modal visible={showResult} transparent animationType="fade" onRequestClose={closeResult}>
       <View style={styles.resultOverlay}>
           <View style={styles.resultContainer}>
             {/* Ronch corner stamp — mood depends on the rarity of the
@@ -915,7 +911,7 @@ shadowOffset: { width: 0, height: 0 },
               <Text style={styles.openPackButtonText}>Opening...</Text>
             ) : packState !== 'idle' ? (
               <Text style={styles.openPackButtonText}>
-                'OPENING...'
+                OPENING...
               </Text>
             ) : (
               <>
@@ -1787,6 +1783,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
+
 
 
 
