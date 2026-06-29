@@ -23,7 +23,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/context/AppContext';
 import { useFocusEffect, useRouter } from 'expo-router';
 import BuyCoinsModal from '../src/components/BuyCoinsModal';
-import ScratchCard from '../src/components/ScratchCard';
 import PackRevealWrapper from '../src/components/PackRevealWrapper';
 import MetalButton from '../src/components/MetalButton';
 import MascotStamp from '../src/components/MascotStamp';
@@ -67,30 +66,8 @@ export default function ShopScreen() {
   const [spinConfig, setSpinConfig] = useState({ spin_cost: 75 });
   const [selectedSeries, setSelectedSeries] = useState<number | null>(null);
   const [packState, setPackState] = useState<'idle' | 'shaking' | 'opening' | 'revealed'>('idle');
-  const [revealIndex, setRevealIndex] = useState(0);
-  const [cardFlipped, setCardFlipped] = useState(false);
-  const [showFrontImage, setShowFrontImage] = useState(false);
-  // Tracks whether the user has finished scratching the variant cover for
-  // the currently-revealed pack card. Non-variants (or variants with no
-  // scratch cover registered) are treated as "already scratched". When this
-  // is false we hide the Next / Awesome button so the user must scratch
-  // before advancing.
-  const [scratched, setScratched] = useState(true);
-  // Ronch trash-talk line shown after pack close every Nth pack open.
-  // null = hidden. Component auto-fades after ~3.2s and calls onDismiss.
   const [ronchLine, setRonchLine] = useState<string | null>(null);
 
-  // Whenever the visible pack card changes (modal open OR Next pressed), look
-  // at the new card and decide whether the user needs to scratch a variant
-  // cover before advancing. Only variants with a registered scratch cover
-  // gate progression; everything else (commons, variants missing covers,
-  // duplicates, reward cards) is auto-marked as scratched.
-  useEffect(() => {
-    const currentCard = spinResult?.won_cards?.[revealIndex]?.card;
-    const needsScratch = !!(currentCard?.is_variant && currentCard?.scratch_cover_url);
-    setScratched(!needsScratch);
-  }, [revealIndex, spinResult]);
-  
   // Daily wheel & medals (medals/free_packs displayed here are read from
   // AppContext via the daily-wheel endpoint on focus; the wheel modal + Card
   // Picker themselves live on the Home screen now).
@@ -147,7 +124,6 @@ export default function ShopScreen() {
   const packOpacityAnim = useRef(new Animated.Value(1)).current;
   const cardSlideAnim = useRef(new Animated.Value(0)).current;
   const cardScaleAnim = useRef(new Animated.Value(0.5)).current;
-  const cardFlipAnim = useRef(new Animated.Value(0)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
   const packFlashAnim = useRef(new Animated.Value(0)).current;
   const collectAnim = useRef(new Animated.Value(0)).current;
@@ -222,7 +198,6 @@ export default function ShopScreen() {
       }
       const data = await res.json();
       setSpinResult({ ...spinResult, won_cards: data.won_cards, won_card: data.won_cards[0]?.card });
-      setRevealIndex(0);
       setMedals(data.remaining_medals);
       // Play axe sound for fresh reveal
       try { cardFlipSound.play(); } catch (_e) { /* ignore */ }
@@ -261,11 +236,8 @@ export default function ShopScreen() {
     packOpacityAnim.setValue(1);
     cardSlideAnim.setValue(0);
     cardScaleAnim.setValue(0.5);
-    cardFlipAnim.setValue(0);
     glowAnim.setValue(0);
     setPackState('idle');
-    setCardFlipped(false);
-    setShowFrontImage(false);
   };
 
   const handleOpenPack = async (opts?: { useFreePack?: boolean }) => {
@@ -459,49 +431,7 @@ export default function ShopScreen() {
     }
   };
 
-  const handleRevealCard = () => {
-    if (packState !== 'revealed' || cardFlipped) return;
-    
-    // Bag-tear plays the moment user taps "TAP TO REVEAL!"
-    try { bagTearSound.play(); } catch (_e) { /* ignore */ }
-
-    setCardFlipped(true);
-    
-    // Flip to 90deg (edge-on), swap image, then flip back to 0
-    Animated.timing(cardFlipAnim, {
-      toValue: 0.5,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
-      // At 90deg the card is edge-on, now show front image
-      setShowFrontImage(true);
-      Animated.timing(cardFlipAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => {
-        // After flip completes, show the result modal
-        setTimeout(() => {
-          setRevealIndex(0);
-          setShowResult(true);
-          // Play axe impact for the first card reveal (wrapped in try to prevent crash)
-          try { cardFlipSound.play(); } catch (_e) { /* ignore */ }
-          // First-Variant celebration check for card #1
-          if (spinResult?.won_cards?.[0]?.card) {
-            setTimeout(() => maybeCelebrateForCard(spinResult.won_cards![0].card), 600);
-          }
-          if (spinResult?.won_cards?.every((c: any) => c.is_duplicate)) {
-            setTimeout(() => dupeSound.play(), 500);
-          }
-          refreshData();
-          fetchSpinData();
-        }, 800);
-      });
-    });
-  };
-
   const closeResult = () => {
-    setRevealIndex(0);
     if (spinResult?.series_completion?.series_completed) {
       setShowResult(false);
       setShowSeriesComplete(true);
@@ -551,11 +481,6 @@ export default function ShopScreen() {
     inputRange: [0, 1],
     outputRange: [0, 42],
   });
-  const cardFlipRotate = cardFlipAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: ['0deg', '90deg', '180deg'],
-  });
-
   const glowOpacity = glowAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0.5, 1],
@@ -607,7 +532,7 @@ export default function ShopScreen() {
 
       {/* Result Modal */}
       <Modal visible={showResult} transparent animationType="fade" onRequestClose={closeResult}>
-        <View style={styles.resultOverlay}>
+      <View style={styles.resultOverlay}>
           <View style={styles.resultContainer}>
             {/* Ronch corner stamp — mood depends on the rarity of the
                 currently-revealed card. Epic / rare pulls get a wide-eyed
@@ -701,18 +626,19 @@ export default function ShopScreen() {
                 }}
                 tone={spinResult?.series_completion?.series_completed ? 'gold' : 'hellfire'}
                 size="md"
-                testID="close-result-btn"
               />
-            </View>
-            {/* Reroll Button - only show on final card */}
-            {medals >= 1 &&
-              spinResult?.won_cards &&
-              revealIndex === spinResult.won_cards.length - 1 && (
-                <TouchableOpacity style={styles.rerollButton} onPress={handleReroll} data-testid="reroll-btn">
+
+              {medals >= 1 && spinResult?.won_cards && (
+                <TouchableOpacity
+                  style={styles.rerollButton}
+                  onPress={handleReroll}
+                  data-testid="reroll-btn"
+                >
                   <Ionicons name="refresh" size={16} color="#000" />
                   <Text style={styles.rerollText}>REROLL (1 Medal)</Text>
                 </TouchableOpacity>
               )}
+            </View>
           </View>
         </View>
       </Modal>
@@ -953,55 +879,6 @@ export default function ShopScreen() {
               </Animated.View>
             )}
 
-            {/* Revealed Card (face down initially) */}
-            {(packState === 'opening' || packState === 'revealed') && (
-              <Animated.View style={[
-                styles.revealedCard,
-                {
-                  transform: [
-                    { translateY: cardSlideTranslate },
-                    { scale: cardScaleAnim },
-                    { rotateY: cardFlipRotate },
-                  ],
-                }
-              ]}>
-                <TouchableOpacity 
-                  onPress={handleRevealCard}
-                  disabled={cardFlipped}
-                  activeOpacity={0.9}
-                  style={styles.cardTouchable}
-                  data-testid="reveal-card-btn"
-                >
-                  {/* Pack cover (before flip) */}
-                  {!showFrontImage && (
-                    <Image
-                      source={{ uri: packCoverImage }}
-                      style={styles.revealedCardImage}
-                      resizeMode="cover"
-                    />
-                  )}
-                  {/* Card front (after flip) — use the first won_cards entry
-                      since `won_card` (singular) is only populated on the
-                      re-roll path. Without this fallback, opening a free
-                      pack (or any first-time pack) crashed with
-                      "Cannot read property 'front_image_url' of undefined". */}
-                  {showFrontImage && (spinResult?.won_card || spinResult?.won_cards?.[0]?.card) && (
-                    <Image
-                      source={{ uri: (spinResult?.won_card || spinResult?.won_cards?.[0]?.card)?.front_image_url }}
-                      style={styles.revealedCardImage}
-                      resizeMode="cover"
-                    />
-                  )}
-                </TouchableOpacity>
-              </Animated.View>
-            )}
-
-            {/* Tap to Reveal Prompt */}
-            {packState === 'revealed' && !cardFlipped && (
-              <Animated.View style={[styles.tapPrompt, { opacity: glowOpacity }]}>
-                <Text style={styles.tapPromptText}>TAP TO REVEAL!</Text>
-              </Animated.View>
-            )}
           </View>
 
           {/* Open Pack Button */}
@@ -1019,7 +896,7 @@ export default function ShopScreen() {
               <Text style={styles.openPackButtonText}>Opening...</Text>
             ) : packState !== 'idle' ? (
               <Text style={styles.openPackButtonText}>
-                {cardFlipped ? 'Nice!' : 'Tap Card!'}
+                'OPENING...'
               </Text>
             ) : (
               <>
@@ -1565,27 +1442,6 @@ const styles = StyleSheet.create({
     color: '#FFD700',
     fontWeight: '600',
   },
-  revealedCard: {
-    position: 'absolute',
-    width: 160,
-    height: 220,
-    borderRadius: 10,
-    overflow: 'hidden',
-    borderWidth: 3,
-    borderColor: '#FFD700',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 10,
-  },
-  cardTouchable: {
-    flex: 1,
-  },
-  revealedCardImage: {
-    width: '100%',
-    height: '100%',
-  },
   tapPrompt: {
     position: 'absolute',
     bottom: -10,
@@ -1912,6 +1768,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
+
+
+
+
+
 
 
 
