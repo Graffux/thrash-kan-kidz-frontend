@@ -386,12 +386,20 @@ export default function ShopScreen() {
               }),
             ]),
           ]),
-          Animated.timing(cardSlideAnim, {
-            toValue: 1,
-            duration: 430,
-            easing: Easing.out(Easing.back(2.2)),
-            useNativeDriver: true,
-          }),
+          Animated.sequence([
+  Animated.timing(cardSlideAnim, {
+    toValue: 1.08,
+    duration: 360,
+    easing: Easing.out(Easing.cubic),
+    useNativeDriver: true,
+  }),
+  Animated.timing(cardSlideAnim, {
+    toValue: 1,
+    duration: 120,
+    easing: Easing.out(Easing.bounce),
+    useNativeDriver: true,
+  }),
+]),
           Animated.timing(cardScaleAnim, {
             toValue: 1,
             duration: 430,
@@ -488,18 +496,18 @@ export default function ShopScreen() {
 
 
   const collectScale = collectAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0.2],
+    inputRange: [0, 0.65, 1],
+    outputRange: [1, 0.85, 0.08],
   });
 
   const collectY = collectAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 420],
+    inputRange: [0, 0.35, 1],
+    outputRange: [0, 40, 560],
   });
 
   const collectOpacity = collectAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0],
+    inputRange: [0, 0.75, 1],
+    outputRange: [1, 1, 0],
   });
   if (!user) {
     return (
@@ -616,8 +624,8 @@ export default function ShopScreen() {
                 onPress={() => {
                   Animated.timing(collectAnim, {
                     toValue: 1,
-                    duration: 450,
-                    easing: Easing.in(Easing.cubic),
+                    duration: 520,
+                    easing: Easing.in(Easing.back(1.4)),
                     useNativeDriver: true,
                   }).start(() => {
                     collectAnim.setValue(0);
@@ -1768,6 +1776,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
 
 
 
