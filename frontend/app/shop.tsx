@@ -905,7 +905,7 @@ export default function ShopScreen() {
               <Text style={styles.openPackButtonText}>Opening...</Text>
             ) : packState !== 'idle' ? (
               <Text style={styles.openPackButtonText}>
-                'OPENING...'
+                OPENING...
               </Text>
             ) : (
               <>
@@ -1777,6 +1777,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
 
 
 
