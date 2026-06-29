@@ -357,6 +357,7 @@ export default function ShopScreen() {
         }
 
         packFlashAnim.setValue(1);
+        shakeAnim.setValue(0);
         Animated.timing(packFlashAnim, {
           toValue: 0,
           duration: 90,
@@ -1776,6 +1777,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
 
 
 
