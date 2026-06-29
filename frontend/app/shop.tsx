@@ -411,6 +411,16 @@ export default function ShopScreen() {
           setPackState('revealed');
           setSpinning(false);
           
+          setShowResult(true);
+          try { cardFlipSound.play(); } catch (_e) { /* ignore */ }
+          if (result?.won_cards?.[0]?.card) {
+            setTimeout(() => maybeCelebrateForCard(result.won_cards[0].card), 600);
+          }
+          if (result?.won_cards?.every((c: any) => c.is_duplicate)) {
+            setTimeout(() => dupeSound.play(), 500);
+          }
+          refreshData();
+          fetchSpinData();
           // Start glow animation for the reveal prompt
           Animated.loop(
             Animated.sequence([
@@ -1777,6 +1787,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+
 
 
 
