@@ -122,7 +122,9 @@ export default function ShopScreen() {
   const shakeAnim = useRef(new Animated.Value(0)).current;
   const packScaleAnim = useRef(new Animated.Value(1)).current;
   const packOpacityAnim = useRef(new Animated.Value(1)).current;
-  const cardSlideAnim = useRef(new Animated.Value(0)).current;
+  const rightDealAnim = useRef(new Animated.Value(0)).current;
+  const middleDealAnim = useRef(new Animated.Value(0)).current;
+  const leftDealAnim = useRef(new Animated.Value(0)).current;
   const cardScaleAnim = useRef(new Animated.Value(0.5)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
   const packFlashAnim = useRef(new Animated.Value(0)).current;
@@ -234,7 +236,9 @@ export default function ShopScreen() {
     shakeAnim.setValue(0);
     packScaleAnim.setValue(1);
     packOpacityAnim.setValue(1);
-    cardSlideAnim.setValue(0);
+    rightDealAnim.setValue(0);
+    middleDealAnim.setValue(0);
+    leftDealAnim.setValue(0);
     cardScaleAnim.setValue(0.5);
     glowAnim.setValue(0);
     setPackState('idle');
@@ -323,6 +327,7 @@ export default function ShopScreen() {
       if (result.success) {
         setSpinResult(result);
         setPackState('opening');
+        setShowResult(true);
         // If we just spent a free pack, the server returns the new balance;
         // mirror it locally so the badge updates immediately even before the
         // post-modal refreshData() resync. If the server didn't echo it
@@ -389,18 +394,50 @@ export default function ShopScreen() {
             ]),
           ]),
           Animated.sequence([
-  Animated.timing(cardSlideAnim, {
-    toValue: 1.08,
-    duration: 360,
-    easing: Easing.out(Easing.cubic),
-    useNativeDriver: true,
-  }),
-  Animated.timing(cardSlideAnim, {
-    toValue: 1,
-    duration: 120,
-    easing: Easing.out(Easing.bounce),
-    useNativeDriver: true,
-  }),
+  Animated.sequence([
+    Animated.timing(rightDealAnim, {
+      toValue: 1.08,
+      duration: 260,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }),
+    Animated.timing(rightDealAnim, {
+      toValue: 1,
+      duration: 90,
+      easing: Easing.out(Easing.bounce),
+      useNativeDriver: true,
+    }),
+  ]),
+  Animated.delay(120),
+  Animated.sequence([
+    Animated.timing(middleDealAnim, {
+      toValue: 1.08,
+      duration: 260,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }),
+    Animated.timing(middleDealAnim, {
+      toValue: 1,
+      duration: 90,
+      easing: Easing.out(Easing.bounce),
+      useNativeDriver: true,
+    }),
+  ]),
+  Animated.delay(120),
+  Animated.sequence([
+    Animated.timing(leftDealAnim, {
+      toValue: 1.08,
+      duration: 260,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }),
+    Animated.timing(leftDealAnim, {
+      toValue: 1,
+      duration: 90,
+      easing: Easing.out(Easing.bounce),
+      useNativeDriver: true,
+    }),
+  ]),
 ]),
           Animated.timing(cardScaleAnim, {
             toValue: 1,
@@ -411,7 +448,7 @@ export default function ShopScreen() {
         ]).start(() => {
           setPackState('revealed');
           setSpinning(false);
-          setShowResult(true);
+          // setShowResult(true);
           
           // Start glow animation for the reveal prompt
           Animated.loop(
@@ -472,30 +509,23 @@ export default function ShopScreen() {
     outputRange: [-8, 0, 8],
   });
 
-  const cardSlideTranslate = cardSlideAnim.interpolate({
-    inputRange: [0, 0.35, 1],
-    outputRange: [130, 35, 0],
-  });
+ 
 
 
-  const leftCardX = cardSlideAnim.interpolate({
-    inputRange: [0, 0.45, 1],
-    outputRange: [0, 0, -42],
-  });
+ const leftCardX = leftDealAnim.interpolate({
+  inputRange: [0, 1],
+  outputRange: [0, -22],
+});
 
-  const centerCardY = cardSlideAnim.interpolate({
-    inputRange: [0, 0.35, 1],
-    outputRange: [130, 25, 0],
-  });
+const centerCardY = middleDealAnim.interpolate({
+  inputRange: [0, 1],
+  outputRange: [130, 0],
+});
 
-  const rightCardX = cardSlideAnim.interpolate({
-    inputRange: [0, 0.45, 1],
-    outputRange: [0, 0, 42],
-  });
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.5, 1],
-  });
+const rightCardX = rightDealAnim.interpolate({
+  inputRange: [0, 1],
+  outputRange: [0, 22],
+});
 
 
   const collectScale = collectAnim.interpolate({
@@ -578,12 +608,22 @@ export default function ShopScreen() {
                       idx === 2 && styles.packCardRight,
                       {
                         transform: [
-                          ...(idx === 0 ? [{ translateX: leftCardX }] : []),
-                          ...(idx === 1 ? [{ translateY: centerCardY }] : []),
-                          ...(idx === 2 ? [{ translateX: rightCardX }] : []),
-                          { scale: cardScaleAnim },
-                        ],
-                        opacity: cardSlideAnim,
+  ...(idx === 0 ? [{ translateX: leftCardX }] : []),
+  ...(idx === 1 ? [{ translateY: centerCardY }] : []),
+  ...(idx === 2 ? [{ translateX: rightCardX }] : []),
+  {
+    scale:
+      idx === 1
+        ? Animated.multiply(cardScaleAnim, 1.06)
+        : cardScaleAnim,
+  },
+],
+                        opacity:
+                          idx === 0
+                            ? leftDealAnim
+                            : idx === 1
+                              ? middleDealAnim
+                              : rightDealAnim,
                       },
                     ]}
                   >
@@ -596,8 +636,8 @@ export default function ShopScreen() {
                       <PackRevealWrapper
                         animationKey={`pack-fan-${idx}-${pull.card.id}`}
                         rarity="common"
-                        width={92}
-                        height={132}
+                        width={102}
+                        height={146}
                       >
                         <ExpoImage
                           source={{ uri: pull.card.front_image_url }}
@@ -1631,7 +1671,7 @@ const styles = StyleSheet.create({
   packCardLeft: {
     transform: [
       { translateX: 10 },
-      { rotate: '-12deg' },
+      { rotate: '-18deg' },
     ],
     zIndex: 1,
   },
@@ -1642,7 +1682,7 @@ const styles = StyleSheet.create({
   packCardRight: {
     transform: [
       { translateX: -10 },
-      { rotate: '12deg' },
+      { rotate: '18deg' },
     ],
     zIndex: 1,
   },
@@ -1662,8 +1702,8 @@ const styles = StyleSheet.create({
     borderColor: '#888',
   },
   packCardImage: {
-    width: 92,
-    height: 132,
+    width: 102,
+    height: 146,
   },
   scratchHint: {
     color: '#FFD700',
