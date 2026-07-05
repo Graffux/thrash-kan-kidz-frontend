@@ -314,6 +314,20 @@ export default function HomeScreen() {
         </View>
 
         {/* Series 8 launch banner removed Jun 11 2026 — ships free with next EAS build. */}
+        
+{/* Series 9 "Black Metal Edition" coming soon banner */}
+<View style={styles.s9Banner} testID="series-9-coming-soon-banner">
+  <View style={styles.s9BannerInner}>
+    <Ionicons name="snow" size={22} color="#e6ecf5" />
+    <View style={{ flex: 1 }}>
+      <Text style={styles.s9BannerTitle}>SERIES 9 — BLACK METAL EDITION</Text>
+      <Text style={styles.s9BannerSub}>Frostbitten pulls incoming. Coming soon.</Text>
+    </View>
+    <Ionicons name="skull-outline" size={20} color="#e6ecf5" />
+  </View>
+</View>
+       
+
 
         {/* Daily Challenges entry tile. Backend lives at /api/users/{uid}/daily-challenges. */}
         <Pressable
@@ -530,6 +544,44 @@ const getRarityStyle = (rarity: string) => {
 };
 
 const styles = StyleSheet.create({
+  s9Banner: {
+  backgroundColor: '#050608',
+  borderWidth: 1.5,
+  borderColor: '#c6cfda',
+  borderRadius: 10,
+  paddingHorizontal: 12,
+  paddingVertical: 10,
+  marginBottom: 14,
+  shadowColor: '#c6cfda',
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.5,
+  shadowRadius: 8,
+  elevation: 5,
+},
+
+s9BannerInner: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 10,
+},
+
+s9BannerTitle: {
+  color: '#8ff5ff',
+  fontSize: 13,
+  fontWeight: '900',
+  letterSpacing: 1,
+},
+
+s9BannerSub: {
+  color: '#e6ecf5',
+  fontSize: 11,
+  marginTop: 2,
+},
+  series9MysteryBanner: {
+  width: '100%',
+  height: 110,
+  borderRadius: 10,
+},
   container: {
     flex: 1,
     backgroundColor: 'transparent',
