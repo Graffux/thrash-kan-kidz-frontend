@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
+import PackEruption from '../components/PackEruption';
 import { Image as ExpoImage } from 'expo-image';
 import { headerSource } from '../src/assets/headerCatalog';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -53,7 +54,6 @@ interface SpinPoolData {
   unlocked_series?: number[];
   completed_series?: number[];
 }
-
 export default function ShopScreen() {
   const { user, apiUrl, refreshData, userCards } = useApp();
   const router = useRouter();
@@ -65,7 +65,9 @@ export default function ShopScreen() {
   const [spinPool, setSpinPool] = useState<SpinPoolData | null>(null);
   const [spinConfig, setSpinConfig] = useState({ spin_cost: 75 });
   const [selectedSeries, setSelectedSeries] = useState<number | null>(null);
-  const [packState, setPackState] = useState<'idle' | 'shaking' | 'opening' | 'revealed'>('idle');
+  const [packState, setPackState] = useState<
+  'idle' | 'shaking' | 'ripped' | 'revealed'
+>('idle');
   const [ronchLine, setRonchLine] = useState<string | null>(null);
 
   // Daily wheel & medals (medals/free_packs displayed here are read from
@@ -326,8 +328,7 @@ export default function ShopScreen() {
 
       if (result.success) {
         setSpinResult(result);
-        setPackState('opening');
-        setShowResult(true);
+        setPackState('ripped');
         // If we just spent a free pack, the server returns the new balance;
         // mirror it locally so the badge updates immediately even before the
         // post-modal refreshData() resync. If the server didn't echo it
@@ -397,7 +398,7 @@ export default function ShopScreen() {
   Animated.sequence([
     Animated.timing(rightDealAnim, {
       toValue: 1.08,
-      duration: 260,
+      duration: 190,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }),
@@ -412,7 +413,7 @@ export default function ShopScreen() {
   Animated.sequence([
     Animated.timing(middleDealAnim, {
       toValue: 1.08,
-      duration: 260,
+      duration: 190,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }),
@@ -427,7 +428,7 @@ export default function ShopScreen() {
   Animated.sequence([
     Animated.timing(leftDealAnim, {
       toValue: 1.08,
-      duration: 260,
+      duration: 190,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }),
@@ -446,10 +447,7 @@ export default function ShopScreen() {
             useNativeDriver: true,
           }),
         ]).start(() => {
-          setPackState('revealed');
-          setSpinning(false);
-          // setShowResult(true);
-          
+  setPackState('revealed');          
           // Start glow animation for the reveal prompt
           Animated.loop(
             Animated.sequence([
@@ -484,10 +482,13 @@ export default function ShopScreen() {
       setShowResult(false);
       setShowSeriesComplete(true);
     } else {
-      setShowResult(false);
-      setSpinResult(null);
-      resetAnimations();
-    }
+  setShowResult(false);
+
+  setTimeout(() => {
+    setSpinResult(null);
+    resetAnimations();
+  }, 250);
+}
     // Ronch's chance to shit-talk — fires every Nth pack open. The helper
     // returns null when it's not Ronch's turn so we just no-op then.
     maybeShowRonchTrashTalk()
@@ -544,6 +545,7 @@ const rightCardX = rightDealAnim.interpolate({
   });
   if (!user) {
     return (
+      
       <GrungeBackground>
         <SafeAreaView style={styles.container}>
           <View style={styles.loginPrompt}>
@@ -558,7 +560,15 @@ const rightCardX = rightDealAnim.interpolate({
 
   return (
     <GrungeBackground>
-      <SafeAreaView style={styles.container}>
+     <PackEruption
+  visible={spinning}
+  packImage={packCoverImage}
+  {...({ cards: spinResult?.won_cards || [] } as any)}
+  onAnimationComplete={() => {
+    setShowResult(true);
+    setSpinning(false);
+  }}
+/>      <SafeAreaView style={styles.container}>
 
       
 <BuyCoinsModal
@@ -598,66 +608,78 @@ const rightCardX = rightDealAnim.interpolate({
     },
   ]}
 >
-                {spinResult.won_cards.map((pull, idx) => (
-                  <Animated.View
-                    key={`pack-fan-${idx}-${pull.card.id}`}
-                    style={[
-                      styles.packCardItem,
-                      idx === 0 && styles.packCardLeft,
-                      idx === 1 && styles.packCardCenter,
-                      idx === 2 && styles.packCardRight,
-                      {
-                        transform: [
-  ...(idx === 0 ? [{ translateX: leftCardX }] : []),
-  ...(idx === 1 ? [{ translateY: centerCardY }] : []),
-  ...(idx === 2 ? [{ translateX: rightCardX }] : []),
-  {
-    scale:
-      idx === 1
-        ? Animated.multiply(cardScaleAnim, 1.06)
-        : cardScaleAnim,
-  },
-],
-                        opacity:
-                          idx === 0
-                            ? leftDealAnim
-                            : idx === 1
-                              ? middleDealAnim
-                              : rightDealAnim,
-                      },
-                    ]}
-                  >
-                    <View
-                      style={[
-                        styles.packCardImageWrap,
-                        pull.is_duplicate && styles.packCardDupe,
-                      ]}
-                    >
-                      <PackRevealWrapper
-                        animationKey={`pack-fan-${idx}-${pull.card.id}`}
-                        rarity="common"
-                        width={102}
-                        height={146}
-                      >
-                        <ExpoImage
-                          source={{ uri: pull.card.front_image_url }}
-                          style={styles.packCardImage}
-                          contentFit="contain"
-                          cachePolicy="memory-disk"
-                          transition={150}
-                        />
-                      </PackRevealWrapper>
-                    </View>
+                {spinResult.won_cards.map((pull, idx) => {
+  const isLeft = idx === 0;
+  const isCenter = idx === 1;
+  const isRight = idx === 2;
 
-                    <Text style={styles.packCardName} numberOfLines={2}>
-                      {pull.card.name}
-                    </Text>
+  const dealAnim = isLeft ? leftDealAnim : isCenter ? middleDealAnim : rightDealAnim;
 
-                    {pull.is_duplicate && (
-                      <Text style={styles.packCardDupeLabel}>DUPE</Text>
-                    )}
-                  </Animated.View>
-                ))}
+  const dealX = dealAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: isLeft ? [70, 0] : isRight ? [-70, 0] : [0, 0],
+  });
+
+  const dealY = dealAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: isCenter ? [420, -18] : [420, 0],
+  });
+
+  return (
+    <Animated.View
+      key={`pack-fan-${idx}-${pull.card.id}`}
+      style={[
+        styles.packCardItem,
+        isLeft && styles.packCardLeft,
+        isCenter && styles.packCardCenter,
+        isRight && styles.packCardRight,
+        {
+          transform: [
+            { translateX: dealX },
+            { translateY: dealY },
+            {
+              scale: isCenter
+                ? Animated.multiply(cardScaleAnim, 1.08)
+                : cardScaleAnim,
+            },
+            { rotate: isLeft ? '-22deg' : isRight ? '22deg' : '0deg' },
+          ],
+          opacity: dealAnim,
+        },
+      ]}
+    >
+      <View
+        style={[
+          styles.packCardImageWrap,
+          pull.is_duplicate && styles.packCardDupe,
+        ]}
+      >
+        <PackRevealWrapper
+          animationKey={`pack-fan-${idx}-${pull.card.id}`}
+          rarity="common"
+          width={102}
+          height={146}
+        >
+          <ExpoImage
+            source={{ uri: pull.card.front_image_url }}
+            style={styles.packCardImage}
+            contentFit="contain"
+            cachePolicy="memory-disk"
+            transition={150}
+          />
+        </PackRevealWrapper>
+      </View>
+
+      <Text style={styles.packCardName} numberOfLines={2}>
+        {pull.card.name}
+      </Text>
+
+      {pull.is_duplicate && (
+        <Text style={styles.packCardDupeLabel}>DUPE</Text>
+      )}
+    </Animated.View>
+  );
+})}
               </Animated.View>
             )}
 
@@ -831,6 +853,7 @@ const rightCardX = rightDealAnim.interpolate({
           }
           // inactive
           return (
+            
             <TouchableOpacity
               style={styles.boostCardInactive}
               onPress={() => setShowBuyCoins(true)}
@@ -926,11 +949,32 @@ shadowRadius: 30,
 shadowOffset: { width: 0, height: 0 },
                 }
               ]}>
-                <Image 
-                  source={{ uri: packCoverImage }}
-                  style={styles.packImage}
-                  resizeMode="cover"
-                />
+                <View style={styles.packImageWrap}>
+  <Image
+  source={{ uri: packCoverImage }}
+  style={styles.packImage}
+  resizeMode="cover"
+/>
+{packState === 'ripped' && (
+  <Image
+    source={{ uri: packCoverImage }}
+    style={[
+      styles.packImage,
+      {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.35,
+        backgroundColor: 'red',
+      },
+    ]}
+    resizeMode="cover"
+  />
+)}
+  
+</View>
               </Animated.View>
             )}
 
@@ -1032,7 +1076,57 @@ shadowOffset: { width: 0, height: 0 },
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({packImageWrap: {
+  width: '100%',
+  height: '100%',
+  position: 'relative',
+  overflow: 'hidden',
+  borderRadius: 16,
+},
+
+rippedPackOverlay: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  height: 52,
+  backgroundColor: 'rgba(0,0,0,0.72)',
+  borderBottomWidth: 3,
+  borderBottomColor: '#9aff5a',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+ripShadow: {
+  position: 'absolute',
+  bottom: -10,
+  left: 20,
+  right: 20,
+  height: 18,
+  backgroundColor: 'rgba(154,255,90,0.25)',
+  borderRadius: 999,
+},
+
+ripText: {
+  color: '#9aff5a',
+  fontWeight: '900',
+  fontSize: 13,
+  letterSpacing: 1.5,
+},
+ripMouth: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  gap: 10,
+},
+
+ripTooth: {
+  width: 18,
+  height: 16,
+  backgroundColor: '#0b0b0b',
+  borderBottomLeftRadius: 8,
+  borderBottomRightRadius: 8,
+},
   container: {
     flex: 1,
     backgroundColor: 'transparent',
@@ -1655,37 +1749,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
   },
   packCardsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    gap: 0,
-    marginTop: 8,
-    marginBottom: 18,
-    paddingHorizontal: 0,
-    minHeight: 190,
-  },
+  width: '100%',
+  height: 220,
+  marginTop: 8,
+  marginBottom: 18,
+  position: 'relative',
+},
   packCardItem: {
-    alignItems: 'center',
-    width: 108,
-  },
+  position: 'absolute',
+  alignItems: 'center',
+  width: 102,
+},
   packCardLeft: {
-    transform: [
-      { translateX: 10 },
-      { rotate: '-18deg' },
-    ],
-    zIndex: 1,
-  },
+  left: '50%',
+  marginLeft: -98,
+  top: 30,
+  zIndex: 1,
+},
   packCardCenter: {
-    transform: [{ translateY: -8 }],
-    zIndex: 3,
-  },
+  left: '50%',
+  marginLeft: -51,
+  top: 8,
+  zIndex: 3,
+},
   packCardRight: {
-    transform: [
-      { translateX: -10 },
-      { rotate: '18deg' },
-    ],
-    zIndex: 1,
-  },
+  left: '50%',
+  marginLeft: -4,
+  top: 30,
+  zIndex: 2,
+},
   packCardImageWrap: {
     borderRadius: 8,
     borderWidth: 2,
