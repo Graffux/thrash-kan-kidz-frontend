@@ -867,18 +867,27 @@ async def seed_database():
     # Quick check - if we already have the right number of cards, skip the full seed
     card_count = await db.cards.count_documents({})
     expected_count = len(INITIAL_CARDS)
-    
+        # Remove stale cards that are no longer in INITIAL_CARDS.
+    valid_ids = {c["id"] for c in INITIAL_CARDS}
+
+    deleted = await db.cards.delete_many({
+        "id": {"$nin": list(valid_ids)}
+    })
+
+    if deleted.deleted_count:
+        logger.info(f"Removed {deleted.deleted_count} stale card(s)")
+        card_count = await db.cards.count_documents({})
     # Insert any cards from INITIAL_CARDS that aren't already in the DB.
     # This lets us add new bands/series without wiping the existing collection.
-    if card_count < expected_count:
-        existing_ids = {c["id"] for c in await db.cards.find({}, {"id": 1, "_id": 0}).to_list(2000)}
-        to_insert = [c for c in INITIAL_CARDS if c["id"] not in existing_ids]
-        if to_insert:
-            for c in to_insert:
-                card_obj = Card(**c)
-                await db.cards.insert_one(card_obj.dict())
-                logger.info(f"Inserted new card: {c['name']}")
-            card_count = await db.cards.count_documents({})
+    existing_ids = {c["id"] for c in await db.cards.find({}, {"id": 1, "_id": 0}).to_list(2000)}
+
+    to_insert = [c for c in INITIAL_CARDS if c["id"] not in existing_ids]
+    if to_insert:
+        for c in to_insert:
+            card_obj = Card(**c)
+            await db.cards.insert_one(card_obj.dict())
+            logger.info(f"Inserted new card: {c['name']}")
+        card_count = await db.cards.count_documents({})
     
     if card_count >= expected_count:
         logger.info(f"Database already has {card_count} cards (expected {expected_count}), skipping seed")
