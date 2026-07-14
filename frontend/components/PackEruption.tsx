@@ -1,202 +1,300 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, Image, Text, View } from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  Easing,
+  Image,
+} from 'react-native';
 
 const PACK_W = 330;
 const PACK_H = 470;
-const HALF_W = PACK_W / 2;
+const TOP_H = 82;
+const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+
+type PackPull = {
+  card: {
+    id?: string;
+    front_image_url?: string;
+  };
+  is_duplicate: boolean;
+};
+
+type PackOrigin = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
 type PackEruptionProps = {
   visible: boolean;
   packImage: string;
-  cards?: { card: any; is_duplicate: boolean }[];
+  origin?: PackOrigin | null;
+  cards?: PackPull[];
   onAnimationComplete?: () => void;
 };
 
 export default function PackEruption({
   visible,
   packImage,
+  origin,
   cards = [],
   onAnimationComplete,
 }: PackEruptionProps) {
-  const slam = useRef(new Animated.Value(0)).current;
+  const intro = useRef(new Animated.Value(0)).current;
   const shakeX = useRef(new Animated.Value(0)).current;
-  const rip = useRef(new Animated.Value(0)).current;
+  const shakeRotate = useRef(new Animated.Value(0)).current;
+  const tear = useRef(new Animated.Value(0)).current;
   const burst = useRef(new Animated.Value(0)).current;
+  const stackOut = useRef(new Animated.Value(0)).current;
+  const fanOut = useRef(new Animated.Value(0)).current;
+  const flash = useRef(new Animated.Value(0)).current;
   const fade = useRef(new Animated.Value(1)).current;
-  const impact = useRef(new Animated.Value(0)).current;
-  const cardsOut = useRef(new Animated.Value(0)).current;
 
-  const slamScale = slam.interpolate({
-    inputRange: [0, 0.7, 1],
-    outputRange: [0.45, 1.12, 1],
-  });
+  const targetCenterX = SCREEN_W / 2;
+  const targetCenterY = SCREEN_H / 2;
 
-  const impactOpacity = impact.interpolate({
-    inputRange: [0, 0.25, 1],
-    outputRange: [0, 0.9, 0],
-  });
+  const originCenterX = origin
+    ? origin.x + origin.width / 2
+    : targetCenterX;
 
-  const impactScale = impact.interpolate({
+  const originCenterY = origin
+    ? origin.y + origin.height / 2
+    : targetCenterY;
+
+  const startTranslateX = originCenterX - targetCenterX;
+  const startTranslateY = originCenterY - targetCenterY;
+  const startScaleX = origin ? origin.width / PACK_W : 0.55;
+  const startScaleY = origin ? origin.height / PACK_H : 0.55;
+
+  const originX = intro.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.25, 2.1],
+    outputRange: [startTranslateX, 0],
   });
 
-  const heroCardY = cardsOut.interpolate({
-  inputRange: [0, 0.12, 0.35, 0.65, 1],
-  outputRange: [260, 170, 20, -140, -235],
-});
-
-const heroCardScale = cardsOut.interpolate({
-  inputRange: [0, 0.08, 0.3, 0.65, 1],
-  outputRange: [0.02, 0.18, 0.95, 1.45, 1.12],
-});
-
-const heroCardRotate = cardsOut.interpolate({
-  inputRange: [0, 0.4, 1],
-  outputRange: ['-18deg', '3deg', '0deg'],
-});
-const heroCardOpacity = cardsOut.interpolate({
-  inputRange: [0, 0.15, 1],
-  outputRange: [0, 1, 1],
-});
-
-  const leftX = rip.interpolate({
+  const originY = intro.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -260],
+    outputRange: [startTranslateY, -10],
   });
 
-  const rightX = rip.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 260],
+  const originScaleX = intro.interpolate({
+    inputRange: [0, 0.8, 1],
+    outputRange: [startScaleX, 1.06, 1.02],
   });
 
-  const leftRot = rip.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '-40deg'],
+  const originScaleY = intro.interpolate({
+    inputRange: [0, 0.8, 1],
+    outputRange: [startScaleY, 1.06, 1.02],
   });
 
-  const rightRot = rip.interpolate({
+  const overlayOpacity = intro.interpolate({
+    inputRange: [0, 0.35, 1],
+    outputRange: [0, 0.7, 1],
+  });
+
+  const packRotate = shakeRotate.interpolate({
+    inputRange: [-1, 0, 1],
+    outputRange: ['-3deg', '0deg', '3deg'],
+  });
+
+  const topY = tear.interpolate({
+    inputRange: [0, 0.15, 1],
+    outputRange: [0, -12, -310],
+  });
+
+  const topX = tear.interpolate({
+    inputRange: [0, 0.4, 1],
+    outputRange: [0, 40, 165],
+  });
+
+  const topRotate = tear.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '40deg'],
+    outputRange: ['0deg', '58deg'],
+  });
+
+  const topOpacity = tear.interpolate({
+    inputRange: [0, 0.62, 1],
+    outputRange: [1, 0.9, 0],
+  });
+
+  const bodyY = tear.interpolate({
+    inputRange: [0, 0.45, 1],
+    outputRange: [0, 18, 135],
+  });
+
+  const bodyRotate = tear.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '-10deg'],
   });
 
   const burstScale = burst.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.2, 3.2],
+    inputRange: [0, 0.25, 1],
+    outputRange: [0.12, 1.4, 4],
   });
 
   const burstOpacity = burst.interpolate({
-    inputRange: [0, 0.25, 1],
-    outputRange: [0, 1, 0],
+    inputRange: [0, 0.15, 0.72, 1],
+    outputRange: [0, 1, 0.65, 0],
+  });
+
+  const flashOpacity = flash.interpolate({
+    inputRange: [0, 0.2, 1],
+    outputRange: [0, 0.9, 0],
+  });
+
+  const stackY = stackOut.interpolate({
+    inputRange: [0, 0.2, 0.65, 1],
+    outputRange: [185, 120, -145, -205],
+  });
+
+  const stackScale = stackOut.interpolate({
+    inputRange: [0, 0.18, 0.7, 1],
+    outputRange: [0.08, 0.28, 1.15, 1],
+  });
+
+  const stackOpacity = stackOut.interpolate({
+    inputRange: [0, 0.12, 0.28, 1],
+    outputRange: [0, 0, 1, 1],
   });
 
   useEffect(() => {
     if (!visible) return;
 
-    slam.setValue(0);
+    intro.setValue(0);
     shakeX.setValue(0);
-    rip.setValue(0);
+    shakeRotate.setValue(0);
+    tear.setValue(0);
     burst.setValue(0);
+    stackOut.setValue(0);
+    fanOut.setValue(0);
+    flash.setValue(0);
     fade.setValue(1);
-    impact.setValue(0);
-    cardsOut.setValue(0);
 
-    Animated.sequence([
+    const shakeSequence = Animated.sequence([
       Animated.parallel([
-        Animated.timing(slam, {
-          toValue: 1,
-          duration: 260,
-          easing: Easing.out(Easing.back(1.8)),
+        Animated.timing(shakeX, {
+          toValue: -22,
+          duration: 45,
           useNativeDriver: true,
         }),
-        Animated.timing(impact, {
-          toValue: 1,
-          duration: 260,
-          easing: Easing.out(Easing.quad),
+        Animated.timing(shakeRotate, {
+          toValue: -1,
+          duration: 45,
           useNativeDriver: true,
         }),
       ]),
+      Animated.parallel([
+        Animated.timing(shakeX, {
+          toValue: 22,
+          duration: 45,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakeRotate, {
+          toValue: 1,
+          duration: 45,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.timing(shakeX, {
+          toValue: 0,
+          duration: 38,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakeRotate, {
+          toValue: 0,
+          duration: 38,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]);
 
-      Animated.loop(
-  Animated.sequence([
-    Animated.timing(shakeX, {
-      toValue: -24,
-      duration: 28,
-      useNativeDriver: true,
-    }),
-    Animated.timing(shakeX, {
-      toValue: 24,
-      duration: 28,
-      useNativeDriver: true,
-    }),
-    Animated.timing(shakeX, {
-      toValue: -18,
-      duration: 28,
-      useNativeDriver: true,
-    }),
-    Animated.timing(shakeX, {
-      toValue: 18,
-      duration: 28,
-      useNativeDriver: true,
-    }),
-    Animated.timing(shakeX, {
-      toValue: -12,
-      duration: 24,
-      useNativeDriver: true,
-    }),
-    Animated.timing(shakeX, {
-      toValue: 12,
-      duration: 24,
-      useNativeDriver: true,
-    }),
-    Animated.timing(shakeX, {
-      toValue: 0,
-      duration: 20,
-      useNativeDriver: true,
-    }),
-  ]),
-  { iterations: 6 }
-),
+    Animated.sequence([
+      Animated.timing(intro, {
+        toValue: 1,
+        duration: 420,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+
+      Animated.loop(shakeSequence, { iterations: 4 }),
 
       Animated.parallel([
-        Animated.timing(rip, {
+        Animated.timing(tear, {
           toValue: 1,
-          duration: 520,
-          easing: Easing.out(Easing.cubic),
+          duration: 550,
+          easing: Easing.out(Easing.exp),
           useNativeDriver: true,
         }),
         Animated.timing(burst, {
           toValue: 1,
-          duration: 520,
+          duration: 650,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
-        Animated.timing(cardsOut, {
-          toValue: 1,
-          duration: 620,
-          easing: Easing.out(Easing.back(1.3)),
-          useNativeDriver: true,
-}),
+        Animated.sequence([
+          Animated.timing(flash, {
+            toValue: 1,
+            duration: 90,
+            useNativeDriver: true,
+          }),
+          Animated.timing(flash, {
+            toValue: 0,
+            duration: 280,
+            useNativeDriver: true,
+          }),
+        ]),
       ]),
 
-      Animated.delay(700),
+      Animated.delay(250),
 
-Animated.timing(fade, {
-  toValue: 0,
-  duration: 180,
-  easing: Easing.out(Easing.quad),
-  useNativeDriver: true,
-}),
+      Animated.timing(stackOut, {
+        toValue: 1,
+        duration: 700,
+        easing: Easing.out(Easing.back(1.6)),
+        useNativeDriver: true,
+      }),
+
+      Animated.delay(180),
+
+      Animated.timing(fanOut, {
+        toValue: 1,
+        duration: 450,
+        easing: Easing.out(Easing.back(1.25)),
+        useNativeDriver: true,
+      }),
+
+      Animated.delay(450),
+
+      Animated.timing(fade, {
+        toValue: 0,
+        duration: 260,
+        easing: Easing.in(Easing.quad),
+        useNativeDriver: true,
+      }),
     ]).start(({ finished }) => {
       if (finished) {
         onAnimationComplete?.();
       }
     });
-  }, [visible]);
+  }, [
+    visible,
+    intro,
+    shakeX,
+    shakeRotate,
+    tear,
+    burst,
+    stackOut,
+    fanOut,
+    flash,
+    fade,
+    onAnimationComplete,
+  ]);
+
   if (!visible) return null;
 
   return (
-    <View
+    <Animated.View
       pointerEvents="none"
       style={{
         position: 'absolute',
@@ -206,35 +304,32 @@ Animated.timing(fade, {
         bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.82)',
+        backgroundColor: 'rgba(0,0,0,0.9)',
+        opacity: Animated.multiply(fade, overlayOpacity),
         zIndex: 999,
       }}
     >
-      <Animated.Text
-  style={{
-    color: '#39ff14',
-    fontSize: 34,
-    fontWeight: '900',
-    letterSpacing: 2,
-    textShadowColor: '#39ff14',
-    textShadowRadius: 18,
-    opacity: fade,
-    transform: [{ scale: slamScale }],
-  }}
->
-  RIP IT OPEN
-</Animated.Text>
-
       <Animated.View
-        pointerEvents="none"
         style={{
           position: 'absolute',
-          width: 180,
-          height: 180,
+          width: 230,
+          height: 230,
           borderRadius: 999,
           backgroundColor: '#39ff14',
-          opacity: impactOpacity,
-          transform: [{ scale: impactScale }],
+          opacity: burstOpacity,
+          transform: [{ scale: burstScale }],
+        }}
+      />
+
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: '#ffffff',
+          opacity: flashOpacity,
         }}
       />
 
@@ -242,66 +337,112 @@ Animated.timing(fade, {
         style={{
           width: PACK_W,
           height: PACK_H,
-          marginTop: 12,
           position: 'relative',
-          opacity: fade,
-          transform: [{ translateX: shakeX }, { scale: slamScale }],
+          transform: [
+            { translateX: originX },
+            { translateY: originY },
+            { scaleX: originScaleX },
+            { scaleY: originScaleY },
+            { translateX: shakeX },
+            { rotate: packRotate },
+          ],
         }}
       >
+        {cards.slice(0, 3).map((pull, index) => {
+          const finalX = index === 0 ? -145 : index === 2 ? 145 : 0;
+          const finalRotate =
+            index === 0 ? '-9deg' : index === 2 ? '9deg' : '0deg';
+
+          const cardX = fanOut.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, finalX],
+          });
+
+          const cardRotate = fanOut.interpolate({
+            inputRange: [0, 1],
+            outputRange: ['0deg', finalRotate],
+          });
+
+          return (
+            <Animated.Image
+              key={pull.card.id || index}
+              source={{ uri: pull.card.front_image_url }}
+              resizeMode="contain"
+              style={{
+                position: 'absolute',
+                top: TOP_H - 5,
+                left: PACK_W * 0.14,
+                width: PACK_W * 0.72,
+                height: PACK_H * 0.7,
+                opacity: stackOpacity,
+                zIndex: 30 - index,
+                transform: [
+                  { translateX: cardX },
+                  { translateY: stackY },
+                  { rotate: cardRotate },
+                  { scale: stackScale },
+                ],
+              }}
+            />
+          );
+        })}
+
         <Animated.View
-          pointerEvents="none"
           style={{
             position: 'absolute',
-            top: PACK_H * 0.22,
-            left: PACK_W * 0.15,
-            width: PACK_W * 0.7,
-            height: PACK_H * 0.5,
+            top: TOP_H - 8,
+            left: 22,
+            width: PACK_W - 44,
+            height: 90,
             borderRadius: 999,
             backgroundColor: '#39ff14',
             opacity: burstOpacity,
             transform: [{ scale: burstScale }],
+            zIndex: 6,
           }}
         />
 
-        {cards.slice(0, 3).map((pull, index) => {
-  const startX = 0;
- const endX = index === 0 ? -170 : index === 1 ? 0 : 170;
+        <Animated.View
+          style={{
+            position: 'absolute',
+            top: TOP_H,
+            left: 0,
+            width: PACK_W,
+            height: PACK_H - TOP_H,
+            overflow: 'hidden',
+            zIndex: 3,
+            transform: [
+              { translateY: bodyY },
+              { rotate: bodyRotate },
+            ],
+          }}
+        >
+          <Image
+            source={{ uri: packImage }}
+            resizeMode="stretch"
+            style={{
+              width: PACK_W,
+              height: PACK_H,
+              marginTop: -TOP_H,
+            }}
+          />
+        </Animated.View>
 
-  const cardX = cardsOut.interpolate({
-    inputRange: [0, 1],
-    outputRange: [startX, endX],
-  });
-
-  return (
-    <Animated.Image
-      key={index}
-      source={{ uri: pull.card.front_image_url }}
-      resizeMode="contain"
-      style={{
-        position: 'absolute',
-        top: PACK_H * 0.30,
-        left: PACK_W * 0.14,
-        width: PACK_W * 0.58,
-        height: PACK_H * 0.64,
-        opacity: heroCardOpacity,
-        transform: [
-          { translateX: cardX },
-          { translateY: heroCardY },
-          { scale: heroCardScale },
-        ],
-      }}
-    />
-  );
-})}
         <Animated.View
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
-            width: HALF_W,
-            height: PACK_H,
+            width: PACK_W,
+            height: TOP_H,
             overflow: 'hidden',
-            transform: [{ translateX: leftX }, { rotate: leftRot }],
+            opacity: topOpacity,
+            zIndex: 12,
+            transform: [
+              { translateX: topX },
+              { translateY: topY },
+              { rotate: topRotate },
+            ],
           }}
         >
           <Image
@@ -310,32 +451,10 @@ Animated.timing(fade, {
             style={{
               width: PACK_W,
               height: PACK_H,
-            }}
-          />
-        </Animated.View>
-
-        <Animated.View
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: HALF_W,
-            width: HALF_W,
-            height: PACK_H,
-            overflow: 'hidden',
-            transform: [{ translateX: rightX }, { rotate: rightRot }],
-          }}
-        >
-          <Image
-            source={{ uri: packImage }}
-            resizeMode="stretch"
-            style={{
-              width: PACK_W,
-              height: PACK_H,
-              marginLeft: -HALF_W,
             }}
           />
         </Animated.View>
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 }

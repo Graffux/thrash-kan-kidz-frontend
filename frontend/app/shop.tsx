@@ -60,6 +60,7 @@ export default function ShopScreen() {
   const [spinning, setSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState<SpinResult | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [packSequenceDone, setPackSequenceDone] = useState(false);
   const [showSeriesComplete, setShowSeriesComplete] = useState(false);
   const [showBuyCoins, setShowBuyCoins] = useState(false);
   const [spinPool, setSpinPool] = useState<SpinPoolData | null>(null);
@@ -69,6 +70,14 @@ export default function ShopScreen() {
   'idle' | 'shaking' | 'ripped' | 'revealed'
 >('idle');
   const [ronchLine, setRonchLine] = useState<string | null>(null);
+
+  const packRef = useRef<View | null>(null);
+  const [packOrigin, setPackOrigin] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
 
   // Daily wheel & medals (medals/free_packs displayed here are read from
   // AppContext via the daily-wheel endpoint on focus; the wheel modal + Card
@@ -247,235 +256,134 @@ export default function ShopScreen() {
   };
 
   const handleOpenPack = async (opts?: { useFreePack?: boolean }) => {
-    if (!user || spinning || !spinPool) return;
-    const useFreePack = !!opts?.useFreePack;
+  if (!user || spinning || !spinPool) return;
 
-    // Coin-gate only applies for paid pulls. Free-pack pulls bypass it
-    // (the free pack itself is the entitlement, no coins charged).
-    if (!useFreePack && user.coins < spinConfig.spin_cost) {
-      setShowBuyCoins(true);
-      return;
-    }
-    if (useFreePack && freePacks <= 0) {
-      Alert.alert('No Free Packs', 'You don\'t have any free packs to redeem.');
-      return;
-    }
+  const useFreePack = !!opts?.useFreePack;
 
-    setSpinning(true);
-    setSpinResult(null);
-    resetAnimations();
-    setPackState('shaking');
-    drumRollSound.play();
+  if (!useFreePack && user.coins < spinConfig.spin_cost) {
+    setShowBuyCoins(true);
+    return;
+  }
 
-    // Snapshot the variant_names this user already owned BEFORE this pack was opened.
-    // Used to detect first-time pulls of any variant theme (Stormy, Decayed, etc.).
-    preOpenVariantsRef.current = new Set(
-      userCards
-        .map((uc: any) => uc?.card?.variant_name)
-        .filter((v: any): v is string => typeof v === 'string' && v.length > 0)
+  if (useFreePack && freePacks <= 0) {
+    Alert.alert(
+      'No Free Packs',
+      "You don't have any free packs to redeem."
     );
-    firedCelebrationsRef.current = new Set();
+    return;
+  }
 
-    try {
-      // Phase 1: Pack shaking animation (1.5 seconds)
-      const shakeAnimation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(shakeAnim, {
-            toValue: 1,
-            duration: 50,
-            useNativeDriver: true,
+  const measuredOrigin = await new Promise<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>((resolve) => {
+    if (!packRef.current) {
+      resolve(null);
+      return;
+    }
+
+    packRef.current.measureInWindow((x, y, width, height) => {
+      resolve({ x, y, width, height });
+    });
+  });
+
+  setPackOrigin(measuredOrigin);
+  setSpinning(true);
+  setSpinResult(null);
+  setShowResult(false);
+  setPackSequenceDone(false);
+  resetAnimations();
+
+  preOpenVariantsRef.current = new Set(
+    userCards
+      .map((uc: any) => uc?.card?.variant_name)
+      .filter(
+        (v: any): v is string =>
+          typeof v === 'string' && v.length > 0
+      )
+  );
+
+  firedCelebrationsRef.current = new Set();
+
+  try {
+    let response: Response;
+
+    if (useFreePack) {
+      response = await fetch(
+        `${apiUrl}/api/users/${user.id}/redeem-free-pack`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            series: spinPool.current_series || 1,
           }),
-          Animated.timing(shakeAnim, {
-            toValue: -1,
-            duration: 50,
-            useNativeDriver: true,
-          }),
-          Animated.timing(shakeAnim, {
-            toValue: 0,
-            duration: 50,
-            useNativeDriver: true,
-          }),
-        ])
+        }
       );
-      
-      shakeAnimation.start();
+    } else {
+      const seriesParam = spinPool.current_series
+        ? `?series=${spinPool.current_series}`
+        : '';
 
-      // Call API while shaking — either the paid /spin endpoint or the
-      // /redeem-free-pack endpoint depending on which entitlement the user
-      // chose. Response shape is the same (won_cards[]) so downstream
-      // reveal logic doesn't need to branch.
-      let response: Response;
-      if (useFreePack) {
-        response = await fetch(`${apiUrl}/api/users/${user.id}/redeem-free-pack`, {
+      response = await fetch(
+        `${apiUrl}/api/users/${user.id}/spin${seriesParam}`,
+        {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ series: spinPool?.current_series || 1 }),
-        });
-      } else {
-        const seriesParam = spinPool?.current_series ? `?series=${spinPool.current_series}` : '';
-        response = await fetch(`${apiUrl}/api/users/${user.id}/spin${seriesParam}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-      
-      const result = await response.json();
-      
-      // Wait for shake animation to complete
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      shakeAnimation.stop();
-      shakeAnim.setValue(0);
-
-      if (result.success) {
-        setSpinResult(result);
-        setPackState('ripped');
-        // If we just spent a free pack, the server returns the new balance;
-        // mirror it locally so the badge updates immediately even before the
-        // post-modal refreshData() resync. If the server didn't echo it
-        // (older deploy), fall back to a -1 decrement so the UI still
-        // reflects the consumption.
-        if (useFreePack) {
-          if (typeof result.remaining_free_packs === 'number') {
-            setFreePacks(result.remaining_free_packs);
-          } else {
-            setFreePacks((n) => Math.max(0, n - 1));
-          }
         }
+      );
+    }
 
-        // Prefetch every won card's front image BEFORE the reveal animation.
-        // Tester report: "when I tap the card to reveal it, it is always blank"
-        // — the ExpoImage component was starting the network fetch only when
-        // it first mounted (during the flip), so slower connections saw an
-        // empty card until the next screen. Kick off warm fetches now, while
-        // the user watches the pack-opening animation for ~1500ms.
-        try {
-          const urls: string[] = (result.won_cards || [])
-            .map((c: any) => c?.card?.front_image_url)
-            .filter((u: any): u is string => typeof u === 'string' && u.length > 0);
-          if (urls.length > 0) {
-            ExpoImage.prefetch(urls).catch(() => {
-              // Prefetch failing just means the image will load lazily
-              // on render — no user-visible regression.
-            });
-          }
-        } catch (_e) {
-          // ignore
-        }
+    const result = await response.json();
 
-        packFlashAnim.setValue(1);
-        shakeAnim.setValue(0);
-        Animated.timing(packFlashAnim, {
-          toValue: 0,
-          duration: 90,
-          useNativeDriver: true,
-        }).start();
-        // Phase 2: Pack bursts open and launches the fan reveal
-        Animated.parallel([
-          Animated.sequence([
-            Animated.timing(packScaleAnim, {
-              toValue: 1.32,
-              duration: 140,
-              easing: Easing.out(Easing.cubic),
-              useNativeDriver: true,
-            }),
-            Animated.parallel([
-              Animated.timing(packScaleAnim, {
-                toValue: 0.72,
-                duration: 90,
-                easing: Easing.in(Easing.quad),
-                useNativeDriver: true,
-              }),
-              
-              Animated.timing(packOpacityAnim, {
-                toValue: 0,
-                duration: 90,
-                easing: Easing.in(Easing.quad),
-                useNativeDriver: true,
-              }),
-            ]),
-          ]),
-          Animated.sequence([
-  Animated.sequence([
-    Animated.timing(rightDealAnim, {
-      toValue: 1.08,
-      duration: 190,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }),
-    Animated.timing(rightDealAnim, {
-      toValue: 1,
-      duration: 90,
-      easing: Easing.out(Easing.bounce),
-      useNativeDriver: true,
-    }),
-  ]),
-  Animated.delay(120),
-  Animated.sequence([
-    Animated.timing(middleDealAnim, {
-      toValue: 1.08,
-      duration: 190,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }),
-    Animated.timing(middleDealAnim, {
-      toValue: 1,
-      duration: 90,
-      easing: Easing.out(Easing.bounce),
-      useNativeDriver: true,
-    }),
-  ]),
-  Animated.delay(120),
-  Animated.sequence([
-    Animated.timing(leftDealAnim, {
-      toValue: 1.08,
-      duration: 190,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }),
-    Animated.timing(leftDealAnim, {
-      toValue: 1,
-      duration: 90,
-      easing: Easing.out(Easing.bounce),
-      useNativeDriver: true,
-    }),
-  ]),
-]),
-          Animated.timing(cardScaleAnim, {
-            toValue: 1,
-            duration: 430,
-            easing: Easing.out(Easing.back(2.2)),
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-  setPackState('revealed');          
-          // Start glow animation for the reveal prompt
-          Animated.loop(
-            Animated.sequence([
-              Animated.timing(glowAnim, {
-                toValue: 1,
-                duration: 1000,
-                useNativeDriver: true,
-              }),
-              Animated.timing(glowAnim, {
-                toValue: 0,
-                duration: 1000,
-                useNativeDriver: true,
-              }),
-            ])
-          ).start();
-        });
-      } else {
-        setSpinning(false);
-        resetAnimations();
-        alert(result.detail || 'Failed to open pack');
-      }
-    } catch (error) {
-      console.error('Pack opening error:', error);
+    if (!result.success) {
       setSpinning(false);
       resetAnimations();
-      alert('Failed to open pack. Please try again.');
+      Alert.alert(
+        'Pack Error',
+        result.detail || 'Failed to open pack'
+      );
+      return;
     }
-  };
+
+    if (useFreePack) {
+      if (typeof result.remaining_free_packs === 'number') {
+        setFreePacks(result.remaining_free_packs);
+      } else {
+        setFreePacks((amount) => Math.max(0, amount - 1));
+      }
+    }
+
+    try {
+      const urls: string[] = (result.won_cards || [])
+        .map((pull: any) => pull?.card?.front_image_url)
+        .filter(
+          (url: any): url is string =>
+            typeof url === 'string' && url.length > 0
+        );
+
+      if (urls.length > 0) {
+        void ExpoImage.prefetch(urls).catch(() => {
+          // Let images continue loading without delaying the pack opening.
+        });
+      }
+    } catch (_error) {
+      // Images will load normally if prefetch fails.
+    }
+
+    setSpinResult(result);
+  } catch (error) {
+    console.error('Pack opening error:', error);
+    setSpinning(false);
+    resetAnimations();
+
+    Alert.alert(
+      'Pack Error',
+      'Failed to open pack. Please try again.'
+    );
+  }
+};
 
   const closeResult = () => {
     if (spinResult?.series_completion?.series_completed) {
@@ -561,20 +469,31 @@ const rightCardX = rightDealAnim.interpolate({
   return (
     <GrungeBackground>
      <PackEruption
-  visible={spinning}
+  visible={spinning && !!spinResult}
   packImage={packCoverImage}
+  origin={packOrigin}
   {...({ cards: spinResult?.won_cards || [] } as any)}
   onAnimationComplete={() => {
-    setShowResult(true);
     setSpinning(false);
+
+    leftDealAnim.setValue(1);
+    middleDealAnim.setValue(1);
+    rightDealAnim.setValue(1);
+
+    setTimeout(() => {
+      setShowResult(true);
+    }, 100);
   }}
-/>      <SafeAreaView style={styles.container}>
+/>
+<SafeAreaView style={styles.container}>
 
       
-<BuyCoinsModal
-  visible={showBuyCoins}
-  onClose={() => setShowBuyCoins(false)}
-/>{/* Buy Coins Modal */}
+{false && (
+  <BuyCoinsModal
+    visible={showBuyCoins}
+    onClose={() => setShowBuyCoins(false)}
+  />
+)}{/* Buy Coins Modal */}
 
 <RonchTrashTalk
   line={ronchLine}
@@ -582,7 +501,11 @@ const rightCardX = rightDealAnim.interpolate({
 />
 
       {/* Result Modal */}
-<Modal visible={showResult} transparent animationType="fade" onRequestClose={closeResult}>
+<Modal
+  visible={showResult} transparent
+  animationType="fade"
+  onRequestClose={closeResult}
+>
       <View style={styles.resultOverlay}>
           <View style={styles.resultContainer}>
             {/* Ronch corner stamp — mood depends on the rarity of the
@@ -637,14 +560,10 @@ const rightCardX = rightDealAnim.interpolate({
           transform: [
             { translateX: dealX },
             { translateY: dealY },
-            {
-              scale: isCenter
-                ? Animated.multiply(cardScaleAnim, 1.08)
-                : cardScaleAnim,
-            },
+            { scale: 1 },
             { rotate: isLeft ? '-22deg' : isRight ? '22deg' : '0deg' },
           ],
-          opacity: dealAnim,
+          opacity: 1,
         },
       ]}
     >
@@ -934,8 +853,10 @@ const rightCardX = rightDealAnim.interpolate({
         <View style={styles.packSection}>
           <View style={styles.packContainer}>
             {/* Card Pack Box - Now using the cover image */}
-            {packState !== 'revealed' && (
-              <Animated.View style={[
+            {!spinning && !spinResult && packState !== 'revealed' && (
+              <Animated.View
+                ref={packRef}
+                style={[
                 styles.cardPack,
                 {
                   transform: [
@@ -1758,23 +1679,23 @@ ripTooth: {
   packCardItem: {
   position: 'absolute',
   alignItems: 'center',
-  width: 102,
+  width: 118,
 },
   packCardLeft: {
   left: '50%',
-  marginLeft: -98,
+  marginLeft: -128,
   top: 30,
   zIndex: 1,
 },
   packCardCenter: {
   left: '50%',
-  marginLeft: -51,
+  marginLeft: -59,
   top: 8,
   zIndex: 3,
 },
   packCardRight: {
   left: '50%',
-  marginLeft: -4,
+  marginLeft: 10,
   top: 30,
   zIndex: 2,
 },
@@ -1806,17 +1727,26 @@ ripTooth: {
     marginTop: 4,
   },
   packCardName: {
-    color: '#9aff5a',
-    fontSize: 18,
-    fontFamily: FONTS.death,
-    fontWeight: '900',
-    letterSpacing: 1.2,
-    textAlign: 'center',
-    marginTop: 6,
-    textShadowColor: 'rgba(57,255,20,0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 6,
-  },
+  color: '#9aff5a',
+  fontSize: 12,
+  lineHeight: 14,
+  fontFamily: FONTS.death,
+  fontWeight: '900',
+  letterSpacing: 0.2,
+  textAlign: 'center',
+  marginTop: 8,
+  width: 116,
+  minHeight: 32,
+  paddingHorizontal: 4,
+  paddingVertical: 3,
+  borderRadius: 5,
+  overflow: 'hidden',
+  backgroundColor: 'rgba(0,0,0,0.82)',
+  alignSelf: 'center',
+  textShadowColor: 'rgba(57,255,20,0.5)',
+  textShadowOffset: { width: 0, height: 0 },
+  textShadowRadius: 6,
+},
   packCardDupeLabel: {
     color: '#FF9800',
     fontSize: 9,
