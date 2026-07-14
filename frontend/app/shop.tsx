@@ -146,7 +146,9 @@ export default function ShopScreen() {
   
   // Pack cover images per series
   const PACK_COVERS: { [key: number]: string } = {
-    1: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/qmfr196q_enhanced-1771247671181.jpg',
+    1: Image.resolveAssetSource(
+      require('../assets/images/packs/series1_pack_closed.png')
+    ).uri,
     2: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/299mm98l_file_00000000e66c71fdbb3b59d1529ea8b0.png',
     3: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/iulfre4h_file_00000000fd5c71f5b5ddd034a592fca7.png',
     4: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rgut5wkf_file_00000000c08471f7b19a3eca347c7b62.png',
@@ -161,6 +163,14 @@ export default function ShopScreen() {
     const series = spinPool?.current_series || 1;
     return PACK_COVERS[series] || PACK_COVERS[1];
   }, [spinPool?.current_series]);
+
+  const packExplosionImage = useMemo(() => {
+    if ((spinPool?.current_series || 1) !== 1) return packCoverImage;
+    return Image.resolveAssetSource(
+      require('../assets/images/Packs/series1_pack_rip3.png')
+    ).uri;
+  }, [spinPool?.current_series, packCoverImage]);
+
 
   useEffect(() => {
     fetchSpinData();
@@ -296,6 +306,9 @@ export default function ShopScreen() {
   setPackSequenceDone(false);
   resetAnimations();
 
+  // Start the visible pack motion immediately while the API request runs.
+  setPackState('shaking');
+
   preOpenVariantsRef.current = new Set(
     userCards
       .map((uc: any) => uc?.card?.variant_name)
@@ -326,6 +339,8 @@ export default function ShopScreen() {
         ? `?series=${spinPool.current_series}`
         : '';
 
+      console.time('PACK REQUEST');
+
       response = await fetch(
         `${apiUrl}/api/users/${user.id}/spin${seriesParam}`,
         {
@@ -333,9 +348,13 @@ export default function ShopScreen() {
           headers: { 'Content-Type': 'application/json' },
         }
       );
+
+      console.timeEnd('PACK REQUEST');
     }
 
+    console.time('PACK JSON');
     const result = await response.json();
+    console.timeEnd('PACK JSON');
 
     if (!result.success) {
       setSpinning(false);
@@ -373,6 +392,7 @@ export default function ShopScreen() {
     }
 
     setSpinResult(result);
+    setPackState('ripped');
   } catch (error) {
     console.error('Pack opening error:', error);
     setSpinning(false);
@@ -471,6 +491,7 @@ const rightCardX = rightDealAnim.interpolate({
      <PackEruption
   visible={spinning && !!spinResult}
   packImage={packCoverImage}
+  packExplosionImage={packExplosionImage}
   origin={packOrigin}
   {...({ cards: spinResult?.won_cards || [] } as any)}
   onAnimationComplete={() => {
@@ -589,9 +610,18 @@ const rightCardX = rightDealAnim.interpolate({
         </PackRevealWrapper>
       </View>
 
-      <Text style={styles.packCardName} numberOfLines={2}>
-        {pull.card.name}
-      </Text>
+      <View
+        style={[
+          styles.packCardNameWrap,
+          isLeft && styles.packCardNameLeft,
+          isCenter && styles.packCardNameCenter,
+          isRight && styles.packCardNameRight,
+        ]}
+      >
+        <Text style={styles.packCardName} numberOfLines={2}>
+          {pull.card.name}
+        </Text>
+      </View>
 
       {pull.is_duplicate && (
         <Text style={styles.packCardDupeLabel}>DUPE</Text>
@@ -1726,22 +1756,37 @@ ripTooth: {
     textAlign: 'center',
     marginTop: 4,
   },
+  packCardNameWrap: {
+    marginTop: 8,
+    width: 118,
+    minHeight: 34,
+    paddingHorizontal: 5,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: 'rgba(0,0,0,0.88)',
+    borderWidth: 1,
+    borderColor: 'rgba(154,255,90,0.45)',
+    justifyContent: 'center',
+  },
+  packCardNameLeft: {
+    transform: [{ rotate: '22deg' }],
+  },
+  packCardNameCenter: {
+    transform: [{ rotate: '0deg' }],
+  },
+  packCardNameRight: {
+    transform: [{ rotate: '-22deg' }],
+  },
+
   packCardName: {
   color: '#9aff5a',
-  fontSize: 12,
-  lineHeight: 14,
+  fontSize: 11,
+  lineHeight: 13,
   fontFamily: FONTS.death,
   fontWeight: '900',
-  letterSpacing: 0.2,
+  letterSpacing: 0.1,
   textAlign: 'center',
-  marginTop: 8,
-  width: 116,
-  minHeight: 32,
-  paddingHorizontal: 4,
-  paddingVertical: 3,
-  borderRadius: 5,
-  overflow: 'hidden',
-  backgroundColor: 'rgba(0,0,0,0.82)',
+  width: '100%',
   alignSelf: 'center',
   textShadowColor: 'rgba(57,255,20,0.5)',
   textShadowOffset: { width: 0, height: 0 },

@@ -29,6 +29,7 @@ type PackOrigin = {
 type PackEruptionProps = {
   visible: boolean;
   packImage: string;
+  packExplosionImage?: string;
   origin?: PackOrigin | null;
   cards?: PackPull[];
   onAnimationComplete?: () => void;
@@ -37,6 +38,7 @@ type PackEruptionProps = {
 export default function PackEruption({
   visible,
   packImage,
+  packExplosionImage,
   origin,
   cards = [],
   onAnimationComplete,
@@ -45,6 +47,7 @@ export default function PackEruption({
   const shakeX = useRef(new Animated.Value(0)).current;
   const shakeRotate = useRef(new Animated.Value(0)).current;
   const tear = useRef(new Animated.Value(0)).current;
+  const ripImpact = useRef(new Animated.Value(0)).current;
   const burst = useRef(new Animated.Value(0)).current;
   const stackOut = useRef(new Animated.Value(0)).current;
   const fanOut = useRef(new Animated.Value(0)).current;
@@ -117,6 +120,16 @@ export default function PackEruption({
     outputRange: [1, 0.9, 0],
   });
 
+  const closedPackOpacity = tear.interpolate({
+    inputRange: [0, 0.08, 0.22],
+    outputRange: [1, 1, 0],
+  });
+
+  const rippedPackOpacity = tear.interpolate({
+    inputRange: [0, 0.08, 0.22, 1],
+    outputRange: [0, 0, 1, 1],
+  });
+
   const bodyY = tear.interpolate({
     inputRange: [0, 0.45, 1],
     outputRange: [0, 18, 135],
@@ -127,14 +140,54 @@ export default function PackEruption({
     outputRange: ['0deg', '-10deg'],
   });
 
+  const ripPackScale = ripImpact.interpolate({
+    inputRange: [0, 0.28, 0.58, 1],
+    outputRange: [1, 1.05, 0.96, 1],
+  });
+
+  const ripPackY = ripImpact.interpolate({
+    inputRange: [0, 0.35, 0.7, 1],
+    outputRange: [0, -14, 7, 0],
+  });
+
+  const ripPackX = ripImpact.interpolate({
+    inputRange: [0, 0.16, 0.32, 0.48, 0.64, 0.8, 1],
+    outputRange: [0, -13, 15, -11, 10, -5, 0],
+  });
+
+  const ripPackRotate = ripImpact.interpolate({
+    inputRange: [0, 0.22, 0.45, 0.68, 1],
+    outputRange: ['0deg', '-2deg', '2.5deg', '-1deg', '0deg'],
+  });
+
   const burstScale = burst.interpolate({
-    inputRange: [0, 0.25, 1],
-    outputRange: [0.12, 1.4, 4],
+    inputRange: [0, 0.18, 0.55, 1],
+    outputRange: [0.08, 0.9, 1.8, 3.4],
   });
 
   const burstOpacity = burst.interpolate({
-    inputRange: [0, 0.15, 0.72, 1],
-    outputRange: [0, 1, 0.65, 0],
+    inputRange: [0, 0.1, 0.42, 0.78, 1],
+    outputRange: [0, 1, 0.8, 0.25, 0],
+  });
+
+  const hotCoreScale = burst.interpolate({
+    inputRange: [0, 0.16, 0.48, 1],
+    outputRange: [0.05, 0.8, 1.45, 2.1],
+  });
+
+  const hotCoreOpacity = burst.interpolate({
+    inputRange: [0, 0.08, 0.38, 0.7, 1],
+    outputRange: [0, 1, 0.75, 0.18, 0],
+  });
+
+  const rayScale = burst.interpolate({
+    inputRange: [0, 0.2, 1],
+    outputRange: [0.1, 1, 2.8],
+  });
+
+  const rayOpacity = burst.interpolate({
+    inputRange: [0, 0.12, 0.55, 1],
+    outputRange: [0, 0.9, 0.45, 0],
   });
 
   const flashOpacity = flash.interpolate({
@@ -164,6 +217,7 @@ export default function PackEruption({
     shakeX.setValue(0);
     shakeRotate.setValue(0);
     tear.setValue(0);
+    ripImpact.setValue(0);
     burst.setValue(0);
     stackOut.setValue(0);
     fanOut.setValue(0);
@@ -226,6 +280,12 @@ export default function PackEruption({
           easing: Easing.out(Easing.exp),
           useNativeDriver: true,
         }),
+        Animated.timing(ripImpact, {
+          toValue: 1,
+          duration: 550,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
         Animated.timing(burst, {
           toValue: 1,
           duration: 650,
@@ -283,6 +343,7 @@ export default function PackEruption({
     shakeX,
     shakeRotate,
     tear,
+    ripImpact,
     burst,
     stackOut,
     fanOut,
@@ -312,14 +373,62 @@ export default function PackEruption({
       <Animated.View
         style={{
           position: 'absolute',
-          width: 230,
-          height: 230,
+          width: 135,
+          height: 135,
           borderRadius: 999,
-          backgroundColor: '#39ff14',
+          backgroundColor: 'rgba(57,255,20,0.72)',
           opacity: burstOpacity,
           transform: [{ scale: burstScale }],
         }}
       />
+
+      <Animated.View
+        style={{
+          position: 'absolute',
+          width: 92,
+          height: 92,
+          borderRadius: 999,
+          backgroundColor: '#ff8a00',
+          opacity: hotCoreOpacity,
+          shadowColor: '#ffffff',
+          shadowOpacity: 1,
+          shadowRadius: 28,
+          transform: [{ scale: hotCoreScale }],
+        }}
+      />
+
+      <Animated.View
+        style={{
+          position: 'absolute',
+          width: 54,
+          height: 54,
+          borderRadius: 999,
+          backgroundColor: '#ffffff',
+          opacity: hotCoreOpacity,
+          shadowColor: '#fff7c2',
+          shadowOpacity: 1,
+          shadowRadius: 24,
+          transform: [{ scale: hotCoreScale }],
+        }}
+      />
+
+      {[-68, -45, -22, 0, 22, 45, 68].map((angle) => (
+        <Animated.View
+          key={`ray-${angle}`}
+          style={{
+            position: 'absolute',
+            width: 10,
+            height: 190,
+            borderRadius: 999,
+            backgroundColor: 'rgba(255,184,72,0.9)',
+            opacity: rayOpacity,
+            transform: [
+              { rotate: `${angle}deg` },
+              { scaleY: rayScale },
+            ],
+          }}
+        />
+      ))}
 
       <Animated.View
         style={{
@@ -333,6 +442,156 @@ export default function PackEruption({
         }}
       />
 
+      {/* Smoke behind the ripped pack */}
+      {[
+        { x: -105, y: 45, size: 120, driftX: -45, rise: -150 },
+        { x: -25, y: 25, size: 150, driftX: -10, rise: -185 },
+        { x: 70, y: 50, size: 125, driftX: 42, rise: -155 },
+        { x: 10, y: 80, size: 105, driftX: 18, rise: -125 },
+      ].map((puff, index) => {
+        const smokeOpacity = burst.interpolate({
+          inputRange: [0, 0.12, 0.72, 1],
+          outputRange: [0, 0.62, 0.38, 0],
+        });
+
+        const smokeY = burst.interpolate({
+          inputRange: [0, 1],
+          outputRange: [puff.y, puff.rise],
+        });
+
+        const smokeX = burst.interpolate({
+          inputRange: [0, 1],
+          outputRange: [puff.x, puff.x + puff.driftX],
+        });
+
+        const smokeScale = burst.interpolate({
+          inputRange: [0, 0.35, 1],
+          outputRange: [0.25, 1, 1.75],
+        });
+
+        return (
+          <Animated.View
+            key={`smoke-${index}`}
+            style={{
+              position: 'absolute',
+              width: puff.size,
+              height: puff.size,
+              borderRadius: puff.size,
+              backgroundColor: 'rgba(70,70,70,0.72)',
+              opacity: smokeOpacity,
+              transform: [
+                { translateX: smokeX },
+                { translateY: smokeY },
+                { scale: smokeScale },
+              ],
+            }}
+          />
+        );
+      })}
+
+      {/* Floating embers */}
+      {[
+        { x: -130, y: 70, dx: -35, rise: -185, size: 5 },
+        { x: -85, y: 110, dx: 20, rise: -220, size: 4 },
+        { x: -35, y: 80, dx: -15, rise: -175, size: 6 },
+        { x: 15, y: 120, dx: 30, rise: -235, size: 4 },
+        { x: 55, y: 75, dx: -10, rise: -195, size: 5 },
+        { x: 105, y: 105, dx: 38, rise: -215, size: 4 },
+        { x: 135, y: 55, dx: 18, rise: -165, size: 6 },
+        { x: 0, y: 55, dx: -28, rise: -250, size: 5 },
+      ].map((ember, index) => {
+        const emberOpacity = burst.interpolate({
+          inputRange: [0, 0.16, 0.78, 1],
+          outputRange: [0, 1, 0.85, 0],
+        });
+
+        const emberY = burst.interpolate({
+          inputRange: [0, 1],
+          outputRange: [ember.y, ember.rise],
+        });
+
+        const emberX = burst.interpolate({
+          inputRange: [0, 1],
+          outputRange: [ember.x, ember.x + ember.dx],
+        });
+
+        const emberScale = burst.interpolate({
+          inputRange: [0, 0.3, 1],
+          outputRange: [0.3, 1.25, 0.45],
+        });
+
+        return (
+          <Animated.View
+            key={`ember-${index}`}
+            style={{
+              position: 'absolute',
+              width: ember.size,
+              height: ember.size * 2.4,
+              borderRadius: ember.size,
+              backgroundColor: '#ff8a00',
+              opacity: emberOpacity,
+              shadowColor: '#ffb000',
+              shadowOpacity: 1,
+              shadowRadius: 7,
+              transform: [
+                { translateX: emberX },
+                { translateY: emberY },
+                { scale: emberScale },
+              ],
+            }}
+          />
+        );
+      })}
+
+      {/* Foil shards thrown outward */}
+      {[
+        { x: -80, y: 35, dx: -155, dy: -115, rotate: '-230deg', w: 13, h: 25 },
+        { x: -40, y: 15, dx: -105, dy: -180, rotate: '190deg', w: 10, h: 21 },
+        { x: 20, y: 10, dx: 95, dy: -205, rotate: '-260deg', w: 12, h: 24 },
+        { x: 65, y: 30, dx: 155, dy: -135, rotate: '240deg', w: 14, h: 27 },
+        { x: -105, y: 80, dx: -175, dy: -55, rotate: '170deg', w: 9, h: 18 },
+        { x: 105, y: 85, dx: 180, dy: -65, rotate: '-185deg', w: 10, h: 20 },
+      ].map((shard, index) => {
+        const shardOpacity = burst.interpolate({
+          inputRange: [0, 0.1, 0.82, 1],
+          outputRange: [0, 1, 0.9, 0],
+        });
+
+        const shardX = burst.interpolate({
+          inputRange: [0, 1],
+          outputRange: [shard.x, shard.dx],
+        });
+
+        const shardY = burst.interpolate({
+          inputRange: [0, 1],
+          outputRange: [shard.y, shard.dy],
+        });
+
+        const shardRotate = burst.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['0deg', shard.rotate],
+        });
+
+        return (
+          <Animated.View
+            key={`foil-${index}`}
+            style={{
+              position: 'absolute',
+              width: shard.w,
+              height: shard.h,
+              backgroundColor: '#d8d8d8',
+              borderRadius: 2,
+              opacity: shardOpacity,
+              transform: [
+                { translateX: shardX },
+                { translateY: shardY },
+                { rotate: shardRotate },
+              ],
+            }}
+          />
+        );
+      })}
+
       <Animated.View
         style={{
           width: PACK_W,
@@ -344,10 +603,28 @@ export default function PackEruption({
             { scaleX: originScaleX },
             { scaleY: originScaleY },
             { translateX: shakeX },
+            { translateX: ripPackX },
+            { translateY: ripPackY },
             { rotate: packRotate },
+            { rotate: ripPackRotate },
+            { scale: ripPackScale },
           ],
         }}
       >
+        <Animated.Image
+          source={{ uri: packExplosionImage || packImage }}
+          resizeMode="contain"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: PACK_W,
+            height: PACK_H,
+            opacity: rippedPackOpacity,
+            zIndex: 15,
+          }}
+        />
+
         {cards.slice(0, 3).map((pull, index) => {
           const finalX = index === 0 ? -145 : index === 2 ? 145 : 0;
           const finalRotate =
@@ -395,9 +672,12 @@ export default function PackEruption({
             width: PACK_W - 44,
             height: 90,
             borderRadius: 999,
-            backgroundColor: '#39ff14',
-            opacity: burstOpacity,
-            transform: [{ scale: burstScale }],
+            backgroundColor: 'rgba(255,138,0,0.7)',
+            opacity: hotCoreOpacity,
+            shadowColor: '#ffffff',
+            shadowOpacity: 1,
+            shadowRadius: 20,
+            transform: [{ scale: hotCoreScale }],
             zIndex: 6,
           }}
         />
@@ -410,6 +690,7 @@ export default function PackEruption({
             width: PACK_W,
             height: PACK_H - TOP_H,
             overflow: 'hidden',
+            opacity: closedPackOpacity,
             zIndex: 3,
             transform: [
               { translateY: bodyY },
@@ -436,7 +717,7 @@ export default function PackEruption({
             width: PACK_W,
             height: TOP_H,
             overflow: 'hidden',
-            opacity: topOpacity,
+            opacity: Animated.multiply(topOpacity, closedPackOpacity),
             zIndex: 12,
             transform: [
               { translateX: topX },

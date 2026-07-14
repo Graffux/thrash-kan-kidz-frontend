@@ -787,9 +787,14 @@ export default function CollectionScreen() {
   const getSeriesStats = (series: number) => {
     const baseTotal = allCards.filter(c => c.series === series && c.rarity === 'common' && !c.base_card_id).length;
     const variantTotal = allCards.filter(c => c.series === series && c.base_card_id).length;
-    const ownedBase = userCards.filter(uc => uc.card.series === series && uc.card.rarity === 'common' && !uc.card.base_card_id).length;
-    const ownedVars = userCards.filter(uc => uc.card.series === series && uc.card.base_card_id).length;
-    return { baseTotal, variantTotal, ownedBase, ownedVars };
+    const ownedBase = allCards.filter(c => c.series === series && c.rarity === 'common' && !c.base_card_id && ownedCardIds.has(c.id)).length;
+    const ownedVars = allCards.filter(c => c.series === series && c.base_card_id && ownedCardIds.has(c.id)).length;
+    return {
+      baseTotal,
+      variantTotal,
+      ownedBase,
+      ownedVars,
+    };
   };
 
   // Per-band stats within a series — used by the new progress bars
