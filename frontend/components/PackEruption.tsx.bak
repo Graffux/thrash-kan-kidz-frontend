@@ -401,6 +401,20 @@ useEffect(() => {
   flash,
   fade,
 ]);
+  }, [
+    visible,
+    intro,
+    shakeX,
+    shakeRotate,
+    tear,
+    ripImpact,
+    burst,
+    stackOut,
+    fanOut,
+    flash,
+    fade,
+    onAnimationComplete,
+  ]);
 
   if (!visible) return null;
 

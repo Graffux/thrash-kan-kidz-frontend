@@ -519,6 +519,25 @@ const rightCardX = rightDealAnim.interpolate({
 
   return (
     <GrungeBackground>
+     <PackEruption
+  visible={packState === 'ripped' && !!spinResult}
+  packImage={packCoverImage}
+  packExplosionImage={packExplosionImage}
+  origin={packOrigin}
+  {...({ cards: spinResult?.won_cards || [] } as any)}
+  onAnimationComplete={() => {
+    setPackState('revealed');
+    setSpinning(false);
+
+    leftDealAnim.setValue(1);
+    middleDealAnim.setValue(1);
+    rightDealAnim.setValue(1);
+
+    setTimeout(() => {
+      setShowResult(true);
+    }, 100);
+  }}
+/>
 <SafeAreaView style={styles.container}>
 
       
@@ -1903,7 +1922,6 @@ ripTooth: {
     marginBottom: 12,
   },
 });
-
 
 
 
