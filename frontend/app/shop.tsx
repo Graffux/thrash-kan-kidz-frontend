@@ -167,7 +167,7 @@ export default function ShopScreen() {
   const packExplosionImage = useMemo(() => {
     if ((spinPool?.current_series || 1) !== 1) return packCoverImage;
     return Image.resolveAssetSource(
-      require('../assets/images/Packs/series1_pack_rip3.png')
+      require('../assets/images/packs/series1_pack_rip3.png')
     ).uri;
   }, [spinPool?.current_series, packCoverImage]);
 
