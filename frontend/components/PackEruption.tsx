@@ -321,7 +321,71 @@ useEffect(() => {
   shakeX.setValue(0);
   shakeRotate.setValue(0);
 
+  const finalViolentShake = Animated.sequence([
+    Animated.parallel([
+      Animated.timing(shakeX, {
+        toValue: -30,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeRotate, {
+        toValue: -1,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+    ]),
+    Animated.parallel([
+      Animated.timing(shakeX, {
+        toValue: 30,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeRotate, {
+        toValue: 1,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+    ]),
+    Animated.parallel([
+      Animated.timing(shakeX, {
+        toValue: -26,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeRotate, {
+        toValue: -1,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+    ]),
+    Animated.parallel([
+      Animated.timing(shakeX, {
+        toValue: 26,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeRotate, {
+        toValue: 1,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+    ]),
+    Animated.parallel([
+      Animated.timing(shakeX, {
+        toValue: 0,
+        duration: 45,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeRotate, {
+        toValue: 0,
+        duration: 45,
+        useNativeDriver: true,
+      }),
+    ]),
+  ]);
+
   eruptionRef.current = Animated.sequence([
+    finalViolentShake,
     Animated.parallel([
       Animated.timing(tear, {
         toValue: 1,
@@ -788,4 +852,6 @@ useEffect(() => {
     </Animated.View>
   );
 }
+
+
 

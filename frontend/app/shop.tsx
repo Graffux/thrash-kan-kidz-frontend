@@ -146,30 +146,36 @@ export default function ShopScreen() {
   
   // Pack cover images per series
   const PACK_COVERS: { [key: number]: string } = {
-    1: Image.resolveAssetSource(
-      require('../assets/images/packs/series1_pack_closed.png')
-    ).uri,
-    2: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/299mm98l_file_00000000e66c71fdbb3b59d1529ea8b0.png',
-    3: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/iulfre4h_file_00000000fd5c71f5b5ddd034a592fca7.png',
-    4: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/rgut5wkf_file_00000000c08471f7b19a3eca347c7b62.png',
-    5: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/jo0a1vaf_file_00000000eb2c71f58adeb4fa7008890f.png',
-    6: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/y80vb5a4_enhanced-1777473438266.jpg',
-    7: 'https://customer-assets.emergentagent.com/job_1bc0dac8-eaf6-4ea9-b00d-e58826a0a195/artifacts/3rs03ne2_Screenshot_20260517_032245_ChatGPT.png',
-    8: Image.resolveAssetSource(require('../assets/series8_cover.png.jpg')).uri,
-};
-  
-  // Get current pack cover based on user's current series - recalculates when spinPool changes
+    1: Image.resolveAssetSource(require('../assets/images/packs/series1_pack_closed.png')).uri,
+    2: Image.resolveAssetSource(require('../assets/images/packs/series2_pack_closed.png')).uri,
+    3: Image.resolveAssetSource(require('../assets/images/packs/series3_pack_closed.png')).uri,
+    4: Image.resolveAssetSource(require('../assets/images/packs/series4_pack_closed.png')).uri,
+    5: Image.resolveAssetSource(require('../assets/images/packs/series5_pack_closed.png')).uri,
+    6: Image.resolveAssetSource(require('../assets/images/packs/series6_pack_closed.png')).uri,
+    7: Image.resolveAssetSource(require('../assets/images/packs/series7_pack_closed.png')).uri,
+    8: Image.resolveAssetSource(require('../assets/images/packs/series8_pack_closed.png')).uri,
+  };
+
+  const PACK_RIPPED: { [key: number]: string } = {
+    1: Image.resolveAssetSource(require('../assets/images/packs/series1_pack_rip3.png')).uri,
+    2: Image.resolveAssetSource(require('../assets/images/packs/series2_pack_rip3.png')).uri,
+    3: Image.resolveAssetSource(require('../assets/images/packs/series3_pack_rip3.png')).uri,
+    4: Image.resolveAssetSource(require('../assets/images/packs/series4_pack_rip3.png')).uri,
+    5: Image.resolveAssetSource(require('../assets/images/packs/series5_pack_rip3.png')).uri,
+    6: Image.resolveAssetSource(require('../assets/images/packs/series6_pack_rip3.png')).uri,
+    7: Image.resolveAssetSource(require('../assets/images/packs/series7_pack_rip3.png')).uri,
+    8: Image.resolveAssetSource(require('../assets/images/packs/series8_pack_rip3.png')).uri,
+  };
+
   const packCoverImage = useMemo(() => {
     const series = spinPool?.current_series || 1;
     return PACK_COVERS[series] || PACK_COVERS[1];
   }, [spinPool?.current_series]);
 
   const packExplosionImage = useMemo(() => {
-    if ((spinPool?.current_series || 1) !== 1) return packCoverImage;
-    return Image.resolveAssetSource(
-      require('../assets/images/packs/series1_pack_rip3.png')
-    ).uri;
-  }, [spinPool?.current_series, packCoverImage]);
+    const series = spinPool?.current_series || 1;
+    return PACK_RIPPED[series] || PACK_RIPPED[1];
+  }, [spinPool?.current_series]);
 
 
   useEffect(() => {
@@ -491,26 +497,6 @@ const rightCardX = rightDealAnim.interpolate({
     <SafeAreaView style={styles.container}>
       ...
     </SafeAreaView>
-
-    <PackEruption
-      visible={spinning}
-      packImage={packCoverImage}
-      packExplosionImage={packExplosionImage}
-      origin={packOrigin}
-      {...({ cards: spinResult?.won_cards || [] } as any)}
-      onAnimationComplete={() => {
-        setPackState('revealed');
-        setSpinning(false);
-
-        leftDealAnim.setValue(1);
-        middleDealAnim.setValue(1);
-        rightDealAnim.setValue(1);
-
-        setTimeout(() => {
-          setShowResult(true);
-        }, 100);
-      }}
-    />
   </GrungeBackground>
 );
   }
@@ -1036,7 +1022,27 @@ shadowOffset: { width: 0, height: 0 },
         </Animated.View>
       )}
       </SafeAreaView>
-    </GrungeBackground>
+    
+    <PackEruption
+      visible={spinning}
+      packImage={packCoverImage}
+      packExplosionImage={packExplosionImage}
+      origin={packOrigin}
+      {...({ cards: spinResult?.won_cards || [] } as any)}
+      onAnimationComplete={() => {
+        setPackState('revealed');
+        setSpinning(false);
+
+        leftDealAnim.setValue(1);
+        middleDealAnim.setValue(1);
+        rightDealAnim.setValue(1);
+
+        setTimeout(() => {
+          setShowResult(true);
+        }, 100);
+      }}
+    />
+  </GrungeBackground>
   );
 }
 
@@ -1903,6 +1909,8 @@ ripTooth: {
     marginBottom: 12,
   },
 });
+
+
 
 
 
