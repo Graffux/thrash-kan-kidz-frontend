@@ -345,7 +345,6 @@ export default function ShopScreen() {
         ? `?series=${spinPool.current_series}`
         : '';
 
-      console.time('PACK REQUEST');
 
       response = await fetch(
         `${apiUrl}/api/users/${user.id}/spin${seriesParam}`,
@@ -355,10 +354,8 @@ export default function ShopScreen() {
         }
       );
 
-      console.timeEnd('PACK REQUEST');
     }
 
-    console.time('PACK JSON');
 
 const responseText = await response.text();
 
@@ -375,7 +372,6 @@ try {
   );
 }
 
-console.timeEnd('PACK JSON');
 
     if (!result.success) {
       setSpinning(false);
@@ -1909,6 +1905,7 @@ ripTooth: {
     marginBottom: 12,
   },
 });
+
 
 
 
