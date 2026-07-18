@@ -504,12 +504,10 @@ const rightCardX = rightDealAnim.interpolate({
 <SafeAreaView style={styles.container}>
 
       
-{false && (
-  <BuyCoinsModal
+<BuyCoinsModal
     visible={showBuyCoins}
     onClose={() => setShowBuyCoins(false)}
-  />
-)}{/* Buy Coins Modal */}
+  />{/* Buy Coins Modal */}
 
 <RonchTrashTalk
   line={ronchLine}
@@ -1905,6 +1903,8 @@ ripTooth: {
     marginBottom: 12,
   },
 });
+
+
 
 
 
