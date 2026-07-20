@@ -79,7 +79,15 @@ const SimpleCard = React.memo(({
   cardFlipPlay: () => void;
 }) => {
   const isVariant = !!card.base_card_id;
-  const isReward = card.rarity === 'rare' || card.rarity === 'epic';
+  const c: any = card;
+const isReward =
+  c.is_daily_reward ||
+  c.reward_type ||
+  c.special_type ||
+  c.card_category === 'reward' ||
+  c.series_reward ||
+  c.rarity === 'rare' ||
+  c.rarity === 'epic';
   const rewardColor = card.rarity === 'epic' ? '#FF2A2A' : '#FFD700';
 
   // If not owned, show mystery card
@@ -159,7 +167,7 @@ const RewardGlow: React.FC<{ active: boolean; color?: string; children: React.Re
         pointerEvents="none"
         style={[
           styles.rewardGlowHalo,
-          { backgroundColor: color, shadowColor: color, opacity: haloOpacity, transform: [{ scale: haloScale }] },
+          { backgroundColor: '#ffffff', shadowColor: color, opacity: haloOpacity, transform: [{ scale: haloScale }] },
         ]}
       />
       {children}
@@ -1040,7 +1048,10 @@ export default function CollectionScreen() {
               position="tr"
               size={64}
             />
-            <Text style={styles.tradeResultTitle}>🎉 Trade Complete!</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+  <Ionicons name="trophy" size={22} color="#FFD700" />
+  <Text style={styles.tradeResultTitle}> Trade Complete!</Text>
+</View>
             {tradeInResult && (
               <>
                 <Text style={styles.tradeResultText}>
@@ -1425,18 +1436,17 @@ const styles = StyleSheet.create({
   // edge as it pulses. Animated through opacity/scale only (native driver).
   rewardGlowHalo: {
     position: 'absolute',
-    top: -6,
-    left: -6,
-    right: -6,
-    bottom: -6,
-    borderRadius: 14,
-    backgroundColor: '#FFD700',
-    // Falls back gracefully on Android — the colored fill is the glow.
-    shadowColor: '#FFD700',
+    top: -12,
+    left: -12,
+    right: -12,
+    bottom: -12,
+    borderRadius: 18,
+    backgroundColor: '#ffffff',
+    shadowColor: '#ffffff',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 0,
+    shadowRadius: 36,
+    elevation: 18,
     zIndex: -1,
   },
   rewardCardBorder: {
@@ -1960,6 +1970,9 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
 });
+
+
+
 
 
 

@@ -1,5 +1,5 @@
-/**
- * ScratchCard — finger-drag scratch-off overlay for variant card reveals.
+﻿/**
+ * ScratchCard â€” finger-drag scratch-off overlay for variant card reveals.
  *
  * Behavior:
  *   - Renders the card image (revealed art) on the bottom layer.
@@ -33,7 +33,7 @@ interface Props {
   coverUri: string;       // The themed scratch cover (gets scratched away)
   onComplete?: () => void; // Fires once when scratch threshold is crossed
   brushRadius?: number;   // Brush size in px, default 22
-  threshold?: number;     // Coverage fraction 0–1 to auto-complete, default 0.55
+  threshold?: number;     // Coverage fraction 0â€“1 to auto-complete, default 0.55
 }
 
 export const ScratchCard: React.FC<Props> = ({
@@ -60,14 +60,14 @@ export const ScratchCard: React.FC<Props> = ({
   const totalCells = cols * rows;
   const touchedCells = useRef<Set<number>>(new Set());
   // Throttle haptic feedback. PanResponder fires onMove ~60Hz which would
-  // queue a vibration on every frame — that feels like a constant buzz
+  // queue a vibration on every frame â€” that feels like a constant buzz
   // and on Android can trip the OS rate limiter. We gate haptics to fire
   // at most once every ~80ms, which feels like the textured chatter of
   // dragging a coin across foil.
   const lastHapticAt = useRef(0);
 
   const fireHaptic = useCallback(() => {
-    // Haptics aren't supported on web — guard so the dev preview doesn't
+    // Haptics aren't supported on web â€” guard so the dev preview doesn't
     // throw. On native, expo-haptics is a no-op if the device lacks a
     // vibration motor.
     if (Platform.OS === 'web') return;
@@ -76,7 +76,7 @@ export const ScratchCard: React.FC<Props> = ({
     lastHapticAt.current = now;
     // Light impact = a single short "tick", perfect for scratch chatter.
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
-      /* ignore haptic errors silently — never crash a scratch */
+      /* ignore haptic errors silently â€” never crash a scratch */
     });
   }, []);
 
@@ -84,11 +84,11 @@ export const ScratchCard: React.FC<Props> = ({
   const triggerReveal = useCallback(() => {
     if (revealed) return;
     setRevealed(true);
-    // Stronger haptic to mark the reveal moment — feels like ripping off
+    // Stronger haptic to mark the reveal moment â€” feels like ripping off
     // the last sliver of foil.
     if (Platform.OS !== 'web') {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {
-        /* swallow — never crash the reveal */
+        /* swallow â€” never crash the reveal */
       });
     }
     Animated.timing(coverOpacity, {
@@ -125,7 +125,7 @@ export const ScratchCard: React.FC<Props> = ({
   );
 
   // PanResponder captures both initial touch and drag deltas. We feed every
-  // sampled point into recordTouch — RN typically delivers events at 60Hz
+  // sampled point into recordTouch â€” RN typically delivers events at 60Hz
   // during a drag, plenty dense for a smooth scratch.
   const panResponder = useMemo(
     () =>
@@ -149,10 +149,12 @@ export const ScratchCard: React.FC<Props> = ({
     touchedCells.current = new Set();
     coverOpacity.setValue(1);
   }, [imageUri, coverOpacity]);
-
   return (
-    <View style={[styles.wrap, { width, height }]} {...panResponder.panHandlers}>
-      {/* Bottom layer: revealed card art */}
+    <View
+      style={[styles.wrap, { width, height }]}
+      {...panResponder.panHandlers}
+    >
+      {/* Bottom layer: actual variant card */}
       <ExpoImage
         source={{ uri: imageUri }}
         style={StyleSheet.absoluteFill}
@@ -160,39 +162,37 @@ export const ScratchCard: React.FC<Props> = ({
         cachePolicy="memory-disk"
         transition={150}
       />
-      {/* Top layer: scratch cover.
-          - SOLID FALLBACK behind the SVG <Image>: if the cover image fails
-            to render (large remote JPEG + react-native-svg's flaky
-            href loading), the user still sees something obvious to scratch
-            off, not a "blank screen, nothing happens" state. The SVG
-            image renders on top of this fallback when it does load — same
-            visual either way. */}
+
+      {/* Top layer: scratch cover only */}
       <Animated.View
         pointerEvents={revealed ? 'none' : 'auto'}
         style={[StyleSheet.absoluteFill, { opacity: coverOpacity }]}
       >
-        {/* Visible fallback layer — always shown until enough is scratched. */}
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            styles.coverFallback,
-          ]}
-        />
-        <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+        <Svg width={width} height={height}>
           <Defs>
-            <Mask id="scratchMask" x="0" y="0" width={width} height={height}>
-              {/* White = visible cover. We start fully white. */}
-              <Rect x="0" y="0" width={width} height={height} fill="white" />
-              {/* Each dot punches a black hole in the mask, revealing card below. */}
+            <Mask id="scratchMask">
+              <Rect
+                x="0"
+                y="0"
+                width={width}
+                height={height}
+                fill="white"
+              />
+
               <G>
-                {dots.map((d, i) => (
-                  <Circle key={i} cx={d.x} cy={d.y} r={brushRadius} fill="black" />
+                {dots.map((dot, index) => (
+                  <Circle
+                    key={`${dot.x}-${dot.y}-${index}`}
+                    cx={dot.x}
+                    cy={dot.y}
+                    r={brushRadius}
+                    fill="black"
+                  />
                 ))}
               </G>
             </Mask>
           </Defs>
-          {/* The fancy cover image. May fail to render on slow devices, in
-              which case the solid coverFallback above carries the load. */}
+
           <SvgImage
             href={coverUri}
             x="0"
@@ -215,15 +215,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#0a0a0a',
     borderRadius: 8,
   },
-  coverFallback: {
-    // Scratch-off "foil" surface. Bright metallic gold so the variant
-    // cover reads as a real scratch-ticket — and so it's clearly visible
-    // even if the remote SVG <Image> href silently fails on a flaky
-    // network. The colored variant artwork loads on top of this when
-    // available. Previous version was a muted brown that looked like a
-    // blank screen on lower-end devices.
-    backgroundColor: '#d4a017',
-  },
 });
 
 export default ScratchCard;
+
+
+
