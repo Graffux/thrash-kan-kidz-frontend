@@ -85,6 +85,7 @@ export default function ShopScreen() {
   const [wheelStreak, setWheelStreak] = useState(0);
   const [medals, setMedals] = useState(0);
   const [freePacks, setFreePacks] = useState(0);
+  const [noDupesPacks, setNoDupesPacks] = useState(0);
 
   // First-Variant celebration
   // Captured at the moment "OPEN PACK!" is tapped: the set of variant_names the
@@ -198,17 +199,27 @@ export default function ShopScreen() {
   // when the screen mounts; AppContext also re-syncs via refreshData()
   // whenever the user returns from a mini-game on Home.
   const refreshShopBalances = async () => {
-    if (!user) return;
-    try {
-      const res = await fetch(`${apiUrl}/api/users/${user.id}/daily-wheel`);
-      const data = await res.json();
-      setMedals(data.medals || 0);
-      setFreePacks(data.free_packs || 0);
-      setWheelStreak(data.wheel_streak || 0);
-    } catch (err) {
-      console.error('Error fetching shop balances:', err);
-    }
-  };
+  if (!user) return;
+
+  try {
+    const wheelRes = await fetch(
+      `${apiUrl}/api/users/${user.id}/daily-wheel`
+    );
+    const wheelData = await wheelRes.json();
+
+    const triviaRes = await fetch(
+      `${apiUrl}/api/users/${user.id}/trivia/status`
+    );
+    const triviaData = await triviaRes.json();
+
+    setMedals(wheelData.medals || 0);
+    setFreePacks(wheelData.free_packs || 0);
+    setWheelStreak(wheelData.wheel_streak || 0);
+    setNoDupesPacks(triviaData.no_dupes_packs || 0);
+  } catch (err) {
+    console.error('Error fetching shop balances:', err);
+  }
+};
 
   const handleReroll = async () => {
     if (!spinResult?.won_cards || !user) return;
@@ -271,10 +282,17 @@ export default function ShopScreen() {
     setPackState('idle');
   };
 
-  const handleOpenPack = async (opts?: { useFreePack?: boolean }) => {
+  const handleOpenPack = async (
+  opts?: {
+    type?: 'coins' | 'free' | 'no_dupes';
+  }
+) => {
   if (!user || spinning || !spinPool) return;
 
-  const useFreePack = !!opts?.useFreePack;
+  const packType = opts?.type ?? 'coins';
+
+const useFreePack = packType === 'free';
+const useNoDupes = packType === 'no_dupes';
 
   if (!useFreePack && user.coins < spinConfig.spin_cost) {
     setShowBuyCoins(true);
@@ -288,6 +306,12 @@ export default function ShopScreen() {
     );
     return;
   }
+  if (useNoDupes && noDupesPacks <= 0) {Alert.alert(
+    'No No-Dupes Packs',
+    "You don't have any No-Dupes Packs."
+  );
+  return;
+}
 
   const measuredOrigin = await new Promise<{
     x: number;
@@ -330,31 +354,40 @@ export default function ShopScreen() {
     let response: Response;
 
     if (useFreePack) {
-      response = await fetch(
-        `${apiUrl}/api/users/${user.id}/redeem-free-pack`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            series: spinPool.current_series || 1,
-          }),
-        }
-      );
-    } else {
-      const seriesParam = spinPool.current_series
-        ? `?series=${spinPool.current_series}`
-        : '';
-
-
-      response = await fetch(
-        `${apiUrl}/api/users/${user.id}/spin${seriesParam}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-
+  response = await fetch(
+    `${apiUrl}/api/users/${user.id}/redeem-free-pack`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        series: spinPool.current_series || 1,
+      }),
     }
+  );
+} else if (useNoDupes) {
+  response = await fetch(
+    `${apiUrl}/api/users/${user.id}/open-no-dupes-pack`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        series: spinPool.current_series || 1,
+      }),
+    }
+  );
+} else {
+  const seriesParam = spinPool.current_series
+    ? `?series=${spinPool.current_series}`
+    : '';
+
+  response = await fetch(
+    `${apiUrl}/api/users/${user.id}/spin${seriesParam}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
+}
 
 
 const responseText = await response.text();
@@ -730,8 +763,7 @@ const rightCardX = rightDealAnim.interpolate({
                       { text: 'Cancel', style: 'cancel' },
                       {
                         text: 'OPEN',
-                        onPress: () => handleOpenPack({ useFreePack: true }),
-                      },
+                        onPress: () => handleOpenPack({ type: 'free' }),                    },
                     ]
                   );
                 }}
@@ -948,6 +980,22 @@ shadowOffset: { width: 0, height: 0 },
               </>
             )}
           </TouchableOpacity>
+          <TouchableOpacity
+  style={[
+    styles.openPackButton,
+    {
+      marginTop: 12,
+      backgroundColor: '#1f7a1f',
+    },
+    (spinning || packState !== 'idle') && styles.openPackButtonDisabled,
+  ]}
+  onPress={() => handleOpenPack({ type: 'no_dupes' })}
+  disabled={spinning || packState !== 'idle'}
+>
+  <Text style={styles.openPackButtonText}>
+    OPEN NO-DUPES PACK
+  </Text>
+</TouchableOpacity>
 
           {user.coins < spinConfig.spin_cost && packState === 'idle' && (
             <Text style={styles.notEnoughCoins}>

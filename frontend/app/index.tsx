@@ -439,6 +439,28 @@ export default function HomeScreen() {
             style={styles.miniGameButton}
             onPress={() => {
               buttonTapSound.play();
+              router.push('/trivia');
+            }}
+            data-testid="home-trivia-btn"
+          >
+            <Text style={styles.miniGameEmoji}>🤘</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.miniGameTitle}>Metal Musick Trivia</Text>
+              <Text style={styles.miniGameSub}>
+                Five questions. Earn a No-Dupes Pack!
+              </Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color="#FFD700"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.miniGameButton}
+            onPress={() => {
+              buttonTapSound.play();
               setShowCardPicker(true);
             }}
             data-testid="home-card-picker-btn"

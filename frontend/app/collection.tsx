@@ -1,3 +1,4 @@
+﻿import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -8,11 +9,12 @@ import {
   Modal,
   Dimensions,
   Alert,
+  Share,
   ScrollView,
   FlatList,
   Animated,
   Easing,
-  Share,
+  // the rest of your imports
 } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { headerSource } from '../src/assets/headerCatalog';
@@ -93,8 +95,8 @@ const isReward =
   // If not owned, show mystery card
   if (!isOwned) {
     return (
-      <RewardGlow active={isReward} color={rewardColor}>
-        <View style={[styles.cardContainer, styles.mysteryCard, isReward && { borderWidth: 3, borderColor: rewardColor }]}>
+      <RewardGlow active={isReward} color={rewardColor} patriotic={card.name?.toLowerCase().includes('uncle slam')}>
+        <View style={[styles.cardContainer, styles.mysteryCard]}>
           <ExpoImage
             source={{ uri: MYSTERY_CARD_IMAGE }}
             style={styles.cardImage}
@@ -117,7 +119,7 @@ const isReward =
   }
 
   return (
-    <RewardGlow active={isReward} color={rewardColor}>
+    <RewardGlow active={isReward} color={rewardColor} patriotic={card.name?.toLowerCase().includes('uncle slam')}>
       <SimpleCardOwned
         card={card}
         quantity={quantity}
@@ -135,45 +137,164 @@ SimpleCard.displayName = 'SimpleCard';
 // Color is rarity-aware: gold (#FFD700) for `rare`, red (#FF2A2A) for `epic`.
 // Why a separate component?
 //   * Allows native-driver opacity animation on Android (true glow shadows
-//     don't animate on Android — only `elevation`, which can't be smoothly
+//     don't animate on Android â€” only `elevation`, which can't be smoothly
 //     interpolated). The halo View pulses cheaply via opacity instead.
 //   * Single Animated.Value per wrapper instance keeps the animation
 //     independent across cards but avoids re-rendering the whole component.
 // Only ~7 reward cards exist in the catalog, so the animation cost is
 // negligible.
-const RewardGlow: React.FC<{ active: boolean; color?: string; children: React.ReactNode }> = ({ active, color = '#FFD700', children }) => {
-  const pulse = useRef(new Animated.Value(0)).current;
+const AnimatedLinearGradient =
+  Animated.createAnimatedComponent(LinearGradient);
+
+const RewardGlow: React.FC<{
+  active: boolean;
+  color?: string;
+  patriotic?: boolean;
+  children: React.ReactNode;
+}> = ({
+  active,
+  color = '#FFD700',
+  patriotic = false,
+  children,
+}) => {
+  const spin = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!active) return;
+    if (!active) {
+      spin.stopAnimation();
+      spin.setValue(0);
+      return;
+    }
+
+    spin.setValue(0);
+
     const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 1100, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0, duration: 1100, useNativeDriver: true }),
-      ])
+      Animated.timing(spin, {
+        toValue: 1,
+        duration: 3800,
+        easing: (t: number) => t,
+        useNativeDriver: true,
+      })
     );
+
     loop.start();
-    return () => loop.stop();
-  }, [active, pulse]);
 
-  if (!active) return <>{children}</>;
+    return () => {
+      loop.stop();
+    };
+  }, [active, spin]);
 
-  const haloOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.95] });
-  const haloScale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.04] });
+  if (!active) {
+    return <>{children}</>;
+  }
+
+  const rotation = spin.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const isEpic = color.toLowerCase() === '#ff2a2a';
+
+  const rimColors: readonly [string, string, ...string[]] = patriotic
+    ? [
+        '#003cff',
+        '#003cff',
+        '#ffffff',
+        '#ffffff',
+        '#e00020',
+        '#e00020',
+        '#003cff',
+      ]
+    : isEpic
+      ? [
+          '#260000',
+          '#760000',
+          '#ff1010',
+          '#fff4f4',
+          '#ffffff',
+          '#ff2a2a',
+          '#260000',
+        ]
+      : [
+          '#2f1d00',
+          '#8a5700',
+          '#ffd000',
+          '#fff2a8',
+          '#ffffff',
+          '#ffbd00',
+          '#2f1d00',
+        ];
+
+  const rimLocations: [number, number, number, number, number, number, number] =
+    patriotic
+      ? [0, 0.22, 0.34, 0.43, 0.58, 0.78, 1]
+      : [0, 0.34, 0.44, 0.49, 0.52, 0.6, 1];
+
+  const glowColor = patriotic
+    ? '#ffffff'
+    : isEpic
+      ? '#ff1616'
+      : '#ffd700';
 
   return (
-    <View style={styles.rewardGlowWrap}>
-      <Animated.View
+    <View
+      style={{
+        position: 'relative',
+      }}
+    >
+      <View
         pointerEvents="none"
-        style={[
-          styles.rewardGlowHalo,
-          { backgroundColor: '#ffffff', shadowColor: color, opacity: haloOpacity, transform: [{ scale: haloScale }] },
-        ]}
-      />
-      {children}
+        style={{
+          position: 'absolute',
+          top: -4,
+          left: -4,
+          right: -4,
+          bottom: -4,
+          borderRadius: 13,
+          overflow: 'hidden',
+
+          shadowColor: glowColor,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 1,
+          shadowRadius: 12,
+          elevation: 12,
+        }}
+      >
+        <AnimatedLinearGradient
+          colors={rimColors}
+          locations={rimLocations}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            position: 'absolute',
+            top: -85,
+            left: -85,
+            right: -85,
+            bottom: -85,
+            transform: [{ rotate: rotation }],
+          }}
+        />
+
+        <View
+          style={{
+            position: 'absolute',
+            top: 4,
+            left: 4,
+            right: 4,
+            bottom: 4,
+            borderRadius: 9,
+            backgroundColor: '#080808',
+          }}
+        />
+      </View>
+
+      <View style={{ position: 'relative' }}>
+        {children}
+      </View>
     </View>
   );
 };
+
 RewardGlow.displayName = 'RewardGlow';
 
 // Owned-card subcomponent. Long-press flips the thumbnail in place via a
@@ -182,7 +303,7 @@ RewardGlow.displayName = 'RewardGlow';
 // Memory-tuned (Samsung OOM fix, May 2026): back-face image is lazy-mounted
 // only after the user has flipped at least once. This avoids decoding 486
 // back-image bitmaps into memory simultaneously when the Collection screen
-// first mounts — which was the primary source of
+// first mounts â€” which was the primary source of
 // `java.lang.OutOfMemoryError` on lower-RAM Android devices.
 const SimpleCardOwned = React.memo(({
   card,
@@ -235,7 +356,7 @@ const SimpleCardOwned = React.memo(({
       style={[
         styles.cardContainer,
         isVariant && styles.variantCardBorder,
-        isReward && { borderWidth: 3, borderColor: card.rarity === 'epic' ? '#FF2A2A' : '#FFD700' },
+        
       ]}
       data-testid={`grid-card-${card.id}`}
     >
@@ -283,7 +404,7 @@ const SimpleCardOwned = React.memo(({
       )}
       {(card as any).is_daily_reward && (
         <View style={styles.dailyRewardBadge} testID={`daily-badge-${card.id}`}>
-          <Text style={styles.dailyRewardBadgeText}>🌙</Text>
+          <Text style={styles.dailyRewardBadgeText}>ðŸŒ™</Text>
         </View>
       )}
       <View style={styles.cardNameBadge}>
@@ -313,11 +434,11 @@ function formatCountdown(iso: string | null): string | null {
 }
 
 // Tile rendered for a series the player can't reach yet. Two flavours:
-//   * status="scheduled"   → shows a live countdown to release_date
-//                            + "🔔 Notify me at launch" button (subscribes
+//   * status="scheduled"   â†’ shows a live countdown to release_date
+//                            + "ðŸ”” Notify me at launch" button (subscribes
 //                            via expo-notifications, fires at the OS level
 //                            even if the app is closed at release time)
-//   * status="coming_soon" → shows just "Coming Soon" (no date, no button)
+//   * status="coming_soon" â†’ shows just "Coming Soon" (no date, no button)
 const ComingSoonTile: React.FC<{ entry: SeriesCatalogEntry }> = ({ entry }) => {
   const [, setTick] = useState(0);
   const [subscribed, setSubscribed] = useState(false);
@@ -368,7 +489,7 @@ const ComingSoonTile: React.FC<{ entry: SeriesCatalogEntry }> = ({ entry }) => {
         if (result.ok) {
           setSubscribed(true);
           Alert.alert(
-            "You're in 🤘",
+            "You're in ðŸ¤˜",
             `We'll ping you the second ${entry.name} goes live.`,
           );
         } else {
@@ -390,7 +511,7 @@ const ComingSoonTile: React.FC<{ entry: SeriesCatalogEntry }> = ({ entry }) => {
       <View style={comingSoonStyles.row}>
         <View style={styles.seriesHeaderLeft}>
           <Text style={comingSoonStyles.title}>
-            {entry.name} — {entry.description}
+            {entry.name} â€” {entry.description}
           </Text>
           <Text style={comingSoonStyles.subtitle}>{subtitle}</Text>
         </View>
@@ -434,7 +555,7 @@ const comingSoonStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 215, 0, 0.18)',
     borderStyle: 'dashed',
-    borderRadius: 12,
+    borderRadius: 11,
     paddingHorizontal: 14,
     paddingVertical: 14,
     marginBottom: 12,
@@ -500,7 +621,7 @@ export default function CollectionScreen() {
   const [isTrading, setIsTrading] = useState(false);
   const cardFlipSound = useSoundPlayer('card_flip');
   const prizeWonSound = useSoundPlayer('prize_won');
-  // NOTE: Removed looping `collection_bg` music — was holding an ExoPlayer
+  // NOTE: Removed looping `collection_bg` music â€” was holding an ExoPlayer
   // instance open indefinitely and contributing to OOM on low-RAM Android
   // devices (Samsung testers reported repeat crashes). Can be re-added as
   // an opt-in toggle in Sound Settings later.
@@ -511,7 +632,7 @@ export default function CollectionScreen() {
   const milestoneScale = useRef(new Animated.Value(0.6)).current;
   const skullPulse = useRef(new Animated.Value(1)).current;
   // Series numbers we've already attempted to claim this session, regardless of
-  // outcome — prevents repeated POSTs while user lingers on Collection tab.
+  // outcome â€” prevents repeated POSTs while user lingers on Collection tab.
   const milestoneAttemptedRef = useRef<Set<number>>(new Set());
 
   // Card-detail modal 3D flip animation: 0 = front, 1 = back.
@@ -571,7 +692,7 @@ export default function CollectionScreen() {
 
   // Series-completion milestone detection. Runs whenever userCards or allCards
   // changes. For each fully-collected series the backend hasn't already paid
-  // out for, hit the milestone endpoint. Server is the source of truth — it
+  // out for, hit the milestone endpoint. Server is the source of truth â€” it
   // decides whether to award and is idempotent.
   useEffect(() => {
     if (!user || allCards.length === 0 || userCards.length === 0) return;
@@ -580,7 +701,7 @@ export default function CollectionScreen() {
     const ownedIds = new Set(userCards.map(uc => uc.card.id));
     const alreadyClaimed = new Set(user.series_milestone_claimed || []);
 
-    // Derive series list from cards we already have — no hardcoded cap.
+    // Derive series list from cards we already have â€” no hardcoded cap.
     const allSeriesNums = Array.from(
       new Set(
         allCards
@@ -676,7 +797,7 @@ export default function CollectionScreen() {
     try {
       await Share.share({
         message:
-          `I just pulled ${card.name}${variantBit}${seriesBit} on THRASH KAN KIDZ! 🤘\n\n` +
+          `I just pulled ${card.name}${variantBit}${seriesBit} on THRASH KAN KIDZ! ðŸ¤˜\n\n` +
           `${card.description}\n\n` +
           `Collect 'em all: https://thrashkankidz.com`,
         url: card.front_image_url,
@@ -741,7 +862,7 @@ export default function CollectionScreen() {
       <GrungeBackground>
         <SafeAreaView style={styles.container}>
           <View style={styles.centerContainer}>
-            <Text style={styles.lockIcon}>🔒</Text>
+            <Text style={styles.lockIcon}>ðŸ”’</Text>
             <Text style={styles.lockedText}>Please login to view your collection</Text>
           </View>
         </SafeAreaView>
@@ -761,7 +882,7 @@ export default function CollectionScreen() {
     setCollapsedSeries(prev => ({ ...prev, [series]: !(prev[series] ?? true) }));
   };
 
-  // Group cards by series — derived from allCards so adding Series 7+
+  // Group cards by series â€” derived from allCards so adding Series 7+
   // requires only a backend change, no frontend rebuild.
   const seriesNumbers: number[] = Array.from(
     new Set(
@@ -805,7 +926,7 @@ export default function CollectionScreen() {
     };
   };
 
-  // Per-band stats within a series — used by the new progress bars
+  // Per-band stats within a series â€” used by the new progress bars
   const getBandsInSeries = (series: number): string[] => {
     const bands = new Set<string>();
     allCards.forEach(c => {
@@ -991,7 +1112,7 @@ export default function CollectionScreen() {
                             style={[styles.bandProgressName, bs.isComplete && styles.bandProgressNameComplete]}
                             numberOfLines={1}
                           >
-                            {bs.isComplete ? '✓ ' : ''}{band}
+                            {bs.isComplete ? 'âœ“ ' : ''}{band}
                           </Text>
                           <Text style={[styles.bandProgressCounts, bs.isComplete && styles.bandProgressNameComplete]}>
                             {bs.ownedBase}/{bs.baseTotal}
@@ -1021,9 +1142,9 @@ export default function CollectionScreen() {
           );
         })}
 
-        {/* Upcoming series tiles ("Coming Soon" / "Drops on …") rendered
+        {/* Upcoming series tiles ("Coming Soon" / "Drops on â€¦") rendered
             from the catalog endpoint. We explicitly check the `status` field
-            (new in this backend) — if the API hasn't been redeployed yet and
+            (new in this backend) â€” if the API hasn't been redeployed yet and
             doesn't return `status`, this is a no-op. That keeps the screen
             looking right against an older backend instead of flagging every
             released series as "Coming Soon" because `released` was `undefined`. */}
@@ -1178,7 +1299,7 @@ export default function CollectionScreen() {
                     <Text style={styles.modalVariantName}>{selectedCard.card.variant_name} Variant</Text>
                   )}
                   <Text style={styles.modalCardRarity}>
-                    {selectedCard.card.rarity?.toUpperCase()} • Series {selectedCard.card.series}
+                    {selectedCard.card.rarity?.toUpperCase()} â€¢ Series {selectedCard.card.series}
                   </Text>
                   <Text style={styles.modalCardDescription}>
                     {selectedCard.card.description}
@@ -1201,7 +1322,7 @@ export default function CollectionScreen() {
         </View>
       </Modal>
 
-      {/* Series Completion Milestone — full-screen celebration with share */}
+      {/* Series Completion Milestone â€” full-screen celebration with share */}
       {milestone && (
         <Animated.View
           style={[styles.milestoneOverlay, { opacity: milestoneOpacity }]}
@@ -1212,9 +1333,9 @@ export default function CollectionScreen() {
             style={[styles.milestoneCard, { transform: [{ scale: milestoneScale }] }]}
           >
             <Animated.View style={{ transform: [{ scale: skullPulse }] }}>
-              <Text style={styles.milestoneSkull}>💀</Text>
+              <Text style={styles.milestoneSkull}>ðŸ’€</Text>
             </Animated.View>
-            <Text style={styles.milestoneFlames}>🔥 🤘 🔥</Text>
+            <Text style={styles.milestoneFlames}>ðŸ”¥ ðŸ¤˜ ðŸ”¥</Text>
             <Text style={styles.milestoneEyebrow}>SERIES COMPLETE!</Text>
             <Text style={styles.milestoneTitle}>SERIES {milestone.series}</Text>
             <Text style={styles.milestoneSubtitle}>100% COLLECTED</Text>
@@ -1328,7 +1449,7 @@ const styles = StyleSheet.create({
   },
   seriesSection: {
     marginBottom: 12,
-    borderRadius: 12,
+    borderRadius: 11,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#333',
@@ -1460,8 +1581,8 @@ const styles = StyleSheet.create({
   },
   rewardBadge: {
     position: 'absolute',
-    top: 4,
-    left: 4,
+    top: 2,
+    left: 2,
     backgroundColor: '#FFD700',
     paddingHorizontal: 4,
     paddingVertical: 2,
@@ -1478,8 +1599,8 @@ const styles = StyleSheet.create({
   },
   quantityBadge: {
     position: 'absolute',
-    top: 4,
-    right: 4,
+    top: 2,
+    right: 2,
     backgroundColor: 'rgba(0,0,0,0.8)',
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -1492,8 +1613,8 @@ const styles = StyleSheet.create({
   },
   variantBadge: {
     position: 'absolute',
-    top: 4,
-    left: 4,
+    top: 2,
+    left: 2,
     backgroundColor: '#9C27B0',
     paddingHorizontal: 4,
     paddingVertical: 2,
@@ -1504,12 +1625,12 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: 'bold',
   },
-  // Daily Reward badge — small moon icon overlay on cards earned via Daily Challenges.
+  // Daily Reward badge â€” small moon icon overlay on cards earned via Daily Challenges.
   // Sits top-right (variant badge is top-left, quantity badge is bottom-right).
   dailyRewardBadge: {
     position: 'absolute',
-    top: 4,
-    right: 4,
+    top: 2,
+    right: 2,
     backgroundColor: 'rgba(58, 26, 74, 0.95)',
     borderWidth: 1,
     borderColor: '#e5b4ff',
@@ -1566,7 +1687,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 12,
+    borderRadius: 11,
     borderWidth: 1,
     borderColor: '#FFD700',
   },
@@ -1585,7 +1706,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     maxHeight: 180,
     backgroundColor: 'rgba(26, 26, 46, 0.95)',
-    borderRadius: 12,
+    borderRadius: 11,
     borderWidth: 1,
     borderColor: '#9C27B0',
   },
@@ -1751,7 +1872,7 @@ const styles = StyleSheet.create({
   modalCardImage: {
     width: width * 0.7,
     height: width * 1.05,
-    borderRadius: 12,
+    borderRadius: 11,
     backgroundColor: '#333',
   },
   tapHint: {
@@ -1925,10 +2046,10 @@ const styles = StyleSheet.create({
   },
   // Share-this-card button inside Card Detail modal
   modalFlipWrap: {
-    // RESTORED to v127 dimensions per user report — the v128 explicit
+    // RESTORED to v127 dimensions per user report â€” the v128 explicit
     // `width * 0.7 / height * 1.05` change was meant to fix a layout
     // collapse but broke working renders for users on v127. Reverting
-    // until we can repro the original 0×0 case with hard evidence.
+    // until we can repro the original 0Ã—0 case with hard evidence.
     width: '100%',
     aspectRatio: 1,
     alignItems: 'center',
@@ -1970,6 +2091,13 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
 });
+
+
+
+
+
+
+
 
 
 

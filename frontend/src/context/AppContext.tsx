@@ -25,6 +25,7 @@ interface User {
   friend_count?: number;
   medals?: number;
   free_packs?: number;
+  no_dupes_packs?: number;
   series_milestone_claimed?: number[];
   featured_card_ids?: string[];
   completed_series?: number[];
@@ -399,23 +400,62 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const refreshData = async () => {
     if (!user) return;
-    
-    try {
-      const [userRes, cardsRes, goalsRes, tradesRes, allCardsRes] = await Promise.all([
-        axios.get(`${API_URL}/api/users/${user.id}`),
-        axios.get(`${API_URL}/api/users/${user.id}/cards`),
-        axios.get(`${API_URL}/api/users/${user.id}/goals`),
-        axios.get(`${API_URL}/api/users/${user.id}/trades`),
-        axios.get(`${API_URL}/api/cards`)
-      ]);
-      
-      setUser(userRes.data);
-      setUserCards(cardsRes.data);
-      setUserGoals(goalsRes.data);
-      setTrades(tradesRes.data);
-      setAllCards(allCardsRes.data);
-    } catch (error) {
-      console.error('Failed to refresh data:', error);
+
+    const results = await Promise.allSettled([
+      axios.get(`${API_URL}/api/users/${user.id}`),
+      axios.get(`${API_URL}/api/users/${user.id}/cards`),
+      axios.get(`${API_URL}/api/users/${user.id}/goals`),
+      axios.get(`${API_URL}/api/users/${user.id}/trades`),
+      axios.get(`${API_URL}/api/cards`)
+    ]);
+
+    const [userResult, cardsResult, goalsResult, tradesResult, allCardsResult] = results;
+
+    if (userResult.status === 'fulfilled') {
+      setUser(userResult.value.data);
+    } else {
+      console.error('Failed to refresh user:', userResult.reason);
+    }
+
+    if (cardsResult.status === 'fulfilled') {
+      const cardsData = Array.isArray(cardsResult.value.data)
+        ? cardsResult.value.data
+        : cardsResult.value.data?.cards || [];
+
+      setUserCards(cardsData);
+      console.log(`Loaded ${cardsData.length} owned cards`);
+    } else {
+      console.error('Failed to refresh user cards:', cardsResult.reason);
+    }
+
+    if (goalsResult.status === 'fulfilled') {
+      const goalsData = Array.isArray(goalsResult.value.data)
+        ? goalsResult.value.data
+        : goalsResult.value.data?.goals || [];
+
+      setUserGoals(goalsData);
+    } else {
+      console.error('Failed to refresh goals:', goalsResult.reason);
+    }
+
+    if (tradesResult.status === 'fulfilled') {
+      setTrades(
+        Array.isArray(tradesResult.value.data)
+          ? tradesResult.value.data
+          : tradesResult.value.data?.trades || []
+      );
+    } else {
+      console.error('Failed to refresh trades:', tradesResult.reason);
+    }
+
+    if (allCardsResult.status === 'fulfilled') {
+      setAllCards(
+        Array.isArray(allCardsResult.value.data)
+          ? allCardsResult.value.data
+          : allCardsResult.value.data?.cards || []
+      );
+    } else {
+      console.error('Failed to refresh all cards:', allCardsResult.reason);
     }
   };
 
@@ -457,3 +497,4 @@ export const useApp = () => {
   }
   return context;
 };
+
