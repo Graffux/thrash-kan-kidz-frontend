@@ -130,7 +130,21 @@ interface AppContextType {
   apiUrl: string;
   login: (username: string, password: string, isRegister?: boolean) => Promise<void>;
   logout: () => Promise<void>;
-  claimDailyLogin: () => Promise<{ streak: number; bonus_coins: number; message: string }>;
+  claimDailyLogin: () => Promise<{
+  streak: number;
+  bonus_coins: number;
+  message: string;
+  streak_save_available: boolean;
+  streak_before_reset: number;
+}>;
+
+  saveLoginStreak: () => Promise<{
+    success: boolean;
+    streak_saved: boolean;
+    streak: number;
+    message: string;
+  }>;
+
   purchaseCard: (cardId: string) => Promise<any>;
   updateProfile: (bio: string) => Promise<void>;
   updateAvatar: (avatarDataUri: string) => Promise<void>;
@@ -286,7 +300,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const claimDailyLogin = async () => {
     if (!user) throw new Error('Not logged in');
     
-    const response = await axios.post(`${API_URL}/api/users/${user.id}/daily-login`);
+    const timezone =
+  Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
+const response = await axios.post(
+  `${API_URL}/api/users/${user.id}/daily-login`,
+  { timezone }
+);
     
     // Refresh user data
     const userRes = await axios.get(`${API_URL}/api/users/${user.id}`);
@@ -298,6 +318,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     
     return response.data;
   };
+
+  const saveLoginStreak = async () => {
+  if (!user) throw new Error('Not logged in');
+
+  const response = await axios.post(
+    `${API_URL}/api/users/${user.id}/save-login-streak`
+  );
+
+  await refreshData();
+
+  return response.data;
+};
 
   const purchaseCard = async (cardId: string) => {
     if (!user) throw new Error('Not logged in');
@@ -474,6 +506,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         login,
         logout,
         claimDailyLogin,
+        saveLoginStreak,
         purchaseCard,
         updateProfile,
         updateAvatar,

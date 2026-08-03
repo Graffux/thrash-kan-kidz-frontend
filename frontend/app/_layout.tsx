@@ -28,6 +28,9 @@ const TAB_ICONS: Record<string, ImageSourcePropType> = {
   trade: ICONS.navTrade,
   leaderboard: ICONS.navLeaderboard,
   profile: ICONS.navProfile,
+
+  trivia: require('../assets/icons/metal_trivia_tab.jpg'),
+  dailyChallenges: require('../assets/icons/daily_challenges_tab.jpg'),
 };
 
 interface MetalTabProps {
@@ -204,6 +207,31 @@ function TabsNavigator() {
           ),
         }}
       />
+      <Tabs.Screen
+  name="trivia"
+  options={{
+    title: 'Trivia',
+    tabBarIcon: ({ focused }) => (
+      <MetalTab
+        iconSource={TAB_ICONS.trivia}
+        focused={focused}
+      />
+    ),
+  }}
+/>
+
+<Tabs.Screen
+  name="daily-challenges"
+  options={{
+    title: 'Daily',
+    tabBarIcon: ({ focused }) => (
+      <MetalTab
+        iconSource={TAB_ICONS.dailyChallenges}
+        focused={focused}
+      />
+    ),
+  }}
+/>
       {/*
         Hidden screens — removed from the tab bar via `href: null`. The
         previous approach (`tabBarButton: () => null`) rendered an empty

@@ -82,20 +82,33 @@ const SimpleCard = React.memo(({
 }) => {
   const isVariant = !!card.base_card_id;
   const c: any = card;
+const isDailyClassic =
+  !!c.is_daily_reward ||
+  card.id.startsWith('card_daily_classic_') ||
+  card.id === 'card_daily_uncle_slam';
 const isReward =
-  c.is_daily_reward ||
+  isDailyClassic ||
   c.reward_type ||
   c.special_type ||
   c.card_category === 'reward' ||
   c.series_reward ||
   c.rarity === 'rare' ||
   c.rarity === 'epic';
-  const rewardColor = card.rarity === 'epic' ? '#FF2A2A' : '#FFD700';
 
+const rewardColor = isDailyClassic
+  ? '#39FF14'
+  : card.rarity === 'epic'
+    ? '#FF2A2A'
+    : '#FFD700';
   // If not owned, show mystery card
   if (!isOwned) {
     return (
-      <RewardGlow active={isReward} color={rewardColor} patriotic={card.name?.toLowerCase().includes('uncle slam')}>
+      <RewardGlow
+  active={isReward}
+  color={rewardColor}
+  dailyClassic={isDailyClassic}
+  patriotic={card.name?.toLowerCase().includes('uncle slam')}
+>
         <View style={[styles.cardContainer, styles.mysteryCard]}>
           <ExpoImage
             source={{ uri: MYSTERY_CARD_IMAGE }}
@@ -119,7 +132,12 @@ const isReward =
   }
 
   return (
-    <RewardGlow active={isReward} color={rewardColor} patriotic={card.name?.toLowerCase().includes('uncle slam')}>
+    <RewardGlow
+  active={isReward}
+  color={rewardColor}
+  dailyClassic={isDailyClassic}
+  patriotic={card.name?.toLowerCase().includes('uncle slam')}
+>
       <SimpleCardOwned
         card={card}
         quantity={quantity}
@@ -150,11 +168,13 @@ const RewardGlow: React.FC<{
   active: boolean;
   color?: string;
   patriotic?: boolean;
+  dailyClassic?: boolean;
   children: React.ReactNode;
 }> = ({
   active,
   color = '#FFD700',
   patriotic = false,
+  dailyClassic = false,
   children,
 }) => {
   const spin = useRef(new Animated.Value(0)).current;
@@ -194,16 +214,27 @@ const RewardGlow: React.FC<{
   });
 
   const isEpic = color.toLowerCase() === '#ff2a2a';
+  const isDaily = dailyClassic;
 
   const rimColors: readonly [string, string, ...string[]] = patriotic
+  ? [
+      '#003cff',
+      '#003cff',
+      '#ffffff',
+      '#ffffff',
+      '#e00020',
+      '#e00020',
+      '#003cff',
+    ]
+  : isDaily
     ? [
-        '#003cff',
-        '#003cff',
-        '#ffffff',
-        '#ffffff',
-        '#e00020',
-        '#e00020',
-        '#003cff',
+        '#004d1a', // dark green trailing edge
+        '#00b83f',
+        '#39FF14', // bright neon leading edge
+        '#FFF44F', // yellow hot spot
+        '#ffffff', // white flash
+        '#39FF14',
+        '#004d1a',
       ]
     : isEpic
       ? [
@@ -231,7 +262,9 @@ const RewardGlow: React.FC<{
       : [0, 0.34, 0.44, 0.49, 0.52, 0.6, 1];
 
   const glowColor = patriotic
-    ? '#ffffff'
+  ? '#ffffff'
+  : isDaily
+    ? '#39FF14'
     : isEpic
       ? '#ff1616'
       : '#ffd700';
@@ -246,19 +279,17 @@ const RewardGlow: React.FC<{
         pointerEvents="none"
         style={{
           position: 'absolute',
-          top: -4,
-          left: -4,
-          right: -4,
-          bottom: -4,
+          top: 1,
+          left: 1,
+          right: 1,
+          bottom: 1,
           borderRadius: 13,
           overflow: 'hidden',
 
           shadowColor: glowColor,
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 1,
-          shadowRadius: 12,
-          elevation: 12,
-        }}
+          shadowRadius: isDaily ? 18 : 12,          elevation: isDaily ? 18 : 12,        }}
       >
         <AnimatedLinearGradient
           colors={rimColors}
@@ -609,6 +640,13 @@ const comingSoonStyles = StyleSheet.create({
 
 export default function CollectionScreen() {
   const { user, userCards, allCards, seriesCatalog, apiUrl, refreshData } = useApp();
+  useFocusEffect(
+   React.useCallback(() => {
+    if (user) {
+      refreshData();
+    }
+  }, [user?.id, refreshData])
+);
   const [selectedCard, setSelectedCard] = useState<UserCard | null>(null);
   const [showFront, setShowFront] = useState(true);
   const [tradeInEligible, setTradeInEligible] = useState<any[]>([]);
@@ -1538,7 +1576,7 @@ const styles = StyleSheet.create({
   cardContainer: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    margin: 4,
+    margin: 6,
     borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: '#333',

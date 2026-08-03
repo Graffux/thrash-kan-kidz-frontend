@@ -13,6 +13,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image as ExpoImage } from 'expo-image';
@@ -40,14 +41,26 @@ import { MASCOT_SIGNATURE } from '../src/assets/mascot';
 import { ICONS } from '../src/assets/icons';
 
 export default function HomeScreen() {
-  const { user, loading, login, logout, claimDailyLogin, userCards, refreshData, apiUrl } = useApp();
-  const router = useRouter();
+  const {
+  user,
+  loading,
+  login,
+  logout,
+  claimDailyLogin,
+  saveLoginStreak,
+  userCards,
+  refreshData,
+  apiUrl,
+} = useApp();  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [dailyMessage, setDailyMessage] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
+  const [streakSaveAvailable, setStreakSaveAvailable] = useState(false);
+  const [streakBeforeReset, setStreakBeforeReset] = useState(0);
+  const [savingStreak, setSavingStreak] = useState(false); 
 
   // Daily wheel + Card picker (moved from Shop to Home so they show up the
   // moment a player lands after login — primary daily retention driver).
@@ -149,17 +162,47 @@ export default function HomeScreen() {
   };
 
   const handleClaimDaily = async () => {
-    setClaiming(true);
-    try {
-      const result = await claimDailyLogin();
-      setDailyMessage(result.message);
-      setTimeout(() => setDailyMessage(null), 3000);
-    } catch (error: any) {
-      Alert.alert('Already Claimed', error.response?.data?.detail || 'Come back tomorrow!');
-    } finally {
-      setClaiming(false);
+  setClaiming(true);
+
+  try {
+    const result = await claimDailyLogin();
+
+    setDailyMessage(result.message);
+    setTimeout(() => setDailyMessage(null), 3000);
+
+    if (result.streak_save_available) {
+      setStreakBeforeReset(result.streak_before_reset || 0);
+      setStreakSaveAvailable(true);
     }
-  };
+  } catch (error: any) {
+    Alert.alert(
+      'Already Claimed',
+      error.response?.data?.detail || 'Come back tomorrow!'
+    );
+  } finally {
+    setClaiming(false);
+  }
+};
+const handleSaveStreak = async () => {
+  setSavingStreak(true);
+
+  try {
+    const result = await saveLoginStreak();
+
+    setDailyMessage(result.message);
+    setStreakSaveAvailable(false);
+    setStreakBeforeReset(0);
+
+    setTimeout(() => setDailyMessage(null), 3000);
+  } catch (error: any) {
+    Alert.alert(
+      'Streak Save Failed',
+      error.response?.data?.detail || 'Could not save your streak.'
+    );
+  } finally {
+    setSavingStreak(false);
+  }
+};
 
   // Show Ronch's entrance once per component mount. On real Android cold
   // start the home screen mounts fresh and this fires; tab-switches back
@@ -511,6 +554,92 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
       </ScrollView>
+      <Modal
+  visible={streakSaveAvailable}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setStreakSaveAvailable(false)}
+>
+  <View
+    style={{
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.75)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    }}
+  >
+    <View
+      style={{
+        width: '100%',
+        maxWidth: 360,
+        backgroundColor: '#111',
+        borderRadius: 16,
+        borderWidth: 3,
+        borderColor: '#39FF14',
+        padding: 22,
+      }}
+    >
+      <Text
+        style={{
+          color: '#39FF14',
+          fontSize: 26,
+          fontWeight: '900',
+          textAlign: 'center',
+          marginBottom: 12,
+        }}
+      >
+        ⚠ STREAK LOST!
+      </Text>
+
+      <Text
+        style={{
+          color: '#fff',
+          textAlign: 'center',
+          fontSize: 16,
+          marginBottom: 20,
+        }}
+      >
+        Your {streakBeforeReset}-day streak can still be saved.
+      </Text>
+
+      <TouchableOpacity
+        onPress={handleSaveStreak}
+        disabled={savingStreak}
+        style={{
+          backgroundColor: '#39FF14',
+          borderRadius: 10,
+          paddingVertical: 14,
+        }}
+      >
+        <Text
+          style={{
+            color: '#000',
+            fontWeight: '900',
+            fontSize: 18,
+            textAlign: 'center',
+          }}
+        >
+          {savingStreak ? 'Saving...' : 'SAVE MY STREAK'}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => setStreakSaveAvailable(false)}
+        style={{ marginTop: 16 }}
+      >
+        <Text
+          style={{
+            color: '#999',
+            textAlign: 'center',
+          }}
+        >
+          Maybe Later
+        </Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
       {/* Daily Wheel Modal — auto-pops on first session login each day. */}
       <DailyWheelModal
