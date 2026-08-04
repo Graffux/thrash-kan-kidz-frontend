@@ -7,6 +7,7 @@
  * - Pull to refresh
  */
 import React, { useCallback, useEffect, useState } from 'react';
+import { usePreventScreenCapture } from 'expo-screen-capture';
 import {
   View,
   Text,
@@ -62,6 +63,8 @@ const relativeTime = (iso: string): string => {
 const MAX_LEN = 200;
 
 export default function MoshPitScreen() {
+  usePreventScreenCapture();
+
   const router = useRouter();
   const params = useLocalSearchParams<{ sharePullName?: string; sharePullImage?: string }>();
   const { user, userCards, apiUrl } = useApp();
@@ -74,6 +77,7 @@ export default function MoshPitScreen() {
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [showCardPicker, setShowCardPicker] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   // Track whether we've consumed the share-pull deeplink so we don't re-fire
   // it if the user navigates back to the screen later.
   const consumedShare = React.useRef(false);
@@ -412,12 +416,17 @@ export default function MoshPitScreen() {
                 </View>
                 <Text style={styles.postContent}>{p.content}</Text>
                 {p.image && (
-                  <Image
-                    source={{ uri: p.image }}
-                    style={styles.postImage}
-                    resizeMode="cover"
-                  />
-                )}
+  <TouchableOpacity
+    activeOpacity={0.9}
+    onPress={() => setSelectedImage(p.image || null)}
+  >
+    <Image
+      source={{ uri: p.image }}
+      style={styles.postImage}
+      resizeMode="cover"
+    />
+  </TouchableOpacity>
+)}
                 <View style={styles.postActions}>
                   <TouchableOpacity
                     style={[styles.reactBtn, p.viewer_reacted && styles.reactBtnActive]}
@@ -533,6 +542,29 @@ export default function MoshPitScreen() {
             </View>
           </View>
         </Modal>
+        <Modal
+  visible={!!selectedImage}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setSelectedImage(null)}
+>
+  <View style={styles.imageViewerOverlay}>
+    <TouchableOpacity
+      style={styles.imageViewerClose}
+      onPress={() => setSelectedImage(null)}
+    >
+      <Ionicons name="close" size={34} color="#fff" />
+    </TouchableOpacity>
+
+    {selectedImage && (
+      <Image
+        source={{ uri: selectedImage }}
+        style={styles.imageViewerImage}
+        resizeMode="contain"
+      />
+    )}
+  </View>
+</Modal>
       </SafeAreaView>
     </GrungeBackground>
   );
@@ -817,4 +849,28 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontWeight: '500',
   },
+  imageViewerOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.98)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+imageViewerImage: {
+  width: '100%',
+  height: '100%',
+},
+
+imageViewerClose: {
+  position: 'absolute',
+  top: 48,
+  right: 18,
+  zIndex: 10,
+  width: 44,
+  height: 44,
+  borderRadius: 22,
+  backgroundColor: 'rgba(0,0,0,0.65)',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
 });
