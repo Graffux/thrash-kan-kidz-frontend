@@ -7,7 +7,8 @@
  * - Pull to refresh
  */
 import React, { useCallback, useEffect, useState } from 'react';
-import { usePreventScreenCapture } from 'expo-screen-capture';
+import * as ScreenCapture from 'expo-screen-capture';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -63,7 +64,15 @@ const relativeTime = (iso: string): string => {
 const MAX_LEN = 200;
 
 export default function MoshPitScreen() {
-  usePreventScreenCapture();
+ useFocusEffect(
+  React.useCallback(() => {
+    ScreenCapture.preventScreenCaptureAsync('mosh-pit');
+
+    return () => {
+      ScreenCapture.allowScreenCaptureAsync('mosh-pit');
+    };
+  }, [])
+);
 
   const router = useRouter();
   const params = useLocalSearchParams<{ sharePullName?: string; sharePullImage?: string }>();
