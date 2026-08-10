@@ -358,21 +358,7 @@ const handleSaveStreak = async () => {
 
         {/* Series 8 launch banner removed Jun 11 2026 — ships free with next EAS build. */}
         
-{/* Series 9 "Black Metal Edition" coming soon banner */}
-<View style={styles.s9Banner} testID="series-9-coming-soon-banner">
-  <View style={styles.s9BannerInner}>
-    <Ionicons name="snow" size={22} color="#e6ecf5" />
-    <View style={{ flex: 1 }}>
-      <Text style={styles.s9BannerTitle}>SERIES 9 — BLACK METAL EDITION</Text>
-      <Text style={styles.s9BannerSub}>Frostbitten pulls incoming. Coming soon.</Text>
-    </View>
-    <Ionicons name="skull-outline" size={20} color="#e6ecf5" />
-  </View>
-</View>
-       
-
-
-        {/* Daily Challenges entry tile. Backend lives at /api/users/{uid}/daily-challenges. */}
+    {/* Daily Challenges entry tile. Backend lives at /api/users/{uid}/daily-challenges. */}
         <Pressable
           testID="daily-challenges-tile"
           onPress={() => router.push("/daily-challenges")}
