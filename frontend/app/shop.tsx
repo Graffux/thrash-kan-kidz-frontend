@@ -29,8 +29,56 @@ import MetalButton from '../src/components/MetalButton';
 import MascotStamp from '../src/components/MascotStamp';
 import RonchTrashTalk, { maybeShowRonchTrashTalk } from '../src/components/RonchTrashTalk';
 import { useSoundPlayer } from '../src/utils/sounds';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as StoreReview from 'expo-store-review';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+const REVIEW_LAST_PROMPT_KEY = 'tkk_last_review_prompt';
+const REVIEW_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+
+async function maybeRequestStoreReview(result: SpinResult | null) {
+  if (!result) return;
+
+  const newRareOrEpic = (result.won_cards || []).some((pull: any) => {
+    const rarity = String(pull?.card?.rarity || '').toLowerCase();
+    return !pull?.is_duplicate && (rarity === 'rare' || rarity === 'epic');
+  });
+
+  const completedSeries = Boolean(
+    result?.series_completion?.series_completed
+  );
+
+  if (!newRareOrEpic && !completedSeries) return;
+
+  try {
+    const lastPromptRaw = await AsyncStorage.getItem(REVIEW_LAST_PROMPT_KEY);
+    const lastPrompt = lastPromptRaw ? Number(lastPromptRaw) : 0;
+
+    if (
+      Number.isFinite(lastPrompt) &&
+      Date.now() - lastPrompt < REVIEW_COOLDOWN_MS
+    ) {
+      return;
+    }
+
+    const available = await StoreReview.isAvailableAsync();
+    const hasAction = await StoreReview.hasAction();
+
+    if (!available || !hasAction) return;
+
+    await StoreReview.requestReview();
+
+    // Record the request even if Google silently suppresses the dialog
+    // because its internal quota has been reached.
+    await AsyncStorage.setItem(
+      REVIEW_LAST_PROMPT_KEY,
+      String(Date.now())
+    );
+  } catch (error) {
+    console.warn('[review] Could not request Play review:', error);
+  }
+}
 
 interface SpinResult {
   won_card: any;
@@ -461,11 +509,14 @@ try {
       setShowResult(false);
       setShowSeriesComplete(true);
     } else {
+  const resultForReview = spinResult;
+
   setShowResult(false);
 
   setTimeout(() => {
     setSpinResult(null);
     resetAnimations();
+    void maybeRequestStoreReview(resultForReview);
   }, 250);
 }
     // Ronch's chance to shit-talk — fires every Nth pack open. The helper
@@ -478,9 +529,13 @@ try {
   };
 
   const closeSeriesComplete = () => {
+    const resultForReview = spinResult;
+
     setShowSeriesComplete(false);
     setSpinResult(null);
     resetAnimations();
+
+    void maybeRequestStoreReview(resultForReview);
   };
 
   // Animation interpolations
