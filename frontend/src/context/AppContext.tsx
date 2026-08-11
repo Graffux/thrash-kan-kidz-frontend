@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { analytics } from '@heycatch/sdk';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { Image as ExpoImage } from 'expo-image';
@@ -189,6 +190,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           try {
             const response = await axios.get(`${API_URL}/api/users/${userId}`);
             setUser(response.data);
+            analytics.setIdentity(
+              response.data.id,
+              { username: response.data.username },
+              { signup_date: response.data.created_at },
+            );
             return;
           } catch (err) {
             lastError = err;
@@ -268,10 +274,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (isRegister) {
           const response = await axios.post(`${API_URL}/api/auth/register`, { username, password });
           setUser(response.data);
+          analytics.setIdentity(
+            response.data.id,
+            { username: response.data.username },
+            { signup_date: response.data.created_at },
+          );
           await AsyncStorage.setItem('userId', response.data.id);
         } else {
           const response = await axios.post(`${API_URL}/api/auth/login`, { username, password });
           setUser(response.data);
+          analytics.setIdentity(
+            response.data.id,
+            { username: response.data.username },
+            { signup_date: response.data.created_at },
+          );
           await AsyncStorage.setItem('userId', response.data.id);
         }
         return;
@@ -290,6 +306,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const logout = async () => {
+    analytics.resetIdentity();
     await AsyncStorage.removeItem('userId');
     setUser(null);
     setUserCards([]);

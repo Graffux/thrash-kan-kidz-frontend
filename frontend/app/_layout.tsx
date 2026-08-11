@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { analytics, HeyCatchProvider } from '@heycatch/sdk';
 import { Tabs } from 'expo-router';
 import { AppProvider, useApp } from '../src/context/AppContext';
 import { View, StyleSheet, Text, Platform, Animated, Easing, Image, ImageSourcePropType } from 'react-native';
@@ -8,6 +9,16 @@ import { Image as ExpoImage } from 'expo-image';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { UpdateBanner } from '../src/components/UpdateBanner';
 import { ICONS } from '../src/assets/icons';
+
+analytics.init({
+  projectKey: 'hck_pk_7XT2I29HWCzsYT4ZEN9wioRFUlPr8jcR',
+  install: {
+    framework: 'react-native',
+    frameworkVersion: '0',
+    agent: 'other',
+  },
+  tracingHosts: ['thrash-kan-kidz-api.onrender.com'],
+});
 
 /**
  * Bottom nav — rusted-metal aesthetic with slime drip on the active tab.
@@ -317,10 +328,12 @@ export default function TabLayout() {
 
   return (
     <ErrorBoundary>
-      <AppProvider>
-        <UpdateBanner />
-        <TabsNavigator />
-      </AppProvider>
+      <HeyCatchProvider>
+        <AppProvider>
+          <UpdateBanner />
+          <TabsNavigator />
+        </AppProvider>
+      </HeyCatchProvider>
     </ErrorBoundary>
   );
 }
