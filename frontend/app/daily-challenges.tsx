@@ -6,6 +6,7 @@ import RewardReveal from "../components/RewardReveal";
 import React, { useEffect, useState, useCallback } from "react";
 import {
   View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, Alert,
+  Image
 } from "react-native";
 import { router, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -118,7 +119,11 @@ export default function DailyChallengesScreen() {
         <Pressable onPress={() => router.back()} hitSlop={12} testID="daily-back-btn">
           <Ionicons name="chevron-back" size={28} color="#ffd24a" />
         </Pressable>
-        <Text style={styles.headerTitle}>DAILY CHALLENGES</Text>
+        <Image
+          source={require('../assets/images/daily-challenge-header.png')}
+          style={{ width: 210, height: 72 }}
+          resizeMode="contain"
+        />
         <View style={{ width: 28 }} />
       </View>
 

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Image
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -300,7 +301,11 @@ export default function TriviaScreen() {
           <Ionicons name="chevron-back" size={30} color="#FFD700" />
         </Pressable>
 
-        <Text style={styles.headerTitle}>METAL MUSICK TRIVIA</Text>
+        <Image
+          source={require('../assets/images/metal-trivia-header.png')}
+          style={{ width: 210, height: 72 }}
+          resizeMode="contain"
+        />
 
         <View style={{ width: 30 }} />
       </View>
