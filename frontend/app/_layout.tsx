@@ -32,13 +32,13 @@ analytics.init({
  * border in oxidized green).
  */
 const TAB_ICONS: Record<string, ImageSourcePropType> = {
-  index: ICONS.navHome,
-  collection: ICONS.navCollection,
-  shop: ICONS.navShop,
+  index: require('../assets/icons/home_tab.png'),
+  collection: require('../assets/icons/kollection_tab.png'),
+  shop: require('../assets/icons/shop_tab.png'),
   goals: ICONS.navGoals,
   trade: ICONS.navTrade,
   leaderboard: ICONS.navLeaderboard,
-  profile: ICONS.navProfile,
+  profile: require('../assets/icons/profile_tab.png'),
 
   trivia: require('../assets/icons/metal_trivia_tab.jpg'),
   dailyChallenges: require('../assets/icons/daily_challenges_tab.jpg'),
@@ -47,10 +47,11 @@ const TAB_ICONS: Record<string, ImageSourcePropType> = {
 interface MetalTabProps {
   iconSource: ImageSourcePropType;
   focused: boolean;
+  label: string;
   badge?: number;
 }
 
-const MetalTab = ({ iconSource, focused, badge }: MetalTabProps) => {
+const MetalTab = ({ iconSource, focused, label, badge }: MetalTabProps) => {
   // Drip animation: slow vertical "ooze" cycle, only active for focused tab.
   const drip = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -89,38 +90,36 @@ const MetalTab = ({ iconSource, focused, badge }: MetalTabProps) => {
   });
 
   return (
-    <View style={tabStyles.tabWrap}>
-      <View style={[tabStyles.iconPlate, focused && tabStyles.iconPlateActive]}>
+    <View
+      style={[
+        tabStyles.tabWrap,
+        focused && tabStyles.tabWrapActive,
+      ]}
+    >
+      <View
+        style={[
+          tabStyles.dividerTab,
+          focused && tabStyles.dividerTabActive,
+        ]}
+      >
         <Image
           source={iconSource}
           style={[
             tabStyles.iconImage,
             focused && tabStyles.iconImageActive,
           ]}
-          resizeMode="contain"
+          resizeMode="cover"
         />
+
+
         {badge !== undefined && badge > 0 && (
           <View style={tabStyles.badge}>
-            <Text style={tabStyles.badgeText}>{badge > 9 ? '9+' : badge}</Text>
+            <Text style={tabStyles.badgeText}>
+              {badge > 9 ? '9+' : badge}
+            </Text>
           </View>
         )}
       </View>
-      {focused && (
-        <>
-          {/* Slime drip — a tiny bar that oozes downward beneath the icon */}
-          <Animated.View
-            style={[
-              tabStyles.drip,
-              {
-                opacity: dripOpacity,
-                transform: [{ translateY: dripTranslate }],
-              },
-            ]}
-            pointerEvents="none"
-          />
-          <View style={tabStyles.dripGlow} pointerEvents="none" />
-        </>
-      )}
     </View>
   );
 };
@@ -128,7 +127,7 @@ const MetalTab = ({ iconSource, focused, badge }: MetalTabProps) => {
 function TabsNavigator() {
   const insets = useSafeAreaInsets();
   const { user, trades } = useApp();
-  const bottomPadding = Math.max(insets.bottom, 48);
+  const bottomPadding = Math.max(insets.bottom, 6);
 
   const incomingTradeCount = user
     ? trades.filter(t => t.trade.status === 'pending' && t.trade.to_user_id === user.id).length
@@ -142,7 +141,7 @@ function TabsNavigator() {
           styles.tabBar,
           {
             paddingBottom: bottomPadding,
-            height: 64 + bottomPadding,
+            height: 78 + bottomPadding,
             marginBottom: Platform.OS === 'android' ? 0 : 0,
           },
         ],
@@ -153,6 +152,7 @@ function TabsNavigator() {
         // worse than no labels. The art is distinct enough to navigate by.
         tabBarShowLabel: false,
         tabBarItemStyle: styles.tabBarItem,
+        tabBarIconStyle: styles.tabBarIcon,
       }}
     >
       <Tabs.Screen
@@ -160,16 +160,16 @@ function TabsNavigator() {
         options={{
           title: 'Home',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconSource={TAB_ICONS.index} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.index} focused={focused} label="HOME" />
           ),
         }}
       />
       <Tabs.Screen
         name="collection"
         options={{
-          title: 'Cards',
+          title: 'Kollection',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconSource={TAB_ICONS.collection} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.collection} focused={focused} label="KOLLECTION" />
           ),
         }}
       />
@@ -178,7 +178,7 @@ function TabsNavigator() {
         options={{
           title: 'Shop',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconSource={TAB_ICONS.shop} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.shop} focused={focused} label="SHOP" />
           ),
         }}
       />
@@ -186,8 +186,9 @@ function TabsNavigator() {
         name="goals"
         options={{
           title: 'Goals',
+          href: null,
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconSource={TAB_ICONS.goals} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.goals} focused={focused} label="GOALS" />
           ),
         }}
       />
@@ -195,8 +196,9 @@ function TabsNavigator() {
         name="trade"
         options={{
           title: 'Trade',
+          href: null,
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconSource={TAB_ICONS.trade} focused={focused} badge={incomingTradeCount} />
+            <MetalTab iconSource={TAB_ICONS.trade} focused={focused} label="TRADE" badge={incomingTradeCount} />
           ),
         }}
       />
@@ -204,8 +206,9 @@ function TabsNavigator() {
         name="leaderboard"
         options={{
           title: 'Ranks',
+          href: null,
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconSource={TAB_ICONS.leaderboard} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.leaderboard} focused={focused} label="RANKS" />
           ),
         }}
       />
@@ -214,7 +217,7 @@ function TabsNavigator() {
         options={{
           title: 'Me',
           tabBarIcon: ({ focused }) => (
-            <MetalTab iconSource={TAB_ICONS.profile} focused={focused} />
+            <MetalTab iconSource={TAB_ICONS.profile} focused={focused} label="PROFILE" />
           ),
         }}
       />
@@ -222,10 +225,12 @@ function TabsNavigator() {
   name="trivia"
   options={{
     title: 'Trivia',
+    href: null,
     tabBarIcon: ({ focused }) => (
       <MetalTab
         iconSource={TAB_ICONS.trivia}
         focused={focused}
+        label="TRIVIA"
       />
     ),
   }}
@@ -235,10 +240,12 @@ function TabsNavigator() {
   name="daily-challenges"
   options={{
     title: 'Daily',
+    href: null,
     tabBarIcon: ({ focused }) => (
       <MetalTab
         iconSource={TAB_ICONS.dailyChallenges}
         focused={focused}
+        label="DAILY"
       />
     ),
   }}
@@ -250,6 +257,8 @@ function TabsNavigator() {
         leftward. `href: null` actually drops them from the bar so the
         visible tabs distribute evenly across the full width.
       */}
+      <Tabs.Screen name="mini-games" options={{ title: 'Mini-Games', href: null }} />
+      <Tabs.Screen name="referral" options={{ title: 'Refer a Friend', href: null }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings', href: null }} />
       <Tabs.Screen name="mosh" options={{ title: 'Mosh Pit', href: null }} />
       <Tabs.Screen name="privacy" options={{ title: 'Privacy Policy', href: null }} />
@@ -368,91 +377,103 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   tabBarLabel: {
-    fontSize: 9,
-    fontWeight: '800',
+    fontSize: 11,
+    fontWeight: '900',
     marginTop: 2,
-    letterSpacing: 0,
+    letterSpacing: 0.5,
   },
   tabBarItem: {
-    // flex:1 is also applied by RN's default `styles.bottomItem` —
-    // re-declaring it explicitly so it can't get overridden by RN's
-    // merge order. Each tab gets exactly screenWidth/7 of horizontal
-    // space; the icon centers inside that cell.
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 2,
-    paddingHorizontal: 0,
+    height: 72,
+    paddingVertical: 0,
+    paddingHorizontal: 1,
+    margin: 0,
+  },
+
+  tabBarIcon: {
+    width: '100%',
+    height: 72,
+    margin: 0,
   },
 });
 
 const tabStyles = StyleSheet.create({
   tabWrap: {
+    width: '100%',
+    height: 72,
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 4,
+    justifyContent: 'flex-end',
+    paddingTop: 0,
   },
-  iconPlate: {
-    // Plain transparent wrapper — no background, no border. Earlier we kept
-    // a rusted-metal rectangle around each icon for the "studded plate" look,
-    // but with 7 tabs on a phone-width bar the visible rectangles butted up
-    // against each other and made the bar read as a solid wall of buttons
-    // instead of clearly-separated tabs. Stripping the background reveals
-    // the real spacing between icons.
-    width: 38,
-    height: 34,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+
+  tabWrapActive: {
+    transform: [{ translateY: -5 }],
+  },
+
+  dividerTab: {
+    width: '100%',
+    height: 64,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
     backgroundColor: 'transparent',
     borderWidth: 0,
-    overflow: 'visible',
+    borderColor: 'transparent',
+    borderBottomColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 0,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: -1 },
+    elevation: 3,
   },
-  iconImage: {
-    width: 26,
-    height: 26,
-    opacity: 0.72,
-  },
-  iconImageActive: {
-    width: 30,
-    height: 30,
-    opacity: 1,
-  },
-  iconPlateActive: {
-    // Only the active tab gets a subtle green glow — translucent fill + shadow.
-    // Earlier the file had a SECOND `iconPlateActive` definition further down
-    // that JS silently overrode this one with (object key collision: last
-    // wins). The override painted an OPAQUE dark-green rectangle on the
-    // active tab which read as a hard square button stuck to its neighbours.
-    // The duplicate has been deleted so this style now actually applies.
-    backgroundColor: 'rgba(57, 255, 20, 0.12)',
-    borderRadius: 10,
+
+  dividerTabActive: {
+    height: 70,
+    backgroundColor: 'transparent',
+    borderColor: '#39ff14',
+    borderWidth: 2,
     shadowColor: '#39ff14',
-    shadowOpacity: 0.8,
+    shadowOpacity: 0.65,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 0 },
-    elevation: 8,
+    elevation: 10,
   },
-  drip: {
-    position: 'absolute',
-    bottom: -8,
-    width: 3,
-    height: 10,
-    borderRadius: 1.5,
-    backgroundColor: '#39ff14',
+
+  iconImage: {
+    width: '100%',
+    height: '100%',
+    opacity: 0.82,
+    marginBottom: 0,
   },
-  dripGlow: {
-    position: 'absolute',
-    bottom: -10,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: 'rgba(57, 255, 20, 0.25)',
+
+  iconImageActive: {
+    width: '100%',
+    height: '100%',
+    opacity: 1,
   },
+
+  tabText: {
+    color: '#aaa58d',
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 0.4,
+    marginTop: 1,
+  },
+
+  tabTextActive: {
+    color: '#39ff14',
+    fontSize: 9,
+  },
+
   badge: {
     position: 'absolute',
-    top: -4,
-    right: -6,
+    top: -5,
+    right: 4,
     backgroundColor: '#FF3B30',
     borderRadius: 9,
     minWidth: 18,
@@ -463,6 +484,7 @@ const tabStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1a1410',
   },
+
   badgeText: {
     color: '#fff',
     fontSize: 10,

@@ -1,70 +1,80 @@
 /**
- * HeroCarousel — auto-rotating promo slides at the top of Home.
+ * HeroCarousel ? swipeable navigation menu on Home.
  *
- * Slides are defined inline (easy to swap content / add new). Each slide
- * has a title, subtitle, accent color, optional background image, and an
- * onPress destination. Auto-advances every 4s; user can tap a slide for
- * its CTA or swipe (paged ScrollView).
+ * Each PNG contains its own title, subtitle, CTA and artwork.
+ * React only supplies navigation, paging and active dots.
  */
+
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   Image,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { HERO_ART } from '../assets/icons';
 
 const SCREEN_W = Dimensions.get('window').width;
-const SLIDE_W = SCREEN_W - 32; // 16px horizontal padding on each side
+const SLIDE_W = SCREEN_W - 32;
 
 interface Slide {
   id: string;
-  title: string;
-  subtitle: string;
-  cta: string;
   href: string;
+  image: any;
   accentColor: string;
-  bgImage?: any;
-  icon: keyof typeof Ionicons.glyphMap;
 }
 
 const SLIDES: Slide[] = [
   {
-    id: 's7',
-    title: 'GRIND OR DIE',
-    subtitle: 'Series 7 packs out now',
-    cta: 'RIP PACKS',
+    id: 'series9',
     href: '/shop',
+    image: HERO_ART.series9,
     accentColor: '#39ff14',
-    bgImage: HERO_ART.series7,
-    icon: 'flame',
   },
   {
     id: 'missions',
-    title: 'THRASH MISSIONS',
-    subtitle: 'Complete goals, earn coins',
-    cta: 'VIEW MISSIONS',
     href: '/goals',
+    image: HERO_ART.missions,
     accentColor: '#ffd24a',
-    bgImage: HERO_ART.missions,
-    icon: 'flash',
   },
   {
     id: 'trade',
-    title: 'TRADE WITH HOMIES',
-    subtitle: 'Swap dupes for missing cards',
-    cta: 'GO TO TRADE',
     href: '/trade',
+    image: HERO_ART.trade,
     accentColor: '#ff7a3a',
-    bgImage: HERO_ART.trade,
-    icon: 'swap-horizontal',
+  },
+  {
+    id: 'daily',
+    href: '/daily-challenges',
+    image: HERO_ART.daily,
+    accentColor: '#b74cff',
+  },
+  {
+    id: 'trivia',
+    href: '/trivia',
+    image: HERO_ART.trivia,
+    accentColor: '#39ff14',
+  },
+  {
+    id: 'leaderboard',
+    href: '/leaderboard',
+    image: HERO_ART.leaderboard,
+    accentColor: '#ffd24a',
+  },
+  {
+    id: 'referral',
+    href: '/referral',
+    image: HERO_ART.referral,
+    accentColor: '#39ff14',
+  },
+  {
+    id: 'minigames',
+    href: '/mini-games',
+    image: HERO_ART.minigames,
+    accentColor: '#39ff14',
   },
 ];
 
@@ -77,21 +87,28 @@ export const HeroCarousel: React.FC = () => {
   const indexRef = useRef(0);
   const userTouching = useRef(false);
 
-  // Autoplay — advance every 4.5s. Reset to 0 after the last slide.
   useEffect(() => {
     const tick = setInterval(() => {
       if (userTouching.current) return;
+
       const next = (indexRef.current + 1) % SLIDES.length;
+
       indexRef.current = next;
       setIndex(next);
-      scrollRef.current?.scrollTo({ x: next * SLIDE_W, animated: true });
+
+      scrollRef.current?.scrollTo({
+        x: next * SLIDE_W,
+        animated: true,
+      });
     }, AUTOPLAY_MS);
+
     return () => clearInterval(tick);
   }, []);
 
   const onScroll = (e: any) => {
     const x = e.nativeEvent.contentOffset.x;
     const i = Math.round(x / SLIDE_W);
+
     if (i !== indexRef.current) {
       indexRef.current = i;
       setIndex(i);
@@ -106,57 +123,47 @@ export const HeroCarousel: React.FC = () => {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={onScroll}
-        onTouchStart={() => { userTouching.current = true; }}
-        onTouchEnd={() => { userTouching.current = false; }}
+        onTouchStart={() => {
+          userTouching.current = true;
+        }}
+        onTouchEnd={() => {
+          userTouching.current = false;
+        }}
       >
-        {SLIDES.map((s) => (
+        {SLIDES.map((slide) => (
           <TouchableOpacity
-            key={s.id}
-            style={[styles.slide, { width: SLIDE_W, borderColor: s.accentColor }]}
-            activeOpacity={0.85}
-            onPress={() => router.push(s.href as any)}
-            testID={`hero-slide-${s.id}`}
+            key={slide.id}
+            style={[
+              styles.slide,
+              {
+                width: SLIDE_W,
+                borderColor: slide.accentColor,
+              },
+            ]}
+            activeOpacity={0.9}
+            onPress={() => router.push(slide.href as any)}
+            testID={`hero-slide-${slide.id}`}
           >
-            <LinearGradient
-              colors={[`${s.accentColor}33`, '#0a0d0a']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.slideGradient}
+            <Image
+              source={slide.image}
+              style={styles.slideImage}
+              resizeMode="contain"
             />
-            {s.bgImage && (
-              <Image source={s.bgImage} style={styles.slideBg} resizeMode="cover" />
-            )}
-            {/* Dark gradient ON TOP of the bgImage so text stays readable */}
-            <LinearGradient
-              colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.75)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={StyleSheet.absoluteFill}
-              pointerEvents="none"
-            />
-            <View style={styles.slideContent}>
-              <View style={styles.slideIconWrap}>
-                <Ionicons name={s.icon} size={32} color={s.accentColor} />
-              </View>
-              <View style={styles.slideTextBlock}>
-                <Text style={[styles.slideTitle, { color: s.accentColor }]}>{s.title}</Text>
-                <Text style={styles.slideSubtitle}>{s.subtitle}</Text>
-                <View style={[styles.slideCta, { borderColor: s.accentColor }]}>
-                  <Text style={[styles.slideCtaText, { color: s.accentColor }]}>{s.cta}</Text>
-                  <Ionicons name="chevron-forward" size={14} color={s.accentColor} />
-                </View>
-              </View>
-            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      {/* Dot indicators */}
       <View style={styles.dots}>
-        {SLIDES.map((_, i) => (
+        {SLIDES.map((slide, i) => (
           <View
-            key={i}
-            style={[styles.dot, i === index && styles.dotActive]}
+            key={slide.id}
+            style={[
+              styles.dot,
+              i === index && styles.dotActive,
+              i === index && {
+                backgroundColor: slide.accentColor,
+              },
+            ]}
           />
         ))}
       </View>
@@ -165,75 +172,39 @@ export const HeroCarousel: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  wrap: { marginBottom: 16 },
+  wrap: {
+    marginBottom: 16,
+  },
+
   slide: {
-    height: 160,
+    height: 150,
     borderRadius: 12,
     borderWidth: 2,
     overflow: 'hidden',
-    backgroundColor: '#0a0d0a',
-    marginRight: 0,
+    backgroundColor: '#050505',
   },
-  slideGradient: { ...StyleSheet.absoluteFillObject, opacity: 0.35 },
-  slideBg: { ...StyleSheet.absoluteFillObject, opacity: 1.0 },
-  slideContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+
+  slideImage: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#050505',
   },
-  slideIconWrap: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
-  },
-  slideTextBlock: { flex: 1 },
-  slideTitle: {
-    fontSize: 18,
-    fontWeight: '900',
-    letterSpacing: 2,
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  slideSubtitle: {
-    color: '#cde',
-    fontSize: 12,
-    marginTop: 2,
-    marginBottom: 6,
-  },
-  slideCta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-    borderWidth: 1,
-  },
-  slideCtaText: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
+
   dots: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 6,
     marginTop: 8,
   },
+
   dot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: '#333',
   },
+
   dotActive: {
-    backgroundColor: '#39ff14',
     width: 16,
   },
 });

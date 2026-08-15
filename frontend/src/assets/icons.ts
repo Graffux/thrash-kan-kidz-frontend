@@ -24,7 +24,12 @@ export const ICONS = {
 };
 
 export const HERO_ART = {
-  series7:  require('../../assets/hero/hero_series7.png'),
-  missions: require('../../assets/hero/hero_missions.png'),
-  trade:    require('../../assets/hero/hero_trade.png'),
+  series9:     require('../../assets/hero/hero_series9_menu.png'),
+  missions:    require('../../assets/hero/hero_missions_menu.png'),
+  trade:       require('../../assets/hero/hero_trade_menu.png'),
+  daily:       require('../../assets/hero/hero_daily_menu.png'),
+  trivia:      require('../../assets/hero/hero_trivia_menu.png'),
+  leaderboard: require('../../assets/hero/hero_leaderboard_menu.png'),
+  referral:    require('../../assets/hero/hero_referral_menu.png'),
+  minigames:   require('../../assets/hero/hero_minigames_menu.png'),
 };

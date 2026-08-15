@@ -359,18 +359,7 @@ const handleSaveStreak = async () => {
         {/* Series 8 launch banner removed Jun 11 2026 — ships free with next EAS build. */}
         
     {/* Daily Challenges entry tile. Backend lives at /api/users/{uid}/daily-challenges. */}
-        <Pressable
-          testID="daily-challenges-tile"
-          onPress={() => router.push("/daily-challenges")}
-          style={styles.dailyTile}
-        >
-          <Ionicons name="flame" size={22} color="#ffd24a" />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.dailyTileTitle}>DAILY CHALLENGES</Text>
-            <Text style={styles.dailyTileSub}>Pick your slam. Earn the daily rare.</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#ffd24a" />
-        </Pressable>
+        
 
         {/* "YOUR STATS" raster banner above the 4-up stat grid. */}
         <ExpoImage
@@ -447,83 +436,9 @@ const handleSaveStreak = async () => {
         {/* Thrash Missions preview — top 3 in-progress goals */}
         <ThrashMissionsPreview />
 
-        <TouchableOpacity
-          style={[styles.miniGameButton, { marginBottom: 16 }]}
-          onPress={() => {
-            buttonTapSound.play();
-            router.push('/referral');
-          }}
-          data-testid="home-referral-btn"
-        >
-          <Text style={styles.miniGameEmoji}>??</Text>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.miniGameTitle}>Refer a Metalhead</Text>
-            <Text style={styles.miniGameSub}>
-              You both get 500 coins + 1 free pack!
-            </Text>
-          </View>
-          <Ionicons
-            name="chevron-forward"
-            size={18}
-            color="#39ff14"
-          />
-        </TouchableOpacity>
+        
 
-        <View style={styles.miniGamesContainer}>
-          <SplatTitle>MINI-GAMES</SplatTitle>
-          <TouchableOpacity
-            style={styles.miniGameButton}
-            onPress={() => {
-              buttonTapSound.play();
-              setShowDailyWheel(true);
-            }}
-            data-testid="home-daily-wheel-btn"
-          >
-            <Text style={styles.miniGameEmoji}>🎡</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.miniGameTitle}>Daily Wheel</Text>
-              <Text style={styles.miniGameSub}>One free spin every day</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#FFD700" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.miniGameButton}
-            onPress={() => {
-              buttonTapSound.play();
-              router.push('/trivia');
-            }}
-            data-testid="home-trivia-btn"
-          >
-            <Text style={styles.miniGameEmoji}>🤘</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.miniGameTitle}>Metal Musick Trivia</Text>
-              <Text style={styles.miniGameSub}>
-                Five questions. Earn a No-Dupes Pack!
-              </Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={18}
-              color="#FFD700"
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.miniGameButton}
-            onPress={() => {
-              buttonTapSound.play();
-              setShowCardPicker(true);
-            }}
-            data-testid="home-card-picker-btn"
-          >
-            <Text style={styles.miniGameEmoji}>🎴</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.miniGameTitle}>Card Picker</Text>
-              <Text style={styles.miniGameSub}>Match a pair, win a prize!</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#FFD700" />
-          </TouchableOpacity>
-        </View>
+        
 
         {/* Mosh Pit community feed preview — latest 3 posts */}
         <MoshPitPreview />
