@@ -447,6 +447,28 @@ const handleSaveStreak = async () => {
         {/* Thrash Missions preview — top 3 in-progress goals */}
         <ThrashMissionsPreview />
 
+        <TouchableOpacity
+          style={[styles.miniGameButton, { marginBottom: 16 }]}
+          onPress={() => {
+            buttonTapSound.play();
+            router.push('/referral');
+          }}
+          data-testid="home-referral-btn"
+        >
+          <Text style={styles.miniGameEmoji}>??</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.miniGameTitle}>Refer a Metalhead</Text>
+            <Text style={styles.miniGameSub}>
+              You both get 500 coins + 1 free pack!
+            </Text>
+          </View>
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color="#39ff14"
+          />
+        </TouchableOpacity>
+
         <View style={styles.miniGamesContainer}>
           <SplatTitle>MINI-GAMES</SplatTitle>
           <TouchableOpacity
