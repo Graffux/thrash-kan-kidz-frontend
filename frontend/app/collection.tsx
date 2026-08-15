@@ -95,11 +95,17 @@ const isReward =
   c.rarity === 'rare' ||
   c.rarity === 'epic';
 
-const rewardColor = isDailyClassic
-  ? '#39FF14'
-  : card.rarity === 'epic'
-    ? '#FF2A2A'
-    : '#FFD700';
+  const isReferralExclusive = [
+    'card_referral_reffer_madness',
+    'card_referral_pit_pal',
+    'card_referral_refernal',
+  ].includes(card.id);
+
+  const rewardColor = isReferralExclusive
+    ? '#00BFFF'
+    : card.rarity === 'epic'
+      ? '#FF2A2A'
+      : '#FFD700';
   // If not owned, show mystery card
   if (!isOwned) {
     return (
