@@ -937,7 +937,7 @@ export default function CollectionScreen() {
   ).sort((a, b) => a - b);
   const getSeriesCards = (series: number) => {
     const base = allCards
-      .filter(c => c.series === series && !c.base_card_id && c.rarity !== 'rare' && c.rarity !== 'epic')
+      .filter(c => c.series === series && !c.base_card_id && !(c as any).series_reward)
       .sort((a, b) => {
         if (a.band !== b.band) return (a.band || '').localeCompare(b.band || '');
         return (a.card_type || '').localeCompare(b.card_type || '');
@@ -1009,7 +1009,9 @@ export default function CollectionScreen() {
         c.reward_type ||
         c.special_type ||
         c.card_category === 'reward' ||
-        c.series_reward || c.rarity === 'rare' || c.rarity === 'epic';
+        c.series_reward ||
+        card.id.startsWith('card_referral_') ||
+        ((c.rarity === 'rare' || c.rarity === 'epic') && !c.series);
 
       return isSpecialReward && arr.findIndex(other => other.id === card.id) === index;
     })

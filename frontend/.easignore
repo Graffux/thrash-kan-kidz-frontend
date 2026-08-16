@@ -1,3 +1,17 @@
 .metro-cache
 .expo
 *.log
+
+# Local EAS inspection output
+eas-archive/
+
+# Backup files created during edits
+*.before_*
+**/*.before_*
+
+# Large local media not required by the app build
+assets/images/cover3.mp4
+
+# Misc local scripts/backups outside the frontend app
+../backend/
+../*.py

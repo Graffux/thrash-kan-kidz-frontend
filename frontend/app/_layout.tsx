@@ -407,7 +407,7 @@ const tabStyles = StyleSheet.create({
   },
 
   tabWrapActive: {
-    transform: [{ translateY: -5 }],
+    transform: [{ translateY: 0 }],
   },
 
   dividerTab: {
@@ -433,21 +433,22 @@ const tabStyles = StyleSheet.create({
   },
 
   dividerTabActive: {
-    height: 70,
+    height: 64,
     backgroundColor: 'transparent',
-    borderColor: '#39ff14',
-    borderWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 3,
+    borderBottomColor: '#39ff14',
     shadowColor: '#39ff14',
-    shadowOpacity: 0.65,
-    shadowRadius: 8,
+    shadowOpacity: 0.7,
+    shadowRadius: 6,
     shadowOffset: { width: 0, height: 0 },
-    elevation: 10,
+    elevation: 4,
   },
 
   iconImage: {
     width: '100%',
     height: '100%',
-    opacity: 0.82,
+    opacity: 0.68,
     marginBottom: 0,
   },
 
