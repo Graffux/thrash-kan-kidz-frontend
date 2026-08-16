@@ -2,6 +2,7 @@
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -307,6 +308,24 @@ export default function ReferralScreen() {
                         : 's'
                     } until your exclusive referral card.`}
               </Text>
+
+              {successfulReferrals >= 5 && (
+                <View style={styles.referralRewardCardWrap}>
+                  <Image
+                    source={{
+                      uri: 'https://thrash-kan-kidz-api.onrender.com/static/cards/reffer_madness.jpg',
+                    }}
+                    style={styles.referralRewardCard}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.referralRewardName}>
+                    REFFER MADNESS
+                  </Text>
+                  <Text style={styles.referralRewardUnlocked}>
+                    5 REFERRALS ? UNLOCKED
+                  </Text>
+                </View>
+              )}
             </View>
 
             <View style={styles.section}>
@@ -664,4 +683,31 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#fff',
   },
+  referralRewardCardWrap: {
+    alignItems: 'center',
+    marginTop: 18,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: '#244224',
+  },
+  referralRewardCard: {
+    width: 180,
+    height: 260,
+    borderRadius: 10,
+  },
+  referralRewardName: {
+    color: '#39ff14',
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+    marginTop: 8,
+  },
+  referralRewardUnlocked: {
+    color: '#00BFFF',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginTop: 3,
+  },
+
 });

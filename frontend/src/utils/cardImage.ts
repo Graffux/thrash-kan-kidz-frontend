@@ -29,6 +29,14 @@ export interface CardImageSource {
 export function cardThumb(card: CardImageSource | undefined | null, width = 360): string {
   if (!card) return '';
   if (!card.id) return card.front_image_url || '';
+
+  // Referral-exclusive cards are hosted directly by this backend under
+  // /static/cards. Use their working full JPG URLs instead of routing them
+  // through the thumbnail resizer.
+  if (card.id.startsWith('card_referral_')) {
+    return card.front_image_url || '';
+  }
+
   // Snap to common widths so the LRU on the backend stays effective.
   // Otherwise width=359 vs 360 would create separate cache entries.
   const w = width <= 160 ? 160 : width <= 240 ? 240 : width <= 360 ? 360 : 540;
