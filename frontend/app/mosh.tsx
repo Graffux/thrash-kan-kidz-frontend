@@ -1,5 +1,5 @@
-/**
- * Mosh Pit — full community feed screen pushed via Home widget.
+﻿/**
+ * Mosh Pit â€” full community feed screen pushed via Home widget.
  *
  * - Composer at top (200ch text post)
  * - Feed list (newest first)
@@ -98,12 +98,12 @@ export default function MoshPitScreen() {
     if (!params.sharePullName && !params.sharePullImage) return;
     consumedShare.current = true;
     if (params.sharePullName) {
-      setComposing(`Just pulled ${params.sharePullName}! 🤘`);
+      setComposing(`Just pulled ${params.sharePullName}! ðŸ¤˜`);
     }
     if (params.sharePullImage) {
-      // Async fire-and-forget — user can still attach manually if it fails.
+      // Async fire-and-forget â€” user can still attach manually if it fails.
       attachFromUrl(params.sharePullImage).catch(() => {
-        Alert.alert('Heads up', 'Card image attach failed — you can still post the text.');
+        Alert.alert('Heads up', 'Card image attach failed â€” you can still post the text.');
       });
     }
   }, [params.sharePullName, params.sharePullImage]);
@@ -112,7 +112,7 @@ export default function MoshPitScreen() {
     if (!user) return;
     try {
       const res = await axios.get(
-        `${apiUrl}/api/mosh/feed?limit=50&viewer_id=${user.id}`,
+        `${apiUrl}/api/mosh/feed?limit=10&viewer_id=${user.id}`,
       );
       setPosts(res.data);
     } catch {
@@ -147,7 +147,7 @@ export default function MoshPitScreen() {
     }
   };
 
-  // Convert remote image URL → base64 data URI (for collection card pulls).
+  // Convert remote image URL â†’ base64 data URI (for collection card pulls).
   //
   // Use fetch + FileReader, which works universally in RN. The previous
   // ImageManipulator + FileSystem approach failed silently in production
@@ -162,7 +162,7 @@ export default function MoshPitScreen() {
   // with Content-Type: application/octet-stream instead of image/png. The
   // backend Mosh endpoint requires a `data:image/...` prefix. So we extract
   // the raw base64 payload from FileReader and rebuild the data URI with a
-  // forced image/jpeg MIME type. The bytes are still the original image —
+  // forced image/jpeg MIME type. The bytes are still the original image â€”
   // only the URI label changes.
   const attachFromUrl = async (url: string) => {
     try {
@@ -181,7 +181,7 @@ export default function MoshPitScreen() {
       });
       // Strip off whatever MIME the CDN gave us (octet-stream, png, jpeg)
       // and rebuild with image/jpeg so the backend accepts it. The Base64
-      // payload is unchanged — just relabeling the wrapper.
+      // payload is unchanged â€” just relabeling the wrapper.
       const base64Payload = rawDataUri.split(',', 2)[1] ?? '';
       if (!base64Payload) throw new Error('Empty image payload');
       const dataUri = `data:image/jpeg;base64,${base64Payload}`;
@@ -197,9 +197,9 @@ export default function MoshPitScreen() {
     }
   };
 
-  // Device picker → resize → base64.
+  // Device picker â†’ resize â†’ base64.
   // SDK 54 on Android 13+ uses the system Photo Picker which does NOT
-  // require READ_MEDIA_IMAGES — Google Play rejects that permission for
+  // require READ_MEDIA_IMAGES â€” Google Play rejects that permission for
   // apps that only need occasional access. So we skip the permission
   // request entirely; the picker handles the rest.
   const pickFromDevice = async () => {
@@ -471,7 +471,7 @@ export default function MoshPitScreen() {
           <View style={{ height: 24 }} />
         </ScrollView>
 
-        {/* Attach menu — choose source */}
+        {/* Attach menu â€” choose source */}
         <Modal
           visible={showAttachMenu}
           transparent
@@ -511,7 +511,7 @@ export default function MoshPitScreen() {
           </TouchableOpacity>
         </Modal>
 
-        {/* Card picker — grid of owned cards */}
+        {/* Card picker â€” grid of owned cards */}
         <Modal
           visible={showCardPicker}
           animationType="slide"
@@ -802,7 +802,7 @@ const styles = StyleSheet.create({
   reactBtnActive: { borderColor: '#39ff14', backgroundColor: 'rgba(57,255,20,0.08)' },
   reactCount: { color: '#789', fontSize: 12, fontWeight: '700' },
 
-  // VIP supporter chip — small star pill rendered right of the username
+  // VIP supporter chip â€” small star pill rendered right of the username
   // on any Mosh post/comment whose author has an active coin boost.
   postUserRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   vipChip: {
@@ -883,3 +883,4 @@ imageViewerClose: {
   justifyContent: 'center',
 },
 });
+

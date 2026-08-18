@@ -18,6 +18,11 @@ interface User {
   coins: number;
   daily_login_streak: number;
   last_login_date: string | null;
+
+  pending_streak_save?: number | null;
+  pending_streak_save_date?: string | null;
+  streak_save_last_used?: string | null;
+
   profile_completed: boolean;
   bio: string;
   avatar_url: string;

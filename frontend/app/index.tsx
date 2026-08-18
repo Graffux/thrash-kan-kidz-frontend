@@ -60,7 +60,25 @@ export default function HomeScreen() {
   const [claiming, setClaiming] = useState(false);
   const [streakSaveAvailable, setStreakSaveAvailable] = useState(false);
   const [streakBeforeReset, setStreakBeforeReset] = useState(0);
-  const [savingStreak, setSavingStreak] = useState(false); 
+  const [savingStreak, setSavingStreak] = useState(false);
+
+useEffect(() => {
+  if (!user?.pending_streak_save || !user?.pending_streak_save_date) {
+    return;
+  }
+
+  const today = new Date().toLocaleDateString('en-CA');
+
+  if (user.pending_streak_save_date === today) {
+    setStreakBeforeReset(user.pending_streak_save);
+    setStreakSaveAvailable(true);
+  }
+}, [
+  user?.pending_streak_save,
+  user?.pending_streak_save_date,
+]);
+
+  
 
   // Daily wheel + Card picker (moved from Shop to Home so they show up the
   // moment a player lands after login — primary daily retention driver).
