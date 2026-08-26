@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
 
@@ -72,10 +72,18 @@ export const BadgeCabinet: React.FC<Props> = ({ userId, apiUrl }) => {
       </View>
       <View style={styles.grid}>
         {badges.map((b) => (
-          <View
+          <TouchableOpacity
             key={b.id}
             style={[styles.tile, !b.earned && styles.tileLocked]}
             testID={`badge-${b.id}`}
+            activeOpacity={0.8}
+            onPress={() =>
+              Alert.alert(
+                b.name,
+                `${b.earned ? 'EARNED' : 'HOW TO EARN'}\n\n${b.description}`,
+                [{ text: 'GOT IT' }]
+              )
+            }
           >
             {b.image_url ? (
               <ExpoImage
@@ -105,7 +113,7 @@ export const BadgeCabinet: React.FC<Props> = ({ userId, apiUrl }) => {
             >
               {b.name}
             </Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </View>
@@ -189,3 +197,4 @@ const styles = StyleSheet.create({
     color: '#777',
   },
 });
+

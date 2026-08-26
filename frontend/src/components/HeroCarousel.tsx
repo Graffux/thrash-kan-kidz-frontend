@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
 
   slide: {
-    height: 150,
+    aspectRatio: 3.9,
     borderRadius: 12,
     borderWidth: 2,
     overflow: 'hidden',
@@ -210,3 +210,4 @@ const styles = StyleSheet.create({
 });
 
 export default HeroCarousel;
+
