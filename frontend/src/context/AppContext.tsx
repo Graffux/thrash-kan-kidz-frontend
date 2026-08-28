@@ -237,36 +237,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!user) return;
     
     try {
-      const [cardsRes, goalsRes, tradesRes, usersRes] = await Promise.all([
+      const [cardsRes, goalsRes, tradesRes] = await Promise.all([
         axios.get(`${API_URL}/api/users/${user.id}/cards`),
         axios.get(`${API_URL}/api/users/${user.id}/goals`),
         axios.get(`${API_URL}/api/users/${user.id}/trades`),
-        axios.get(`${API_URL}/api/users`)
       ]);
       
       setUserCards(cardsRes.data);
       setUserGoals(goalsRes.data);
       setTrades(tradesRes.data);
-      setAllUsers(usersRes.data.filter((u: User) => u.id !== user.id));
 
-      // Prefetch all owned card thumbnails into expo-image's disk cache in
-      // the background. We prefetch thumb URLs (~50KB each) rather than the
-      // original PNGs (~3MB) so cellular users actually finish the prefetch.
-      // First-time load fills the cache; subsequent renders are instant.
-      try {
-        const urls: string[] = [];
-        for (const uc of cardsRes.data as { card?: { id?: string; front_image_url?: string } }[]) {
-          if (uc?.card) {
-            const url = cardThumb(uc.card, 240);
-            if (url) urls.push(url);
-          }
-        }
-        if (urls.length > 0) {
-          ExpoImage.prefetch(urls, 'memory-disk').catch(() => {});
-        }
-      } catch {
-        // Defensive — never block app boot on prefetch.
-      }
     } catch (error) {
       console.error('Failed to load user data:', error);
     }
@@ -452,7 +432,7 @@ const response = await axios.post(
     setTrades(tradesRes.data);
   };
 
-  const refreshData = async () => {
+  const refreshData = React.useCallback(async () => {
     if (!user) return;
 
     const results = await Promise.allSettled([
@@ -460,10 +440,9 @@ const response = await axios.post(
       axios.get(`${API_URL}/api/users/${user.id}/cards`),
       axios.get(`${API_URL}/api/users/${user.id}/goals`),
       axios.get(`${API_URL}/api/users/${user.id}/trades`),
-      axios.get(`${API_URL}/api/cards`)
     ]);
 
-    const [userResult, cardsResult, goalsResult, tradesResult, allCardsResult] = results;
+    const [userResult, cardsResult, goalsResult, tradesResult] = results;
 
     if (userResult.status === 'fulfilled') {
       setUser(userResult.value.data);
@@ -501,17 +480,7 @@ const response = await axios.post(
     } else {
       console.error('Failed to refresh trades:', tradesResult.reason);
     }
-
-    if (allCardsResult.status === 'fulfilled') {
-      setAllCards(
-        Array.isArray(allCardsResult.value.data)
-          ? allCardsResult.value.data
-          : allCardsResult.value.data?.cards || []
-      );
-    } else {
-      console.error('Failed to refresh all cards:', allCardsResult.reason);
-    }
-  };
+  }, [user?.id]);
 
   return (
     <AppContext.Provider
@@ -543,7 +512,7 @@ const response = await axios.post(
       {children}
     </AppContext.Provider>
   );
-};
+}
 
 export const useApp = () => {
   const context = useContext(AppContext);
@@ -552,4 +521,13 @@ export const useApp = () => {
   }
   return context;
 };
+
+
+
+
+
+
+
+
+
 
