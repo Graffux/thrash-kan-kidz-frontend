@@ -10,6 +10,8 @@ export const ICONS = {
   statCoins:   require('../../assets/icons/stat_coins.png'),
   statStreak:  require('../../assets/icons/stat_streak.png'),
   statTrophy:  require('../../assets/icons/stat_trophy.png'),
+  statDaily:   require('../../assets/icons/stat_daily.png'),
+  statTrivia:  require('../../assets/icons/stat_trivia.png'),
   // Bottom nav tabs
   navHome:       require('../../assets/icons/nav_home.png'),
   navCollection: require('../../assets/icons/nav_collection.png'),
@@ -33,3 +35,4 @@ export const HERO_ART = {
   referral:    require('../../assets/hero/hero_referral_menu.png'),
   minigames:   require('../../assets/hero/hero_minigames_menu.png'),
 };
+

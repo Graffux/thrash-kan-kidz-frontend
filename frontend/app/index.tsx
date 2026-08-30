@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'expo-router';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
 import {
   View,
   Text,
@@ -86,6 +86,11 @@ useEffect(() => {
   const [showCardPicker, setShowCardPicker] = useState(false);
   const [wheelStreak, setWheelStreak] = useState(0);
   const [dailyWheelChecked, setDailyWheelChecked] = useState(false);
+
+  const [dailyTile, setDailyTile] = useState<{
+    label: string;
+    completed: boolean;
+  }>({ label: 'Pick your slam. Earn the daily rare.', completed: false });
   const buttonTapSound = useSoundPlayer('button_tap');
   const prizeWonSound = useSoundPlayer('prize_won');
 
@@ -110,6 +115,70 @@ useEffect(() => {
     }
   }, [user?.id]);
 
+  const refreshDailyTile = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const res = await fetch(`${apiUrl}/api/users/${user.id}/daily-challenges`);
+      if (!res.ok) return;
+
+      const data = await res.json();
+      const offerings: any[] = Array.isArray(data.offerings) ? data.offerings : [];
+      const claimed = !!data.claimed_at;
+      const selectedId: string | null = data.selected_id ?? null;
+
+      if (claimed) {
+        setDailyTile({
+          label: "Today's reward claimed. See you tomorrow.",
+          completed: true,
+        });
+        return;
+      }
+
+      const selected = selectedId
+        ? offerings.find(o => o.id === selectedId)
+        : null;
+
+      if (selected) {
+        const prog = Number(data.selected_progress ?? selected.progress ?? 0);
+        const tgt = Number(data.selected_target ?? selected.target ?? 0);
+        const done = !!data.selected_is_complete;
+
+        setDailyTile({
+          label: done
+            ? `${selected.name}: ready to claim!`
+            : `${selected.name}: ${prog}/${tgt}`,
+          completed: done,
+        });
+        return;
+      }
+
+      if (offerings.length > 0) {
+        const menu = offerings
+          .slice(0, 3)
+          .map(o => o.name)
+          .join(' · ');
+
+        setDailyTile({
+          label: `Pick your slam - ${menu}`,
+          completed: false,
+        });
+      } else {
+        setDailyTile({
+          label: 'Pick your slam. Earn the daily rare.',
+          completed: false,
+        });
+      }
+    } catch {
+      // Leave the previous label in place on a network error.
+    }
+  }, [user?.id, apiUrl]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshDailyTile();
+    }, [refreshDailyTile]),
+  );
   const checkDailyWheel = async () => {
     if (!user || dailyWheelChecked) return;
     try {
@@ -376,7 +445,53 @@ const handleSaveStreak = async () => {
 
         {/* Series 8 launch banner removed Jun 11 2026 â€” ships free with next EAS build. */}
         
-    {/* Daily Challenges entry tile. Backend lives at /api/users/{uid}/daily-challenges. */}
+        {/* Daily Challenges */}
+        <Pressable
+          testID="daily-challenges-tile"
+          onPress={() => router.push("/daily-challenges")}
+          style={styles.dailyTile}
+        >
+          <ExpoImage
+            source={ICONS.statDaily}
+            style={styles.dailyTileIcon}
+            contentFit="contain"
+          />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.dailyTileTitle}>DAILY CHALLENGES</Text>
+            <Text
+              style={styles.dailyTileSub}
+              numberOfLines={1}
+              testID="daily-challenges-tile-progress"
+            >
+              {dailyTile.label}
+            </Text>
+          </View>
+          <Ionicons
+            name={dailyTile.completed ? 'checkmark-circle' : 'chevron-forward'}
+            size={20}
+            color="#ffd24a"
+          />
+        </Pressable>
+
+        {/* Metal Trivia */}
+        <Pressable
+          testID="metal-trivia-tile"
+          onPress={() => router.push("/trivia" as any)}
+          style={styles.triviaTile}
+        >
+          <ExpoImage
+            source={ICONS.statTrivia}
+            style={styles.triviaTileIcon}
+            contentFit="contain"
+          />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.triviaTileTitle}>METAL TRIVIA</Text>
+            <Text style={styles.triviaTileSub}>
+              Prove your worth. Beat the quiz.
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#c084fc" />
+        </Pressable>
         
 
         {/* "YOUR STATS" raster banner above the 4-up stat grid. */}
@@ -885,6 +1000,41 @@ s9BannerSub: {
     marginTop: 2,
   },
 
+  dailyTileIcon: {
+    width: 34,
+    height: 34,
+  },
+
+  triviaTile: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: 'rgba(28, 10, 40, 0.92)',
+    borderWidth: 1.5,
+    borderColor: '#c084fc',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 14,
+  },
+
+  triviaTileTitle: {
+    color: '#e9d5ff',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 1.4,
+  },
+
+  triviaTileIcon: {
+    width: 34,
+    height: 34,
+  },
+
+  triviaTileSub: {
+    color: '#f3e8ff',
+    fontSize: 11,
+    marginTop: 2,
+  },
   // VIP supporter chip rendered on home next to the user's name when
   // their 30-day coin boost is active.
   homeVipChip: {
@@ -1086,3 +1236,9 @@ s9BannerSub: {
     marginTop: 4,
   },
 });
+
+
+
+
+
+

@@ -1,5 +1,5 @@
-﻿/**
- * ScratchCard â€” finger-drag scratch-off overlay for variant card reveals.
+/**
+ * ScratchCard — finger-drag scratch-off overlay for variant card reveals.
  *
  * Behavior:
  *   - Renders the card image (revealed art) on the bottom layer.
@@ -33,7 +33,7 @@ interface Props {
   coverUri: string;       // The themed scratch cover (gets scratched away)
   onComplete?: () => void; // Fires once when scratch threshold is crossed
   brushRadius?: number;   // Brush size in px, default 22
-  threshold?: number;     // Coverage fraction 0â€“1 to auto-complete, default 0.55
+  threshold?: number;     // Coverage fraction 0–1 to auto-complete, default 0.55
 }
 
 export const ScratchCard: React.FC<Props> = ({
@@ -60,14 +60,14 @@ export const ScratchCard: React.FC<Props> = ({
   const totalCells = cols * rows;
   const touchedCells = useRef<Set<number>>(new Set());
   // Throttle haptic feedback. PanResponder fires onMove ~60Hz which would
-  // queue a vibration on every frame â€” that feels like a constant buzz
+  // queue a vibration on every frame — that feels like a constant buzz
   // and on Android can trip the OS rate limiter. We gate haptics to fire
   // at most once every ~80ms, which feels like the textured chatter of
   // dragging a coin across foil.
   const lastHapticAt = useRef(0);
 
   const fireHaptic = useCallback(() => {
-    // Haptics aren't supported on web â€” guard so the dev preview doesn't
+    // Haptics aren't supported on web — guard so the dev preview doesn't
     // throw. On native, expo-haptics is a no-op if the device lacks a
     // vibration motor.
     if (Platform.OS === 'web') return;
@@ -76,7 +76,7 @@ export const ScratchCard: React.FC<Props> = ({
     lastHapticAt.current = now;
     // Light impact = a single short "tick", perfect for scratch chatter.
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
-      /* ignore haptic errors silently â€” never crash a scratch */
+      /* ignore haptic errors silently — never crash a scratch */
     });
   }, []);
 
@@ -84,11 +84,11 @@ export const ScratchCard: React.FC<Props> = ({
   const triggerReveal = useCallback(() => {
     if (revealed) return;
     setRevealed(true);
-    // Stronger haptic to mark the reveal moment â€” feels like ripping off
+    // Stronger haptic to mark the reveal moment — feels like ripping off
     // the last sliver of foil.
     if (Platform.OS !== 'web') {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {
-        /* swallow â€” never crash the reveal */
+        /* swallow — never crash the reveal */
       });
     }
     Animated.timing(coverOpacity, {
@@ -125,7 +125,7 @@ export const ScratchCard: React.FC<Props> = ({
   );
 
   // PanResponder captures both initial touch and drag deltas. We feed every
-  // sampled point into recordTouch â€” RN typically delivers events at 60Hz
+  // sampled point into recordTouch — RN typically delivers events at 60Hz
   // during a drag, plenty dense for a smooth scratch.
   const panResponder = useMemo(
     () =>
@@ -168,9 +168,9 @@ export const ScratchCard: React.FC<Props> = ({
         pointerEvents={revealed ? 'none' : 'auto'}
         style={[StyleSheet.absoluteFill, { opacity: coverOpacity }]}
       >
-        <Svg width={width} height={height}>
+        <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
           <Defs>
-            <Mask id="scratchMask">
+            <Mask id="scratchMask" x="0" y="0" width={width} height={height}>
               <Rect
                 x="0"
                 y="0"
@@ -193,6 +193,14 @@ export const ScratchCard: React.FC<Props> = ({
             </Mask>
           </Defs>
 
+          <Rect
+            x="0"
+            y="0"
+            width={width}
+            height={height}
+            fill="#d4a017"
+            mask="url(#scratchMask)"
+          />
           <SvgImage
             href={coverUri}
             x="0"
@@ -218,6 +226,8 @@ const styles = StyleSheet.create({
 });
 
 export default ScratchCard;
+
+
 
 
 
