@@ -30,10 +30,14 @@ export function cardThumb(card: CardImageSource | undefined | null, width = 360)
   if (!card) return '';
   if (!card.id) return card.front_image_url || '';
 
-  // Referral-exclusive cards are hosted directly by this backend under
-  // /static/cards. Use their working full JPG URLs instead of routing them
-  // through the thumbnail resizer.
-  if (card.id.startsWith('card_referral_')) {
+  // Reward and referral cards are already optimized and hosted directly
+  // by this backend. Bypass the thumbnail resizer for these cards because
+  // some reward-card IDs do not render reliably through /api/cards/{id}/thumb.
+  if (
+    card.id.startsWith('card_referral_') ||
+    card.front_image_url?.includes('/static/cards/rewards/') ||
+    card.front_image_url?.includes('/static/cards/daily_classics/')
+  ) {
     return card.front_image_url || '';
   }
 
@@ -64,3 +68,4 @@ export function scratchCoverThumb(
   const w = width <= 240 ? 240 : width <= 360 ? 360 : width <= 540 ? 540 : 1024;
   return `${API_BASE}/api/cards/${card.id}/scratch-cover?w=${w}`;
 }
+
