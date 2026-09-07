@@ -401,7 +401,8 @@ const handleSaveStreak = async () => {
     );
   }
 
-  const canClaimDaily = user.last_login_date !== new Date().toISOString().split('T')[0];
+  const localToday = new Date().toLocaleDateString('en-CA');
+  const canClaimDaily = user.last_login_date !== localToday;
 
   return (
     <GrungeBackground>
@@ -1236,6 +1237,7 @@ s9BannerSub: {
     marginTop: 4,
   },
 });
+
 
 
 
