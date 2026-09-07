@@ -35,7 +35,7 @@ import * as StoreReview from 'expo-store-review';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const REVIEW_LAST_PROMPT_KEY = 'tkk_last_review_prompt';
-const REVIEW_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+const REVIEW_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
 
 async function maybeRequestStoreReview(result: SpinResult | null) {
   if (!result) return;
