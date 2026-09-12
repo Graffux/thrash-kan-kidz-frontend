@@ -203,7 +203,8 @@ export default function ShopScreen() {
     6: Image.resolveAssetSource(require('../assets/images/packs/series6_pack_closed.png')).uri,
     7: Image.resolveAssetSource(require('../assets/images/packs/series7_pack_closed.png')).uri,
     8: Image.resolveAssetSource(require('../assets/images/packs/series8_pack_closed.png')).uri,
-9: Image.resolveAssetSource(require('../assets/images/packs/series9_pack_closed.png')).uri,
+    9: Image.resolveAssetSource(require('../assets/images/packs/series9_pack_closed.png')).uri,
+    10: Image.resolveAssetSource(require('../assets/cards/series10/cover/cover_closed.jpg')).uri,
   };
 
   const PACK_RIPPED: { [key: number]: string } = {
@@ -215,7 +216,8 @@ export default function ShopScreen() {
     6: Image.resolveAssetSource(require('../assets/images/packs/series6_pack_rip3.png')).uri,
     7: Image.resolveAssetSource(require('../assets/images/packs/series7_pack_rip3.png')).uri,
     8: Image.resolveAssetSource(require('../assets/images/packs/series8_pack_rip3.png')).uri,
-9: Image.resolveAssetSource(require('../assets/images/packs/series9_pack_rip3.png')).uri,
+    9: Image.resolveAssetSource(require('../assets/images/packs/series9_pack_rip3.png')).uri,
+    10: Image.resolveAssetSource(require('../assets/cards/series10/cover/cover_open.jpg')).uri,
   };
 
   const packCoverImage = useMemo(() => {
