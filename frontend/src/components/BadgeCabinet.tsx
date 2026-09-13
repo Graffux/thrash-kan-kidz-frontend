@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Modal, Pressable, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
 import { FONTS } from '../theme';
+import { useFocusEffect } from 'expo-router';
 
 interface Badge {
   id: string;
@@ -31,28 +32,33 @@ export const BadgeCabinet: React.FC<Props> = ({ userId, apiUrl }) => {
   const [earnedCount, setEarnedCount] = useState(0);
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch(`${apiUrl}/api/users/${userId}/badges`);
-        const json = await res.json();
-        if (!cancelled) {
-          setBadges(json.badges || []);
-          setEarnedCount(json.earned_count || 0);
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+
+      setLoading(true);
+
+      (async () => {
+        try {
+          const res = await fetch(`${apiUrl}/api/users/${userId}/badges`);
+          const json = await res.json();
+
+          if (!cancelled) {
+            setBadges(json.badges || []);
+            setEarnedCount(json.earned_count || 0);
+          }
+        } catch {
+          // Keep existing badge state if a refresh temporarily fails.
+        } finally {
+          if (!cancelled) setLoading(false);
         }
-      } catch {
-        // Network failure — leave state empty so the cabinet shows nothing
-        // rather than half-rendered placeholders. The toast/error system
-        // upstream surfaces the failure to the user already.
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [userId, apiUrl]);
+      })();
+
+      return () => {
+        cancelled = true;
+      };
+    }, [userId, apiUrl])
+  );
 
   if (loading) {
     return (
