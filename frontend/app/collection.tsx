@@ -1985,6 +1985,7 @@ const styles = StyleSheet.create({
   modalCardInfo: {
     alignItems: 'center',
     paddingHorizontal: 16,
+    marginTop: 30,
   },
   modalCardName: {
     fontSize: 22,
@@ -2007,7 +2008,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#ccc',
     textAlign: 'center',
-    marginTop: 12,
+    marginTop: 4,
     lineHeight: 20,
   },
   modalQuantity: {
@@ -2192,18 +2193,3 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
