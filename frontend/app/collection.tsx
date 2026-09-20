@@ -1345,7 +1345,7 @@ export default function CollectionScreen() {
                     <Text style={styles.modalVariantName}>{selectedCard.card.variant_name} Variant</Text>
                   )}
                   <Text style={styles.modalCardRarity}>
-                    {selectedCard.card.rarity?.toUpperCase()}{selectedCard.card.series != null ? ` • Series ${selectedCard.card.series}` : ""}
+                    {(selectedCard.card as any).is_daily_reward ? "REWARD" : selectedCard.card.rarity?.toUpperCase()}{selectedCard.card.series != null ? ` • Series ${selectedCard.card.series}` : ""}
                   </Text>
                   <Text style={styles.modalCardDescription}>
                     {selectedCard.card.description}
