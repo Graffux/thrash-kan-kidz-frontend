@@ -17,6 +17,8 @@ import {
   // the rest of your imports
 } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
+import { File, Paths } from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
 import { headerSource } from '../src/assets/headerCatalog';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GrungeBackground } from '../src/components/GrungeBackground';
@@ -851,6 +853,50 @@ export default function CollectionScreen() {
     }
   };
 
+  const saveCard = async (card: Card) => {
+    try {
+      const imageUrl = showFront
+        ? card.front_image_url
+        : (card.back_image_url || card.front_image_url);
+
+      if (!imageUrl) {
+        Alert.alert('Save Card', 'No image is available for this card.');
+        return;
+      }
+
+      const permission = await MediaLibrary.requestPermissionsAsync(true);
+
+      if (!permission.granted) {
+        Alert.alert(
+          'Permission Required',
+          'Please allow photo access so THRASH KAN KIDZ can save cards to your device.'
+        );
+        return;
+      }
+
+      const extensionMatch = imageUrl.match(/\.(jpg|jpeg|png|webp)(?:\?|$)/i);
+      const extension = extensionMatch?.[1]?.toLowerCase() || 'jpg';
+      const safeName = card.name.replace(/[^a-z0-9_-]/gi, '_');
+      const side = showFront ? 'front' : 'back';
+
+      const destination = new File(
+        Paths.cache,
+        `${safeName}_${side}_${Date.now()}.${extension}`
+      );
+
+      const downloadedFile = await File.downloadFileAsync(imageUrl, destination);
+
+      await MediaLibrary.saveToLibraryAsync(downloadedFile.uri);
+
+      Alert.alert(
+        'Card Saved!',
+        `${card.name} ${showFront ? 'front' : 'back'} was saved to your device.`
+      );
+    } catch (error) {
+      console.error('Card save failed:', error);
+      Alert.alert('Save Failed', 'Could not save this card. Please try again.');
+    }
+  };
   const fetchTradeInEligible = async () => {
     if (!user) return;
     try {
@@ -1360,6 +1406,15 @@ export default function CollectionScreen() {
                   >
                     <Ionicons name="share-social" size={16} color="#0f0f1a" />
                     <Text style={styles.cardShareButtonText}>SHARE THIS CARD</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.cardShareButton}
+                    onPress={() => saveCard(selectedCard.card)}
+                    data-testid="card-save-btn"
+                  >
+                    <Ionicons name="download-outline" size={16} color="#0f0f1a" />
+                    <Text style={styles.cardShareButtonText}>SAVE CARD</Text>
                   </TouchableOpacity>
                 </View>
               </ScrollView>
