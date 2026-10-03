@@ -103,11 +103,15 @@ const isReward =
     'card_referral_refernal',
   ].includes(card.id);
 
-  const rewardColor = isReferralExclusive
-    ? '#00BFFF'
-    : card.rarity === 'epic'
-      ? '#FF2A2A'
-      : '#FFD700';
+  const isHalloweenReward = card.id?.startsWith('card_daily_halloween_');
+
+  const rewardColor = isHalloweenReward
+    ? '#FF6A00'
+    : isReferralExclusive
+      ? '#00BFFF'
+      : card.rarity === 'epic'
+        ? '#FF2A2A'
+        : '#FFD700';
   // If not owned, show mystery card
   if (!isOwned) {
     return (
