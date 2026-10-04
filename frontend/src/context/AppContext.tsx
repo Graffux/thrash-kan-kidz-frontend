@@ -34,6 +34,7 @@ interface User {
   no_dupes_packs?: number;
   series_milestone_claimed?: number[];
   featured_card_ids?: string[];
+  show_reward_cards?: boolean;
   completed_series?: number[];
   rank?: {
     id: string;
@@ -64,6 +65,8 @@ interface Card {
   card_type?: string;
   base_card_id?: string;
   variant_name?: string;
+  is_daily_reward?: boolean;
+  series_reward?: number;
 }
 
 interface UserCard {
@@ -154,6 +157,7 @@ interface AppContextType {
   purchaseCard: (cardId: string) => Promise<any>;
   updateProfile: (bio: string) => Promise<void>;
   updateAvatar: (avatarDataUri: string) => Promise<void>;
+  updateRewardCardVisibility: (show: boolean) => Promise<void>;
   updateFeaturedCards: (cardIds: string[]) => Promise<void>;
   createTrade: (toUserId: string, offeredCardIds: string[], requestedCardIds: string[]) => Promise<void>;
   acceptTrade: (tradeId: string) => Promise<void>;
@@ -368,6 +372,15 @@ const response = await axios.post(
     setUser(response.data);
   };
 
+  const updateRewardCardVisibility = async (show: boolean) => {
+    if (!user) throw new Error('Not logged in');
+    const response = await axios.put(
+      `${API_URL}/api/users/${user.id}/profile`,
+      { show_reward_cards: show },
+    );
+    setUser(response.data);
+  };
+
   const updateFeaturedCards = async (cardIds: string[]) => {
     if (!user) throw new Error('Not logged in');
     const response = await axios.put(
@@ -501,6 +514,7 @@ const response = await axios.post(
         purchaseCard,
         updateProfile,
         updateAvatar,
+        updateRewardCardVisibility,
         updateFeaturedCards,
         createTrade,
         acceptTrade,

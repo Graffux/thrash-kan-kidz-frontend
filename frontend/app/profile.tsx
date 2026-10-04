@@ -26,6 +26,7 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
@@ -33,6 +34,8 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import axios from 'axios';
+import { Image as ExpoImage } from 'expo-image';
+import { cardThumb } from '../src/utils/cardImage';
 import { useApp } from '../src/context/AppContext';
 import { RankCrest } from '../src/components/RankCrest';
 import { BadgeCabinet } from '../src/components/BadgeCabinet';
@@ -52,13 +55,14 @@ interface PublicUser {
   friend_code?: string;
   friend_count?: number;
   featured_card_ids?: string[];
+  show_reward_cards?: boolean;
   completed_series?: number[];
   rank?: any;
 }
 
 export default function ProfileScreen() {
   const params = useLocalSearchParams<{ userId?: string }>();
-  const { user: currentUser, userCards, userGoals, allCards, apiUrl, updateAvatar } = useApp();
+  const { user: currentUser, userCards, userGoals, allCards, apiUrl, updateAvatar, updateRewardCardVisibility } = useApp();
 
   const viewingUserId = params.userId && typeof params.userId === 'string' ? params.userId : null;
   const isOwn = !viewingUserId || (currentUser && viewingUserId === currentUser.id);
@@ -141,6 +145,17 @@ export default function ProfileScreen() {
     return () => { cancelled = true; };
   }, [viewingUserId, isOwn, currentUser, apiUrl]);
 
+  const handleRewardVisibility = async (show: boolean) => {
+    if (!isOwn || !publicUser) return;
+    setPublicUser((prev) => prev ? { ...prev, show_reward_cards: show } : prev);
+    try {
+      await updateRewardCardVisibility(show);
+    } catch (e) {
+      setPublicUser((prev) => prev ? { ...prev, show_reward_cards: !show } : prev);
+      Alert.alert('Error', 'Could not update Reward Kards visibility.');
+    }
+  };
+
   const handleAddFriend = async () => {
     if (!currentUser || !publicUser || isOwn) return;
     setAddingFriend(true);
@@ -171,6 +186,21 @@ export default function ProfileScreen() {
     }
     return Object.values(otherCardsLookup).filter(isBaseCard).length;
   }, [isOwn, userCards, otherCardsLookup]);
+
+  const isRewardCard = (c: any) =>
+    c?.is_daily_reward === true ||
+    c?.series_reward != null ||
+    c?.id?.startsWith('card_referral_');
+
+  const rewardCards = useMemo(() => {
+    if (isOwn) {
+      return userCards
+        .filter((uc) => uc.card && isRewardCard(uc.card))
+        .map((uc) => uc.card);
+    }
+    return Object.values(otherCardsLookup).filter(isRewardCard);
+  }, [isOwn, userCards, otherCardsLookup]);
+
   const collectionProgress = baseCardTotal > 0
     ? Math.round((baseCardsOwned / baseCardTotal) * 100) : 0;
   const completedGoals = userGoals.filter((ug) => ug.user_goal.completed).length;
@@ -287,6 +317,50 @@ export default function ProfileScreen() {
               cardsLookup={isOwn ? undefined : otherCardsLookup}
             />
           </View>
+
+          {/* Reward Kards */}
+          {(isOwn || publicUser.show_reward_cards !== false) && (
+            <View style={styles.section}>
+              <View style={styles.rewardHeaderRow}>
+                <SplatTitle style={styles.rewardTitle}>REWARD KARDS</SplatTitle>
+
+                {isOwn && (
+                  <View style={styles.rewardToggle}>
+                    <Text style={styles.rewardToggleText}>SHOW ON PROFILE</Text>
+                    <Switch
+                      value={publicUser.show_reward_cards !== false}
+                      onValueChange={handleRewardVisibility}
+                    />
+                  </View>
+                )}
+              </View>
+
+              {publicUser.show_reward_cards !== false && (
+                rewardCards.length > 0 ? (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.rewardCardsRow}
+                  >
+                    {rewardCards.map((card: any) => (
+                      <View key={card.id} style={styles.rewardCard}>
+                        <ExpoImage
+                          source={{ uri: cardThumb(card, 360) }}
+                          style={styles.rewardCardImage}
+                          contentFit="cover"
+                          cachePolicy="memory-disk"
+                          transition={150}
+                          recyclingKey={card.id}
+                        />
+                      </View>
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <Text style={styles.rewardEmpty}>No Reward Kards earned yet.</Text>
+                )
+              )}
+            </View>
+          )}
 
           {/* Collection Progress */}
           <View style={styles.section}>
@@ -431,6 +505,51 @@ const styles = StyleSheet.create({
   memberSince: { color: '#789', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
 
   section: { paddingHorizontal: 16, marginBottom: 8 },
+  rewardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  rewardTitle: {
+    flex: 1,
+    marginBottom: 8,
+  },
+  rewardToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginLeft: 8,
+  },
+  rewardToggleText: {
+    color: '#9aff5a',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  rewardCardsRow: {
+    gap: 10,
+    paddingBottom: 8,
+  },
+  rewardCard: {
+    width: 96,
+    height: 132,
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#ffd24a',
+    backgroundColor: '#0a0d0a',
+  },
+  rewardCardImage: {
+    width: '100%',
+    height: '100%',
+  },
+  rewardEmpty: {
+    color: '#789',
+    fontSize: 12,
+    fontStyle: 'italic',
+    marginBottom: 10,
+  },
+
   progressCard: {
     backgroundColor: 'rgba(20, 25, 20, 0.85)',
     borderRadius: 10,
