@@ -119,6 +119,7 @@ const isReward =
   active={isReward}
   color={rewardColor}
   dailyClassic={isDailyClassic}
+  halloween={isHalloweenReward}
   patriotic={card.name?.toLowerCase().includes('uncle slam')}
 >
         <View style={[styles.cardContainer, styles.mysteryCard]}>
@@ -148,6 +149,7 @@ const isReward =
   active={isReward}
   color={rewardColor}
   dailyClassic={isDailyClassic}
+  halloween={isHalloweenReward}
   patriotic={card.name?.toLowerCase().includes('uncle slam')}
 >
       <SimpleCardOwned
@@ -181,12 +183,14 @@ const RewardGlow: React.FC<{
   color?: string;
   patriotic?: boolean;
   dailyClassic?: boolean;
+  halloween?: boolean;
   children: React.ReactNode;
 }> = ({
   active,
   color = '#FFD700',
   patriotic = false,
   dailyClassic = false,
+  halloween = false,
   children,
 }) => {
   const spin = useRef(new Animated.Value(0)).current;
@@ -238,17 +242,27 @@ const RewardGlow: React.FC<{
       '#e00020',
       '#003cff',
     ]
-  : isDaily
+  : halloween
     ? [
-        '#004d1a', // dark green trailing edge
-        '#00b83f',
-        '#39FF14', // bright neon leading edge
-        '#FFF44F', // yellow hot spot
+        '#4d1600', // dark orange trailing edge
+        '#b83d00',
+        '#FF6A00', // bright Halloween orange
+        '#FFB000', // amber hot spot
         '#ffffff', // white flash
-        '#39FF14',
-        '#004d1a',
+        '#FF6A00',
+        '#4d1600',
       ]
-    : isEpic
+    : isDaily
+      ? [
+          '#004d1a', // dark green trailing edge
+          '#00b83f',
+          '#39FF14', // bright neon leading edge
+          '#FFF44F', // yellow hot spot
+          '#ffffff', // white flash
+          '#39FF14',
+          '#004d1a',
+        ]
+      : isEpic
       ? [
           '#260000',
           '#760000',
@@ -275,9 +289,11 @@ const RewardGlow: React.FC<{
 
   const glowColor = patriotic
   ? '#ffffff'
-  : isDaily
-    ? '#39FF14'
-    : isEpic
+  : halloween
+    ? '#FF6A00'
+    : isDaily
+      ? '#39FF14'
+      : isEpic
       ? '#ff1616'
       : '#ffd700';
 
